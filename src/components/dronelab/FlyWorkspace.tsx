@@ -25,11 +25,13 @@ import { anyBreak, craftPatch, createFlyStore, flightCalc, flightFaults, flyPick
 import { readBenchSummary } from "@/lib/dronelab/session";
 import { finishOf, flightOf, medalFor, parOf, sfxFor, startMode, type BreakId, type CourseText, type FlightEvent } from "@/lib/flight";
 import { dailyChallenge, loadChallengeBest, readChallengeQuery, saveChallengeBest } from "@/lib/flight/challenge";
+import { lapInputs, lapMs, onBoard, type LapFinish } from "@/lib/flight/lap";
 import { useBest } from "@/lib/progress/hooks";
 import { progressKey } from "@/lib/progress/keys";
 import { markDone, recordBest } from "@/lib/progress/progress";
 import { useRoom, withRoom } from "@/lib/realtime";
 import { playSound } from "@/lib/sound";
+import { useStdbActions } from "@/lib/stdb";
 import { track } from "@/lib/telemetry";
 import { CraftProgress } from "./CraftProgress";
 import { KeyboardHelp } from "./KeyboardHelp";
@@ -51,11 +53,10 @@ type Props = {
 const noSubscribe = () => () => {};
 const readSearch = () => window.location.search;
 const noSearch = () => "";
-/** The leaderboard takes 1 s to 1 h (the ingest's bounds). */
-const onBoard = (ms: number) => ms >= 1000 && ms <= 3_600_000;
 
 export function FlyWorkspace({ lang, content, text, messages, flight, pool, board, notice }: Props) {
   const room = useRoom();
+  const { submitLap } = useStdbActions();
   const t = useMemo(() => droneLabT(lang, messages), [lang, messages]);
   const ct = useMemo(() => contentT(lang, content.id, text), [lang, content.id, text]);
   const ft = useMemo(() => createTranslator(lang, flight, "flight"), [lang, flight]);
@@ -119,14 +120,22 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
       recordBest(key, done.time, "lower");
       markDone(key);
       if (broken) return;
-      const timeMs = Math.round(done.time * 1000);
-      if (onBoard(timeMs)) track("flight.lap", { course: `${id}-${flightCourse.id}`, timeMs });
-      if (challenge && challenge.course === flightCourse.id) {
-        if (onBoard(timeMs)) track("flight.lap", { course: challenge.board, timeMs });
-        if (saveChallengeBest(challenge.date, done.time)) bestSaved();
-      }
+      if (challenge && challenge.course === flightCourse.id && saveChallengeBest(challenge.date, done.time)) bestSaved();
     },
     [flightCourse, id, broken, challenge],
+  );
+  // the server keeps each pilot's best lap per board with the inputs that flew it; never one flown with something broken on purpose
+  const onFinish = useCallback(
+    (finish: LapFinish) => {
+      if (!flightCourse || broken) return;
+      const timeMs = lapMs(finish.time);
+      if (!onBoard(timeMs)) return;
+      const inputs = lapInputs(finish);
+      const boards = [`${id}-${flightCourse.id}`];
+      if (challenge && challenge.course === flightCourse.id) boards.push(challenge.board);
+      for (const course of boards) submitLap({ course, timeMs, inputs }).catch(() => {});
+    },
+    [flightCourse, id, broken, challenge, submitLap],
   );
   const onFix = useCallback((fault: BreakId) => store.dispatch({ type: "break", id: fault, on: false }), [store]);
   const isOn = (b: BreakId) => (b === "overKv" ? !!outputs.overKv : !!faults?.[b]);
@@ -261,6 +270,7 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
             initialMode={startMode(content, flightCourse.id)}
             par={par}
             onEvent={onEvent}
+            onFinish={onFinish}
             onFigure={setFigure}
             onFix={onFix}
             peers={ghosts.peers}

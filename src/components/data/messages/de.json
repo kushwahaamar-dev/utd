@@ -5,7 +5,6 @@
     "rank": "Platz",
     "pilot": "Pilot",
     "best": "Beste Runde",
-    "laps": "Runden",
     "you": "Du",
     "anonymous": "Anonymer Pilot",
     "pilots": {
@@ -16,11 +15,8 @@
     "notOnBoard": "Flieg eine Runde, um in die Liste zu kommen.",
     "empty": "Noch keine Runden. Flieg den Kurs und hol dir Platz eins.",
     "loading": "Bestenliste wird geladen…",
-    "error": "Die Bestenliste konnte nicht geladen werden.",
-    "retry": "Erneut versuchen",
-    "refresh": "Aktualisieren",
     "offTitle": "Bestenlisten sind hier nicht eingerichtet",
-    "offBody": "Diese Installation hat keine Datenbank, deine Runden bleiben auf deinem Gerät."
+    "offBody": "Der Echtzeit-Server ist nicht erreichbar, deine Runden bleiben auf deinem Gerät."
   },
   "live": {
     "title": "Gerade jetzt bei HackUTD",
@@ -41,9 +37,7 @@
     "chart": "Ereignisse pro Minute in der letzten Stunde",
     "quiet": "Gerade ist es ruhig. Öffne ein Labor und mach in dieser Stunde den Anfang.",
     "loading": "Zähle, wer gerade baut…",
-    "error": "Die Live-Zähler konnten nicht geladen werden.",
-    "retry": "Erneut versuchen",
     "offTitle": "Live-Zähler sind hier nicht eingerichtet",
-    "offBody": "Diese Installation hat keine Datenbank, um mitzuzählen."
+    "offBody": "Der Echtzeit-Server ist nicht erreichbar, daher gibt es keine Live-Zähler."
   }
 }

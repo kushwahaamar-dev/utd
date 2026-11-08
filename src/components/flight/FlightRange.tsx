@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, use
 import { FigureFrame, type FigureEvent, type FigureHandle } from "@/components/figure";
 import { Button, cx, Kbd, Select, Stat, Toggle } from "@/components/ui";
 import type { ParTimes } from "@/content/schema";
+import type { LapFinish } from "@/lib/flight/lap";
 import { useLocale } from "@/i18n/client";
 import type { Messages } from "@/i18n/namespaces";
 import { createTranslator } from "@/i18n/translate";
@@ -68,6 +69,8 @@ export type FlightRangeProps = {
   par?: ParTimes | null;
   /** armed, checkpoint, lap, crash, landed, battery, run (best range time), missionStep... */
   onEvent?: (event: FlightEvent) => void;
+  /** A finished lap or run (never the autopilot's), with the session's input log so far: what the leaderboard keeps. */
+  onFinish?: (finish: LapFinish) => void;
   /** The flight store, for the drone lab store and the LabDock to observe and drive. */
   onSession?: (session: FlightSession) => void;
   /** The range's FigureFrame handle (for the LabDock), or null while it is not mounted. */
@@ -147,7 +150,7 @@ const GHOST_PACE = "#1c2948";
 const scoresGates = (course: Course, mode: { task: string }) => course.kind === "gates" || (!course.kind && mode.task === "race");
 const scoresCheckpoints = (course: Course, mode: { task: string }) => (course.kind ? course.kind !== "gates" : mode.task === "range");
 
-export function FlightRange({ craft, course, calc, faults, t: dict, courseText, initialMode, par, onEvent, onSession, onFigure, peers, wind, onPose, onFix, className }: FlightRangeProps) {
+export function FlightRange({ craft, course, calc, faults, t: dict, courseText, initialMode, par, onEvent, onFinish, onSession, onFigure, peers, wind, onPose, onFix, className }: FlightRangeProps) {
   const locale = useLocale();
   const t = useMemo(() => createTranslator(locale, dict, "flight"), [locale, dict]);
   const label = useCallback((en: string) => courseText?.labels?.[en] ?? en, [courseText]);
@@ -378,10 +381,11 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
         if (text && e.type !== "takeoff") say(text);
         const done = finishOf(e);
         if (done?.best && !done.demo) keepBest(done.time);
+        if (done && !done.demo) onFinish?.({ time: done.time, steps: session.sim.step, origin: session.origin, log: session.log().slice() });
         if (e.type === "crash") seeCrash();
       }
     },
-    [describe, onEvent, say, keepBest, seeCrash],
+    [describe, onEvent, onFinish, session, say, keepBest, seeCrash],
   );
   const handleRef = useRef(handleEvents);
   useEffect(() => {

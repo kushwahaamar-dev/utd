@@ -1,15 +1,14 @@
 "use client";
 
-import { useId, useMemo } from "react";
-import { Button, Callout, cx } from "@/components/ui";
+import { useEffect, useId, useMemo, useState } from "react";
+import { Callout, cx } from "@/components/ui";
 import { useLocale } from "@/i18n/client";
 import { createTranslator } from "@/i18n/translate";
-import type { LiveResponse } from "@/lib/telemetry/responses";
+import { useLiveActivity, usePlayers, useStdb } from "@/lib/stdb";
 import { formatCount } from "./format";
 import type { DataMessages } from "./messages";
-import { useFeed } from "./useFeed";
 
-const POLL_MS = 15_000;
+const WINDOW_MINUTES = 60;
 
 type LiveCounterProps = {
   messages: DataMessages["live"];
@@ -18,15 +17,40 @@ type LiveCounterProps = {
 
 /**
  * "Right now at HackUTD: N builders, M LEDs blinked, K drones flown", plus a
- * strip of events per minute, from the activity_1m continuous aggregate.
- * Polls every 15 s while the tab is visible.
+ * strip of events per minute. Everything is a live SpacetimeDB subscription:
+ * builders are the players online, the rest comes from the per-minute
+ * activity rows the module keeps.
  */
 export function LiveCounter({ messages, className }: LiveCounterProps) {
   const locale = useLocale();
   const t = useMemo(() => createTranslator(locale, messages, `${locale}/data.live`), [locale, messages]);
-  const feed = useFeed<LiveResponse>("/api/live", { pollMs: POLL_MS });
+  const { status } = useStdb();
+  const { rows: players, ready: playersReady } = usePlayers();
+  const { totals, minutes, ready: activityReady } = useLiveActivity(WINDOW_MINUTES);
   const headingId = useId();
-  const live = feed.data;
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
+  const offline = status === "offline";
+  const ready = playersReady && activityReady;
+
+  const live = useMemo(() => {
+    const perMinute = new Array<number>(WINDOW_MINUTES).fill(0);
+    const nowMinute = Math.floor(now / 60_000);
+    for (const row of minutes) {
+      const age = nowMinute - Math.floor(Number(row.minute.microsSinceUnixEpoch / 1000n) / 60_000);
+      if (age >= 0 && age < WINDOW_MINUTES) perMinute[WINDOW_MINUTES - 1 - age] += row.count;
+    }
+    return {
+      builders: players.filter((p) => p.online).length,
+      ledsBlinked: totals["led.blink"] ?? 0,
+      dronesFlown: totals["flight.start"] ?? 0,
+      events: perMinute.reduce((sum, n) => sum + n, 0),
+      perMinute,
+    };
+  }, [players, totals, minutes, now]);
 
   return (
     <section aria-labelledby={headingId} className={cx("flex flex-col gap-3", className)}>
@@ -34,7 +58,7 @@ export function LiveCounter({ messages, className }: LiveCounterProps) {
         <h2 id={headingId} className="font-head text-lg leading-tight">
           {t("title")}
         </h2>
-        {feed.status === "ready" ? (
+        {!offline && ready ? (
           <span className="inline-flex shrink-0 items-center gap-1.5 font-ui text-xs font-bold text-muted">
             <span aria-hidden="true" className="size-2.5 rounded-full border-[1.5px] border-line bg-tomato motion-safe:animate-pulse" />
             {t("live")}
@@ -42,7 +66,7 @@ export function LiveCounter({ messages, className }: LiveCounterProps) {
         ) : null}
       </header>
 
-      {feed.status === "loading" ? (
+      {!offline && !ready ? (
         <div role="status" className="grid grid-cols-3 gap-2">
           <span className="sr-only">{t("loading")}</span>
           {[0, 1, 2].map((i) => (
@@ -51,22 +75,13 @@ export function LiveCounter({ messages, className }: LiveCounterProps) {
         </div>
       ) : null}
 
-      {feed.status === "off" ? (
+      {offline ? (
         <Callout variant="quiet" title={t("offTitle")}>
           <span className="mt-0.5 block">{t("offBody")}</span>
         </Callout>
       ) : null}
 
-      {feed.status === "error" ? (
-        <div className="flex flex-col items-start gap-2">
-          <Callout tone="warn" title={t("error")} live className="self-stretch" />
-          <Button variant="secondary" size="sm" onClick={feed.refresh}>
-            {t("retry")}
-          </Button>
-        </div>
-      ) : null}
-
-      {feed.status === "ready" && live ? (
+      {!offline && ready ? (
         <>
           <dl className="@container grid grid-cols-3 gap-3">
             <Counter value={formatCount(live.builders, locale)} label={t("builders", { count: live.builders })} />

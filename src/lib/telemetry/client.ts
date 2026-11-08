@@ -1,280 +1,96 @@
-// Browser telemetry (HX-CONTRACT H8). track() only queues; batches go out every
-// 10 s, at 50 events, right away for the few events people wait to see (a lap on
-// the leaderboard), and through sendBeacon when the page is hidden. It does
-// nothing on the server, and stops for the page once it learns that this
-// deployment has no database. It sends nothing while the learner has unticked
-// "Share anonymous usage counts" (settings.telemetry). No personal data: a random
-// session id, the event kind, and what the caller puts in data.
+// Anonymous usage counts for the live counter. track() and tally() only add to
+// an in-memory count; every few seconds (and when the page is hidden) the
+// counts go to the SpacetimeDB module as trackActivity(kind, count), which
+// folds them into its per-minute activity rows. Nothing is sent while the
+// learner has unticked "Share anonymous usage counts" (settings.telemetry),
+// and no identifier beyond the SpacetimeDB identity ever leaves the browser.
 
 import { getSettings } from "@/lib/settings/settings";
-import {
-  MAX_BODY_BYTES,
-  MAX_EVENTS_PER_BATCH,
-  SESSION_PATTERN,
-  type KnownPayloads,
-  type TelemetryBatch,
-  type TelemetryData,
-  type TelemetryEvent,
-  type TelemetryKind,
-} from "./kinds";
 
-const ENDPOINT = "/api/telemetry";
-const STATUS_ENDPOINT = "/api/status";
-const SESSION_KEY = "iynk:telemetry:v1";
-const FLUSH_MS = 10_000;
-const FLUSH_AT = 50;
-const MAX_QUEUE = 1000;
-const SAMPLE_GAP_MS = 950; // flight.sample is 1 Hz
-const URGENT = new Set<TelemetryKind>(["flight.lap", "lesson.pass", "credential.issued"]);
+/** The kinds the module counts; anything else passed to track() is ignored. */
+export const ACTIVITY_KINDS = [
+  "flight.start",
+  "led.blink",
+  "lesson.attempt",
+  "lesson.pass",
+  "fault",
+  "ai.call",
+  "hw.connect",
+  "search.call",
+] as const;
 
-type Mode = "unknown" | "on" | "off";
+export type TelemetryKind = (typeof ACTIVITY_KINDS)[number];
 type Context = { room?: string; item?: string };
-type Tally = { kind: TallyKind; room?: string; item?: string; count: number; ts: number };
-type TallyKind = { [K in keyof KnownPayloads]: KnownPayloads[K] extends { count: number } ? K : never }[keyof KnownPayloads];
-type DataFor<K extends TelemetryKind> = K extends keyof KnownPayloads ? KnownPayloads[K] & TelemetryData : TelemetryData;
+type Sink = (kind: string, count: number) => Promise<unknown>;
 
-let mode: Mode = "unknown";
-let queue: TelemetryEvent[] = [];
-const tallies = new Map<string, Tally>();
-let context: Context = {};
-let session: string | null = null;
+const FLUSH_MS = 4_000;
+const KINDS = new Set<string>(ACTIVITY_KINDS);
+
+const counts = new Map<string, number>();
+let sink: Sink | null = null;
 let timer: ReturnType<typeof setTimeout> | null = null;
-let sending: Promise<void> | null = null;
-let flushAgain = false;
-let lastSample = 0;
 let wired = false;
-const flushedListeners = new Set<(kinds: ReadonlySet<TelemetryKind>) => void>();
+let context: Context = {};
 
 const inBrowser = () => typeof window !== "undefined" && typeof document !== "undefined";
-/** The learner unticked usage sharing (the checkbox at the bottom of every lab page). */
 const optedOut = () => !getSettings().telemetry;
-const encoder = new TextEncoder();
 
-function randomId(): string {
-  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
-  const bytes = crypto.getRandomValues(new Uint8Array(16));
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+/** Where counts go. The provider bridge sets it while connected and clears it on the way out. */
+export function setTelemetrySink(next: Sink | null): void {
+  sink = next;
+  if (next && counts.size) schedule();
 }
 
-/**
- * This browser's anonymous telemetry id: random, kept in localStorage, never
- * tied to a person. Browser only; on the server it is "" (no id is ever shared
- * between requests).
- */
-export function telemetrySession(): string {
-  if (!inBrowser()) return "";
-  if (session) return session;
-  try {
-    const saved = JSON.parse(localStorage.getItem(SESSION_KEY) ?? "null") as { session?: unknown } | null;
-    if (saved && typeof saved.session === "string" && SESSION_PATTERN.test(saved.session)) {
-      session = saved.session;
-      return session;
-    }
-  } catch {
-    // Storage blocked or corrupt: a fresh id for this page load.
-  }
-  session = randomId();
-  try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ session }));
-  } catch {
-    // Private mode: the id lives as long as the page.
-  }
-  return session;
-}
-
-/** Room and item stamped on every following event (the room provider and lab pages set it). */
+/** Room and item the current page is about; kept for callers that still set it. */
 export function setTelemetryContext(next: Context): void {
   context = { ...context, ...next };
 }
 
-/** Records one event. Cheap and synchronous; safe to call anywhere, any time. */
-export function track<K extends TelemetryKind>(kind: K, data?: DataFor<K>): void {
-  if (!inBrowser() || mode === "off" || optedOut()) return;
-  const now = Date.now();
-  if (kind === "flight.sample") {
-    if (now - lastSample < SAMPLE_GAP_MS) return;
-    lastSample = now;
-  }
-  wire();
-  queue.push({ ts: now, kind, session: telemetrySession(), ...stamp(), data: data ?? {} });
-  if (queue.length > MAX_QUEUE) queue.splice(0, queue.length - MAX_QUEUE);
-  if (URGENT.has(kind) || queue.length >= FLUSH_AT) void flush();
-  else schedule();
+export function getTelemetryContext(): Readonly<Context> {
+  return context;
 }
 
-/** Counts something that happens too often for one event each (LED blinks); sent as one event per flush. */
-export function tally(kind: TallyKind, n = 1): void {
-  if (!inBrowser() || mode === "off" || optedOut() || !(n > 0)) return;
+/** Counts one event of `kind`. Cheap and synchronous; safe to call anywhere, any time. */
+export function track(kind: string, _data?: Record<string, unknown>): void {
+  add(kind, 1);
+}
+
+/** Counts something that happens too often for one call each (LED blinks). */
+export function tally(kind: string, n = 1): void {
+  if (n > 0) add(kind, Math.round(n));
+}
+
+function add(kind: string, n: number) {
+  if (!inBrowser() || !KINDS.has(kind) || optedOut()) return;
   wire();
-  const { room, item } = stamp();
-  const key = `${kind}|${room ?? ""}|${item ?? ""}`;
-  const entry = tallies.get(key) ?? { kind, room, item, count: 0, ts: Date.now() };
-  entry.count += Math.round(n);
-  tallies.set(key, entry);
+  counts.set(kind, Math.min((counts.get(kind) ?? 0) + n, 100_000));
   schedule();
-}
-
-/** Called after a batch is stored, with the kinds it held (the leaderboard refreshes on a lap). */
-export function onFlushed(listener: (kinds: ReadonlySet<TelemetryKind>) => void): () => void {
-  flushedListeners.add(listener);
-  return () => flushedListeners.delete(listener);
-}
-
-function stamp(): Context {
-  return { ...(context.room ? { room: context.room } : {}), ...(context.item ? { item: context.item } : {}) };
 }
 
 function schedule() {
   timer ??= setTimeout(() => {
     timer = null;
-    void flush();
+    flush();
   }, FLUSH_MS);
 }
 
 function wire() {
   if (wired) return;
   wired = true;
-  const onHide = () => {
-    if (document.visibilityState === "hidden") beacon();
-  };
-  document.addEventListener("visibilitychange", onHide);
-  window.addEventListener("pagehide", beacon);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flush();
+  });
+  window.addEventListener("pagehide", flush);
 }
 
-function drainTallies() {
-  for (const t of tallies.values()) {
-    queue.push({
-      ts: t.ts,
-      kind: t.kind,
-      session: telemetrySession(),
-      ...(t.room ? { room: t.room } : {}),
-      ...(t.item ? { item: t.item } : {}),
-      data: { count: Math.min(t.count, 100_000) },
-    });
-  }
-  tallies.clear();
-}
-
-/** Splits the queue into bodies under the per-request event and byte caps. */
-function takeBatches(): TelemetryEvent[][] {
-  drainTallies();
-  const batches: TelemetryEvent[][] = [];
-  let current: TelemetryEvent[] = [];
-  let bytes = 64;
-  for (const event of queue.splice(0)) {
-    const size = encoder.encode(JSON.stringify(event)).length + 1;
-    if (size > MAX_BODY_BYTES - 64) continue; // can never fit; the server would refuse it anyway
-    if (current.length >= MAX_EVENTS_PER_BATCH || bytes + size > MAX_BODY_BYTES) {
-      batches.push(current);
-      current = [];
-      bytes = 64;
-    }
-    current.push(event);
-    bytes += size;
-  }
-  if (current.length) batches.push(current);
-  return batches;
-}
-
-async function featureOn(): Promise<Mode> {
-  if (mode !== "unknown") return mode;
-  try {
-    const res = await fetch(STATUS_ENDPOINT, { headers: { accept: "application/json" } });
-    if (res.ok) {
-      const body = (await res.json()) as { features?: { db?: unknown } };
-      mode = body.features?.db === true ? "on" : "off";
-    }
-  } catch {
-    // Offline: ask again at the next flush; the queue keeps the events meanwhile.
-  }
-  if (mode === "off") stop();
-  return mode;
-}
-
-/** Unticking the box with events still queued: they are dropped, never sent later. */
-function dropQueued() {
-  queue = [];
-  tallies.clear();
+/** Sends every count now. With no connection or after an opt-out they stay (or go) and nothing is sent. */
+export function flush(): void {
   if (timer) clearTimeout(timer);
   timer = null;
-}
-
-function stop() {
-  mode = "off";
-  dropQueued();
-}
-
-/** Sends everything queued now. Resolves when the batches are stored, retried later, or dropped. */
-export function flush(): Promise<void> {
-  if (!inBrowser()) return Promise.resolve();
-  if (optedOut()) {
-    dropQueued();
-    return sending ?? Promise.resolve();
-  }
-  if (timer) clearTimeout(timer);
-  timer = null;
-  if (sending) {
-    // Events queued while a send is in flight go out right after it.
-    flushAgain = true;
-    return sending;
-  }
-  sending = (async () => {
-    try {
-      if ((await featureOn()) !== "on") {
-        if (mode === "unknown" && (queue.length || tallies.size)) schedule();
-        return;
-      }
-      for (const batch of takeBatches()) {
-        if (optedOut()) return dropQueued();
-        const outcome = await post(batch);
-        if (outcome === "retry") {
-          queue = [...batch, ...queue].slice(-MAX_QUEUE);
-          schedule();
-          return;
-        }
-        if (outcome === "off") return stop();
-        if (outcome === "stored") notify(batch);
-      }
-    } finally {
-      sending = null;
-      if (flushAgain) {
-        flushAgain = false;
-        void flush();
-      }
-    }
-  })();
-  return sending;
-}
-
-async function post(events: TelemetryEvent[]): Promise<"stored" | "retry" | "dropped" | "off"> {
-  try {
-    const res = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ events, sentAt: Date.now() } satisfies TelemetryBatch),
-      keepalive: true,
-    });
-    if (res.ok) return "stored";
-    if (res.status === 503) return "off";
-    if (res.status === 429 || res.status >= 500) return "retry";
-    return "dropped";
-  } catch {
-    return "retry";
-  }
-}
-
-function notify(batch: TelemetryEvent[]) {
-  const kinds = new Set(batch.map((e) => e.kind));
-  for (const listener of flushedListeners) listener(kinds);
-}
-
-/** The page is going away: hand whatever is queued to sendBeacon, which outlives the page. */
-function beacon() {
-  if (optedOut()) return dropQueued();
-  if (mode === "off" || typeof navigator.sendBeacon !== "function") return;
-  for (const batch of takeBatches()) {
-    const payload: TelemetryBatch = { events: batch, sentAt: Date.now() };
-    const body = new Blob([JSON.stringify(payload)], { type: "application/json" });
-    if (!navigator.sendBeacon(ENDPOINT, body)) queue.push(...batch);
+  if (optedOut()) return void counts.clear();
+  if (!sink) return;
+  for (const [kind, count] of [...counts]) {
+    counts.delete(kind);
+    sink(kind, count).catch(() => {});
   }
 }

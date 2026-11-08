@@ -5,8 +5,27 @@ import { getSaved, updateSaved, type QuizResult, type Saved } from "./storage";
 
 export type Count = { done: number; total: number };
 
+type DoneSink = (key: string) => void;
+let doneSink: DoneSink | null = null;
+
+/** Where newly finished keys are also reported (the SpacetimeDB bridge); localStorage stays the source offline. */
+export function setDoneSink(sink: DoneSink | null): void {
+  doneSink = sink;
+}
+
+/** Adds a key to the local document only. Returns true when it was new. */
+export function markDoneLocal(key: string): boolean {
+  let added = false;
+  updateSaved((saved) => {
+    if (saved.done[key]) return saved;
+    added = true;
+    return { ...saved, done: { ...saved.done, [key]: true } };
+  });
+  return added;
+}
+
 export function markDone(key: string): void {
-  updateSaved((saved) => (saved.done[key] ? saved : { ...saved, done: { ...saved.done, [key]: true } }));
+  if (markDoneLocal(key)) doneSink?.(key);
 }
 
 export function isDone(key: string, saved: Saved = getSaved()): boolean {

@@ -9,10 +9,13 @@ export {
   getQuiz,
   isDone,
   markDone,
+  markDoneLocal,
   recordBest,
   recordQuiz,
   resetProgress,
+  setDoneSink,
   type Count,
 } from "./progress";
 export { useBest, useCount, useCountKeys, useDone, useQuiz, useSaved } from "./hooks";
 export { STORAGE_KEY, type QuizResult, type Saved } from "./storage";
+export { ProgressBridge } from "./bridge";

@@ -5,7 +5,6 @@
     "rank": "Rank",
     "pilot": "Pilot",
     "best": "Best lap",
-    "laps": "Laps",
     "you": "You",
     "anonymous": "Anonymous pilot",
     "pilots": {
@@ -16,11 +15,8 @@
     "notOnBoard": "Fly a lap to get on the board.",
     "empty": "No laps yet. Fly the course and take first place.",
     "loading": "Loading the leaderboard…",
-    "error": "The leaderboard didn't load.",
-    "retry": "Try again",
-    "refresh": "Refresh",
     "offTitle": "Leaderboards aren't set up here",
-    "offBody": "This deployment has no database, so your laps stay on your device."
+    "offBody": "The realtime server isn't reachable, so your laps stay on your device."
   },
   "live": {
     "title": "Right now at HackUTD",
@@ -41,9 +37,7 @@
     "chart": "Events per minute over the last hour",
     "quiet": "Quiet right now. Open a lab and be this hour's first builder.",
     "loading": "Counting builders…",
-    "error": "The live counters didn't load.",
-    "retry": "Try again",
     "offTitle": "Live counters aren't set up here",
-    "offBody": "This deployment has no database to count builders with."
+    "offBody": "The realtime server isn't reachable, so there are no live counters."
   }
 }

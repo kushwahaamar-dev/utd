@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/shell";
 import { SkipLink } from "@/components/ui/SkipLink";
 import { I18nProvider } from "@/i18n/client";
+import { ProgressBridge } from "@/lib/progress";
 import { StdbProvider } from "@/lib/stdb";
+import { TelemetryBridge } from "@/lib/telemetry";
 import { LOCALES, htmlLang, isLocale } from "@/i18n/config";
 import { siteUrl } from "@/i18n/seo";
 import { getMessages, getT } from "@/i18n/server";
@@ -67,6 +69,8 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
         <I18nProvider locale={lang} messages={common.client}>
           <SettingsSync />
           <StdbProvider>
+            <TelemetryBridge />
+            <ProgressBridge />
             <SkipLink label={t("a11y.skipToContent")} target={mainId} />
             <SiteHeader lang={lang} />
             <main id={mainId} tabIndex={-1} className="flex-1 outline-none">

@@ -5,7 +5,6 @@
     "rank": "Puesto",
     "pilot": "Piloto",
     "best": "Mejor vuelta",
-    "laps": "Vueltas",
     "you": "Tú",
     "anonymous": "Piloto anónimo",
     "pilots": {
@@ -16,11 +15,8 @@
     "notOnBoard": "Completa una vuelta para entrar en la tabla.",
     "empty": "Todavía no hay vueltas. Vuela el circuito y llévate el primer puesto.",
     "loading": "Cargando la clasificación…",
-    "error": "No se pudo cargar la clasificación.",
-    "retry": "Reintentar",
-    "refresh": "Actualizar",
     "offTitle": "Las clasificaciones no están configuradas aquí",
-    "offBody": "Este despliegue no tiene base de datos, así que tus vueltas se quedan en tu dispositivo."
+    "offBody": "El servidor en tiempo real no responde, así que tus vueltas se quedan en tu dispositivo."
   },
   "live": {
     "title": "Ahora mismo en HackUTD",
@@ -41,9 +37,7 @@
     "chart": "Eventos por minuto en la última hora",
     "quiet": "Todo tranquilo por ahora. Abre un laboratorio y sé la primera persona en construir esta hora.",
     "loading": "Contando a quienes construyen…",
-    "error": "No se pudieron cargar los contadores en vivo.",
-    "retry": "Reintentar",
     "offTitle": "Los contadores en vivo no están configurados aquí",
-    "offBody": "Este despliegue no tiene una base de datos para contar a quienes construyen."
+    "offBody": "El servidor en tiempo real no responde, así que no hay contadores en vivo."
   }
 }

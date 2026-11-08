@@ -1,3 +1,2 @@
-export { flush, onFlushed, setTelemetryContext, tally, telemetrySession, track } from "./client";
-export { TELEMETRY_KINDS, type KnownPayloads, type TelemetryData, type TelemetryEvent, type TelemetryKind } from "./kinds";
-export type { BuddiesResponse, BuddyPostResponse, BuddyProfile, LeaderboardResponse, LeaderboardRow, LiveResponse } from "./responses";
+export { ACTIVITY_KINDS, flush, getTelemetryContext, setTelemetryContext, setTelemetrySink, tally, track, type TelemetryKind } from "./client";
+export { TelemetryBridge } from "./bridge";

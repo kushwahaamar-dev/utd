@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useId, useMemo, useSyncExternalStore } from "react";
-import { Button, Callout, Chip, cx } from "@/components/ui";
+import { useId, useMemo } from "react";
+import { Callout, Chip, cx } from "@/components/ui";
 import { useLocale } from "@/i18n/client";
 import type { Locale } from "@/i18n/config";
 import { createTranslator, type Translate } from "@/i18n/translate";
-import { onFlushed, telemetrySession } from "@/lib/telemetry";
-import type { LeaderboardResponse, LeaderboardRow } from "@/lib/telemetry/responses";
+import { useLeaderboard, useStdb } from "@/lib/stdb";
 import { formatLap } from "./format";
 import type { DataMessages } from "./messages";
-import { useFeed } from "./useFeed";
 
 type LeaderboardProps = {
   /** Course id, as the flight range names it ("quad5-bando"). */
@@ -22,51 +20,51 @@ type LeaderboardProps = {
   className?: string;
 };
 
-const noSubscribe = () => () => {};
+type Row = { rank: number; name: string; timeMs: number; you: boolean };
 
 /**
  * Best lap per pilot on one course, ranked, with the pilot's own place even
- * when it is below the shown rows. It refreshes after this browser's own laps
- * reach the server, when the tab comes back, and on demand.
+ * when it is below the shown rows. Rows arrive over the SpacetimeDB
+ * subscription, so a lap flown in another tab shows up without a refresh.
  */
 export function Leaderboard({ course, courseLabel, messages, limit = 10, className }: LeaderboardProps) {
   const locale = useLocale();
   const t = useMemo(() => createTranslator(locale, messages, `${locale}/data.leaderboard`), [locale, messages]);
-  const session = useSyncExternalStore(noSubscribe, telemetrySession, () => "");
-  const params = new URLSearchParams({ course, limit: String(limit) });
-  if (session) params.set("session", session);
-  const feed = useFeed<LeaderboardResponse>(`/api/leaderboard?${params}`);
-  const { refresh } = feed;
+  const { status, identity } = useStdb();
+  const { entries, ready } = useLeaderboard(course, 500);
   const headingId = useId();
 
-  useEffect(
+  const rows = useMemo<Row[]>(
     () =>
-      onFlushed((kinds) => {
-        if (kinds.has("flight.lap")) refresh();
-      }),
-    [refresh],
+      entries.map((e, i) => ({
+        rank: i + 1,
+        name: e.name,
+        timeMs: e.bestMs,
+        you: !!identity && e.identity.isEqual(identity),
+      })),
+    [entries, identity],
   );
-
-  const board = feed.data;
-  const ownBelow = board?.you && !board.rows.some((r) => r.you) ? board.you : null;
+  const shown = rows.slice(0, limit);
+  const own = rows.find((r) => r.you);
+  const ownBelow = own && !shown.includes(own) ? own : null;
+  const offline = status === "offline";
 
   return (
     <section aria-labelledby={headingId} className={cx("flex flex-col gap-3", className)}>
-      <header className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <h2 id={headingId} className="font-head text-lg leading-tight">
-            {t("title")}
-          </h2>
-          <p className="text-sm text-muted">{t("caption", { course: courseLabel })}</p>
-        </div>
-        {feed.status === "ready" || feed.status === "error" ? (
-          <Button variant="ghost" size="sm" onClick={refresh}>
-            {feed.status === "error" ? t("retry") : t("refresh")}
-          </Button>
-        ) : null}
+      <header className="min-w-0">
+        <h2 id={headingId} className="font-head text-lg leading-tight">
+          {t("title")}
+        </h2>
+        <p className="text-sm text-muted">{t("caption", { course: courseLabel })}</p>
       </header>
 
-      {feed.status === "loading" ? (
+      {offline ? (
+        <Callout variant="quiet" title={t("offTitle")}>
+          <span className="mt-0.5 block">{t("offBody")}</span>
+        </Callout>
+      ) : null}
+
+      {!offline && !ready ? (
         <div role="status" className="flex flex-col gap-2">
           <span className="sr-only">{t("loading")}</span>
           {[0, 1, 2].map((i) => (
@@ -75,23 +73,13 @@ export function Leaderboard({ course, courseLabel, messages, limit = 10, classNa
         </div>
       ) : null}
 
-      {feed.status === "off" ? (
-        <Callout variant="quiet" title={t("offTitle")}>
-          <span className="mt-0.5 block">{t("offBody")}</span>
-        </Callout>
-      ) : null}
-
-      {feed.status === "error" ? (
-        <Callout tone="warn" title={t("error")} live />
-      ) : null}
-
-      {feed.status === "ready" && board && board.rows.length === 0 ? (
+      {!offline && ready && rows.length === 0 ? (
         <p role="status" className="text-sm text-muted">
           {t("empty")}
         </p>
       ) : null}
 
-      {feed.status === "ready" && board && board.rows.length > 0 ? (
+      {!offline && ready && rows.length > 0 ? (
         <>
           <table className="w-full border-collapse text-sm">
             <caption className="sr-only">{t("caption", { course: courseLabel })}</caption>
@@ -106,19 +94,16 @@ export function Leaderboard({ course, courseLabel, messages, limit = 10, classNa
                 <th scope="col" className="pb-1 text-end font-bold">
                   {t("best")}
                 </th>
-                <th scope="col" className="w-12 pb-1 text-end font-bold">
-                  {t("laps")}
-                </th>
               </tr>
             </thead>
             <tbody>
-              {board.rows.map((row) => (
-                <BoardRow key={`${row.rank}-${row.timeMs}-${row.name ?? ""}-${row.you}`} row={row} t={t} locale={locale} />
+              {shown.map((row) => (
+                <BoardRow key={row.rank} row={row} t={t} locale={locale} />
               ))}
               {ownBelow ? (
                 <>
                   <tr aria-hidden="true">
-                    <td colSpan={4} className="py-1 text-center text-muted">
+                    <td colSpan={3} className="py-1 text-center text-muted">
                       ⋯
                     </td>
                   </tr>
@@ -128,8 +113,8 @@ export function Leaderboard({ course, courseLabel, messages, limit = 10, classNa
             </tbody>
           </table>
           <p className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-            <span>{t("pilots", { count: board.pilots })}</span>
-            <span>{board.you ? t("yourRank", { rank: board.you.rank }) : t("notOnBoard")}</span>
+            <span>{t("pilots", { count: rows.length })}</span>
+            <span>{own ? t("yourRank", { rank: own.rank }) : t("notOnBoard")}</span>
           </p>
         </>
       ) : null}
@@ -137,13 +122,13 @@ export function Leaderboard({ course, courseLabel, messages, limit = 10, classNa
   );
 }
 
-function BoardRow({ row, t, locale }: { row: LeaderboardRow; t: Translate<DataMessages["leaderboard"]>; locale: Locale }) {
+function BoardRow({ row, t, locale }: { row: Row; t: Translate<DataMessages["leaderboard"]>; locale: Locale }) {
   return (
     <tr aria-current={row.you ? "true" : undefined} className={cx("border-t-[1.5px] border-rule", row.you && "bg-mustard/35")}>
       <td className="py-2 pe-2 font-ui font-extrabold tabular">{row.rank}</td>
       <td className="max-w-0 py-2 pe-2">
         <span className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
-          <span className={cx("[overflow-wrap:anywhere]", !row.name && "italic text-muted")}>{row.name ?? t("anonymous")}</span>
+          <span className={cx("[overflow-wrap:anywhere]", !row.name && "italic text-muted")}>{row.name || t("anonymous")}</span>
           {row.you ? (
             <Chip tone="ink" className="shrink-0">
               {t("you")}
@@ -152,7 +137,6 @@ function BoardRow({ row, t, locale }: { row: LeaderboardRow; t: Translate<DataMe
         </span>
       </td>
       <td className="py-2 text-end font-ui font-bold tabular">{formatLap(row.timeMs, locale)}</td>
-      <td className="py-2 text-end tabular text-muted">{row.laps}</td>
     </tr>
   );
 }

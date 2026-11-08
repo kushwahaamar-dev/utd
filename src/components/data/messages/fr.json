@@ -5,7 +5,6 @@
     "rank": "Rang",
     "pilot": "Pilote",
     "best": "Meilleur tour",
-    "laps": "Tours",
     "you": "Vous",
     "anonymous": "Pilote anonyme",
     "pilots": {
@@ -16,11 +15,8 @@
     "notOnBoard": "Bouclez un tour pour entrer au classement.",
     "empty": "Aucun tour pour l'instant. Pilotez le circuit et prenez la première place.",
     "loading": "Chargement du classement…",
-    "error": "Le classement n'a pas pu être chargé.",
-    "retry": "Réessayer",
-    "refresh": "Actualiser",
     "offTitle": "Les classements ne sont pas configurés ici",
-    "offBody": "Ce déploiement n'a pas de base de données : vos tours restent sur votre appareil."
+    "offBody": "Le serveur temps réel est injoignable : vos tours restent sur votre appareil."
   },
   "live": {
     "title": "En ce moment à HackUTD",
@@ -41,9 +37,7 @@
     "chart": "Événements par minute sur la dernière heure",
     "quiet": "C'est calme pour l'instant. Ouvrez un labo et lancez la première construction de l'heure.",
     "loading": "On compte les makers…",
-    "error": "Les compteurs en direct n'ont pas pu être chargés.",
-    "retry": "Réessayer",
     "offTitle": "Les compteurs en direct ne sont pas configurés ici",
-    "offBody": "Ce déploiement n'a pas de base de données pour compter les makers."
+    "offBody": "Le serveur temps réel est injoignable, donc pas de compteurs en direct."
   }
 }
