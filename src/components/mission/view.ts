@@ -21,7 +21,7 @@ export function parseJson(value: unknown): unknown {
 }
 
 export type PlanItem = { id: string; text: string };
-export type Plan = { items: PlanItem[]; criteria: string[] };
+export type Plan = { items: PlanItem[]; criteria: string[]; budget?: number };
 
 function textOf(value: unknown): string | undefined {
   if (typeof value === "string") return str(value);
@@ -32,18 +32,19 @@ function textOf(value: unknown): string | undefined {
 export function readPlan(step: Step): Plan {
   const out = isRec(step.output) ? step.output : {};
   const raw = list(out.plan ?? out.items ?? out.steps);
-  const items = raw.flatMap((entry, i): PlanItem[] => {
+  const items = raw.flatMap((entry): PlanItem[] => {
     const text = textOf(entry);
     if (!text) return [];
-    const id = isRec(entry) ? (str(entry.id) ?? `p${i + 1}`) : `p${i + 1}`;
+    const id = isRec(entry) ? (str(entry.id) ?? text) : text;
     return [{ id, text }];
   });
-  const criteria = list(out.criteria ?? out.success ?? out.successCriteria).flatMap((c) => textOf(c) ?? []);
-  return { items, criteria };
+  const criteria = list(out.success_criteria ?? out.criteria ?? out.success ?? out.successCriteria).flatMap((c) => textOf(c) ?? []);
+  const budget = isRec(out.budget) ? num(out.budget.usd) : num(out.budget);
+  return { items, criteria, budget };
 }
 
 export type Verdict = "approve" | "revise" | "reject";
-export type CriticReading = { verdict: Verdict; reasons: string[]; revision?: number };
+export type CriticReading = { verdict: Verdict; reasons: string[]; fixes: string[]; revision?: number };
 
 export function readCritic(step: Step): CriticReading | undefined {
   if (step.role !== "critic") return undefined;
@@ -51,9 +52,16 @@ export function readCritic(step: Step): CriticReading | undefined {
   const raw = str(out.verdict)?.toLowerCase() ?? "";
   const verdict: Verdict | undefined = /^(approve|accept|pass|ok)/.test(raw) ? "approve" : /^(reject|fail)/.test(raw) ? "reject" : /^(revise|revision|retry)/.test(raw) ? "revise" : undefined;
   if (!verdict) return undefined;
-  const reasons = list(out.reasons ?? out.reason).flatMap((r) => textOf(r) ?? []);
+  const strings = (value: unknown) => list(value).flatMap((r) => textOf(r) ?? []);
+  const reasons = strings(out.issues ?? out.reasons ?? out.reason);
   const single = str(out.reasons) ?? str(out.reason);
-  return { verdict, reasons: reasons.length ? reasons : single ? [single] : [], revision: num(out.revision) };
+  const fromTitle = /revision (\d+)/i.exec(step.title);
+  return {
+    verdict,
+    reasons: reasons.length ? reasons : single ? [single] : [],
+    fixes: strings(out.fixes),
+    revision: num(out.revision) ?? (fromTitle ? Number(fromTitle[1]) : undefined),
+  };
 }
 
 export type RevisionChange = { revision: number; what?: string; metric?: string; from?: string; to?: string };
@@ -62,10 +70,12 @@ const show = (value: unknown): string | undefined => str(value) ?? (num(value) !
 
 /** An executor step that redoes earlier work after a critic said revise. */
 export function readRevision(step: Step): RevisionChange | undefined {
-  if (step.role === "critic" || !isRec(step.output)) return undefined;
-  const revision = num(step.output.revision);
+  if (step.role === "critic") return undefined;
+  const out = isRec(step.output) ? step.output : {};
+  const fromTitle = step.role === "executor" ? /^revision (\d+)/i.exec(step.title) : null;
+  const revision = num(out.revision) ?? (fromTitle ? Number(fromTitle[1]) : undefined);
   if (revision === undefined) return undefined;
-  const change = isRec(step.output.change) ? step.output.change : {};
+  const change = isRec(out.change) ? out.change : {};
   return { revision, what: str(change.what), metric: str(change.metric), from: show(change.from), to: show(change.to) };
 }
 
@@ -129,8 +139,8 @@ export function rawJson(value: unknown): string {
   }
 }
 
-export type Verification = { label: string; ok: boolean };
-export type BomLine = { part: string; store?: string; price: number; qty: number; url?: string };
+export type Verification = { label: string; ok: boolean; evidence?: string };
+export type BomLine = { part: string; store?: string; price?: number; qty: number; url?: string };
 export type LabTarget = { kind: "drone" | "board" | "robotics"; id: string };
 export type MissionResult = {
   summary?: string;
@@ -147,15 +157,17 @@ function readBom(raw: unknown): BomLine[] {
   return list(raw).flatMap((entry): BomLine[] => {
     if (!isRec(entry)) return [];
     const part = str(entry.part) ?? str(entry.name) ?? str(entry.title);
-    const price = num(entry.price) ?? num(Number(entry.price));
-    if (!part || price === undefined) return [];
-    const url = str(entry.url) ?? str(entry.link);
-    return [{ part, store: str(entry.store) ?? str(entry.seller), price, qty: Math.max(1, Math.round(num(entry.qty) ?? 1)), url: url && /^https?:\/\//.test(url) ? url : undefined }];
+    if (!part) return [];
+    const price = num(entry.unit_usd) ?? num(entry.price) ?? num(Number(entry.price));
+    const source = str(entry.url) ?? str(entry.link) ?? str(entry.source) ?? str(entry.store) ?? str(entry.seller);
+    const url = source && /^https?:\/\//.test(source) ? source : undefined;
+    const store = url ? new URL(url).hostname.replace(/^www\./, "") : source;
+    return [{ part, store, price, qty: Math.max(1, Math.round(num(entry.qty) ?? 1)), url }];
   });
 }
 
 export function bomTotal(bom: readonly BomLine[]): number {
-  return bom.reduce((sum, line) => sum + line.price * line.qty, 0);
+  return bom.reduce((sum, line) => sum + (line.price ?? 0) * line.qty, 0);
 }
 
 export function readResult(raw: unknown): MissionResult | undefined {
@@ -164,32 +176,33 @@ export function readResult(raw: unknown): MissionResult | undefined {
   const verification = list(parsed.verification ?? parsed.checks).flatMap((entry): Verification[] => {
     if (typeof entry === "string") return [{ label: entry, ok: true }];
     if (!isRec(entry)) return [];
-    const label = str(entry.label) ?? str(entry.name);
-    return label ? [{ label, ok: entry.ok !== false && entry.passed !== false }] : [];
+    const label = str(entry.label) ?? str(entry.name) ?? str(entry.check);
+    return label ? [{ label, ok: entry.ok !== false && entry.passed !== false, evidence: str(entry.evidence) }] : [];
   });
   const bom = readBom(parsed.bom ?? parsed.parts);
-  const labRaw = isRec(parsed.lab) ? parsed.lab : undefined;
-  const kind = LAB_KINDS.find((k) => k === labRaw?.kind);
-  const id = str(labRaw?.id);
+  const labRaw = isRec(parsed.load_into_lab) ? parsed.load_into_lab : isRec(parsed.lab) ? parsed.lab : undefined;
+  const kind = LAB_KINDS.find((k) => k === (labRaw?.kind ?? labRaw?.lab));
+  const id = str(labRaw?.itemId) ?? str(labRaw?.id);
   return {
     summary: str(parsed.summary),
     verification,
     bom,
-    budget: num(parsed.budget),
-    total: num(parsed.total) ?? (bom.length ? bomTotal(bom) : undefined),
+    budget: isRec(parsed.budget) ? num(parsed.budget.usd) : num(parsed.budget),
+    total: num(parsed.total_usd) ?? num(parsed.total) ?? (bom.length ? bomTotal(bom) : undefined),
     lab: kind && id && /^[a-z0-9-]+$/.test(id) ? { kind, id } : undefined,
   };
 }
 
-export type ProposalView = { title: string; detail?: string; delta?: string };
+export type ProposalView = { title: string; detail?: string; delta?: string; code?: string };
 
 export function readProposal(kind: string, payload: unknown): ProposalView {
   const parsed = parseJson(payload);
   const rec = isRec(parsed) ? parsed : {};
   return {
-    title: str(rec.title) ?? str(rec.summary) ?? kind.replace(/[_-]+/g, " "),
+    title: str(rec.title) ?? str(rec.summary) ?? str(rec.question) ?? str(rec.part) ?? kind.replace(/[_-]+/g, " "),
     detail: str(rec.detail) ?? str(rec.reason) ?? str(rec.description),
     delta: str(rec.delta) ?? str(rec.effect),
+    code: str(rec.code),
   };
 }
 
@@ -197,8 +210,9 @@ export function readProposal(kind: string, payload: unknown): ProposalView {
 export function donePlanItems(steps: readonly Step[]): Set<string> {
   const done = new Set<string>();
   for (const step of steps) {
-    if (step.status !== "ok" || !isRec(step.output)) continue;
-    const id = str(step.output.planItem);
+    if (step.status !== "ok") continue;
+    if (step.role === "executor") done.add(step.title);
+    const id = isRec(step.output) ? str(step.output.planItem) : undefined;
     if (id) done.add(id);
   }
   return done;
@@ -220,4 +234,10 @@ export function formatDuration(ms: number, locale: string): string {
 
 export function formatMoney(amount: number, locale: string): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(amount);
+}
+
+/** The budget the planner committed to, for results that do not repeat it. */
+export function planBudget(steps: readonly Step[]): number | undefined {
+  const planner = steps.find((s) => s.role === "planner" && readPlan(s).budget !== undefined);
+  return planner ? readPlan(planner).budget : undefined;
 }

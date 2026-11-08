@@ -77,7 +77,7 @@ function StepCard({ step, planDone, finished }: { step: Step; planDone: Set<stri
         </span>
       </header>
 
-      <h3 className="mt-2 text-[17px] font-medium leading-snug text-balance">{step.title}</h3>
+      {step.role === "tool" ? null : <h3 className="mt-2 text-[17px] font-medium leading-snug text-balance">{step.title}</h3>}
 
       {step.role === "planner" ? <PlanBody step={step} planDone={planDone} finished={finished} /> : null}
 
@@ -95,7 +95,8 @@ function StepCard({ step, planDone, finished }: { step: Step; planDone: Set<stri
       ) : null}
 
       {revision?.from || revision?.to ? <Delta change={revision} /> : null}
-      {critic && critic.reasons.length ? <Reasons critic={critic} /> : null}
+      {critic && critic.reasons.length ? <Reasons title={t("trace.reasons")} items={critic.reasons} /> : null}
+      {critic && critic.fixes.length ? <Reasons title={t("trace.fixes")} items={critic.fixes} /> : null}
       {step.status === "error" ? <p className="mt-2 text-sm text-bad">{t("trace.stepFailed")}</p> : null}
 
       <button
@@ -175,13 +176,12 @@ function VerdictChip({ verdict }: { verdict: CriticReading["verdict"] }) {
   return <span className={cx("rounded-full px-2.5 py-0.5 text-xs font-medium text-on-color", tone)}>{t(`trace.${verdict}`)}</span>;
 }
 
-function Reasons({ critic }: { critic: CriticReading }) {
-  const { t } = useMissionText();
+function Reasons({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="mt-3">
-      <p className="text-xs font-medium text-muted">{t("trace.reasons")}</p>
+      <p className="text-xs font-medium text-muted">{title}</p>
       <ul className="mt-1.5 list-none space-y-1.5 p-0">
-        {critic.reasons.map((reason) => (
+        {items.map((reason) => (
           <li key={reason} className="flex items-start gap-2.5 text-[15px] leading-[1.45]">
             <span aria-hidden="true" className="mt-[7px] size-1.5 shrink-0 rotate-45 bg-muted" />
             {reason}

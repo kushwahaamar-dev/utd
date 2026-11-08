@@ -93,7 +93,8 @@
     "reject": "अस्वीकृत",
     "reasons": "क्यों",
     "noOutput": "अभी कोई आउटपुट नहीं",
-    "to": "से"
+    "to": "से",
+    "fixes": "क्या बदलना है"
   },
   "announce": {
     "step": "{role}: {title}",

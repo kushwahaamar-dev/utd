@@ -93,7 +93,8 @@
     "reject": "不通过",
     "reasons": "原因",
     "noOutput": "暂无输出",
-    "to": "变为"
+    "to": "变为",
+    "fixes": "需要修改的地方"
   },
   "announce": {
     "step": "{role}：{title}",

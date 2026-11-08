@@ -11,7 +11,8 @@ export type MissionAdapter = {
   mode: "demo" | "live";
   useMission: (jobId: string) => Mission;
   useMyMissions: () => Job[];
-  startMission: (input: StartInput) => Promise<string>;
+  useOnline: () => boolean;
+  useStartMission: () => (input: StartInput) => Promise<string>;
 };
 
 const noop = () => {};
@@ -38,8 +39,9 @@ export function createDemoAdapter(speed = 1): MissionAdapter {
       // eslint-disable-next-line react-hooks/exhaustive-deps -- the key stands for the list
       return useMemo(() => listDemoRuns(), [key]);
     },
-    async startMission({ kind, goal, roomCode }) {
-      return startDemoRun({ kind, goal, roomCode, speed });
+    useOnline: () => true,
+    useStartMission() {
+      return useCallback(async ({ kind, goal, roomCode }) => startDemoRun({ kind, goal, roomCode, speed }), []);
     },
   };
 }
@@ -58,5 +60,6 @@ function useAdapter(): MissionAdapter {
 
 export const useMissionMode = () => useAdapter().mode;
 export const useMission = (jobId: string): Mission => useAdapter().useMission(jobId);
+export const useMissionOnline = (): boolean => useAdapter().useOnline();
 export const useMyMissions = (): Job[] => useAdapter().useMyMissions();
-export const useStartMission = () => useAdapter().startMission;
+export const useStartMission = () => useAdapter().useStartMission();

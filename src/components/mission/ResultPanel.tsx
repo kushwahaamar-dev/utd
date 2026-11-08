@@ -14,7 +14,7 @@ function labPath(result: MissionResult): { open: string; fly?: string } | undefi
   return { open: `/robotics/${lab.id}` };
 }
 
-export function ResultPanel({ result: raw, lang }: { result: unknown; lang: string }) {
+export function ResultPanel({ result: raw, lang, planBudget }: { result: unknown; lang: string; planBudget?: number }) {
   const { t, locale } = useMissionText();
   const result = readResult(raw);
   if (!result) {
@@ -46,9 +46,10 @@ export function ResultPanel({ result: raw, lang }: { result: unknown; lang: stri
             {result.verification.map((v) => (
               <li
                 key={v.label}
-                className={cx("inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-medium text-on-color", v.ok ? "bg-good-bg" : "bg-bad-bg")}
+                title={v.evidence}
+                className={cx("inline-flex items-start gap-2 rounded-2xl px-3.5 py-1.5 text-sm font-medium leading-snug text-on-color", v.ok ? "bg-good-bg" : "bg-bad-bg")}
               >
-                <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg aria-hidden="true" className="mt-[3px] shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                   <path d={v.ok ? "M5 12.5l4.2 4.2L19 7" : "M6 6l12 12M18 6L6 18"} />
                 </svg>
                 {v.label}
@@ -79,7 +80,7 @@ export function ResultPanel({ result: raw, lang }: { result: unknown; lang: stri
                   <td className="tabular px-3 py-3 text-end text-muted max-sm:hidden">{line.qty}</td>
                   <td className="tabular px-3 py-3 text-end font-ui max-sm:p-0">
                     {line.qty > 1 ? <span className="text-muted sm:hidden">{`${line.qty} × `}</span> : null}
-                    {money(line.price * line.qty)}
+                    {line.price === undefined ? "–" : money(line.price * line.qty)}
                   </td>
                   <td className="py-3 ps-3 text-end max-sm:col-span-2 max-sm:p-0 max-sm:pt-1 max-sm:text-start">
                     {line.url ? (
@@ -93,7 +94,7 @@ export function ResultPanel({ result: raw, lang }: { result: unknown; lang: stri
               ))}
             </tbody>
           </table>
-          <Budget total={total} budget={result.budget} money={money} />
+          <Budget total={total} budget={result.budget ?? planBudget} money={money} />
         </div>
       ) : null}
 
@@ -169,6 +170,7 @@ export function Proposals({ proposals, onResolve }: { proposals: Proposal[]; onR
               <p className="text-[17px] font-medium leading-snug">{view.title}</p>
               {view.detail ? <p className="mt-2 text-[15px] leading-[1.5] text-muted">{view.detail}</p> : null}
               {view.delta ? <p className="tabular mt-3 font-ui text-sm">{view.delta}</p> : null}
+              {view.code ? <pre tabIndex={0} className="mt-3 max-h-48 overflow-auto rounded-xl bg-sunken p-3 font-ui text-xs leading-[1.55]">{view.code}</pre> : null}
               <div className="mt-auto flex flex-wrap items-center gap-2 pt-5">
                 {p.status === "pending" ? (
                   <>

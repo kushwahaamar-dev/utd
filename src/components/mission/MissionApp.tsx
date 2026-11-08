@@ -7,37 +7,38 @@ import { ActionLink, Note, eyebrow, page } from "@/components/editorial/Editoria
 import { cx } from "@/components/ui/cx";
 import type { Locale } from "@/i18n/config";
 import { Composer } from "./Composer";
-import { createDemoAdapter, MissionDataProvider, useMission, useMissionMode, useMyMissions, useStartMission, type MissionAdapter } from "./data";
+import { createDemoAdapter, MissionDataProvider, useMission, useMissionMode, useMissionOnline, useMyMissions, useStartMission } from "./data";
 import { JobHeader } from "./JobHeader";
+import { liveAdapter } from "./live";
 import { Proposals, ResultPanel } from "./ResultPanel";
+import { StdbProvider } from "@/lib/stdb";
 import { MissionTextProvider, useMissionText, type MissionMessages } from "./text";
 import { Trace } from "./Trace";
 import { isActive, type JobKind, type Step } from "./types";
-import { readCritic } from "./view";
+import { planBudget, readCritic } from "./view";
 
 const column = "mx-auto w-full max-w-[880px]";
 
 /** The page body for /mission, where ?job= picks a mission (the static layout cannot take a path segment for it). The live backend plugs in through `live`; without it only the recorded demo runs. */
-export function MissionApp({ lang, messages, head, live }: { lang: Locale; messages: MissionMessages; head?: ReactNode; live?: MissionAdapter }) {
+export function MissionApp({ lang, messages, head }: { lang: Locale; messages: MissionMessages; head?: ReactNode }) {
   return (
     <MissionTextProvider locale={lang} messages={messages}>
       <Suspense fallback={<div className={cx(page, "min-h-[50vh]")} aria-busy="true" />}>
-        <Frame lang={lang} head={head} live={live} />
+        <Frame lang={lang} head={head} />
       </Suspense>
     </MissionTextProvider>
   );
 }
 
-function Frame({ lang, head, live }: { lang: Locale; head?: ReactNode; live?: MissionAdapter }) {
+function Frame({ lang, head }: { lang: Locale; head?: ReactNode }) {
   const params = useSearchParams();
   const jobId = params.get("job") || undefined;
   const demo = params.get("demo") === "1";
   const speed = Math.min(20, Math.max(1, Number(params.get("speed")) || 1));
-  const adapter = useMemo(() => (demo ? createDemoAdapter(speed) : live), [demo, speed, live]);
+  const adapter = useMemo(() => (demo ? createDemoAdapter(speed) : liveAdapter), [demo, speed]);
   const roomCode = params.get("room")?.slice(0, 12) || undefined;
 
-  if (!adapter) return <Offline lang={lang} jobId={jobId} />;
-  return (
+  const body = (
     <MissionDataProvider adapter={adapter}>
       {jobId ? null : <div className={page}>{head}</div>}
       <div className={cx(page, "pb-[clamp(72px,10vw,160px)]")}>
@@ -45,6 +46,7 @@ function Frame({ lang, head, live }: { lang: Locale; head?: ReactNode; live?: Mi
       </div>
     </MissionDataProvider>
   );
+  return demo ? body : <StdbProvider>{body}</StdbProvider>;
 }
 
 function demoQuery(search: URLSearchParams, keys: readonly string[] = ["demo", "speed", "room"]): string {
@@ -57,22 +59,20 @@ function demoQuery(search: URLSearchParams, keys: readonly string[] = ["demo", "
   return text ? `?${text}` : "";
 }
 
-function Offline({ lang, jobId }: { lang: Locale; jobId?: string }) {
+function OfflineNote({ lang }: { lang: Locale }) {
   const { t } = useMissionText();
   return (
-    <div className={cx(page, "pb-[clamp(72px,10vw,160px)]")}>
-      <div className={cx(column, "mt-12")}>
-        <Note
-          title={t("state.offline.title")}
-          action={
-            <ActionLink kind="primary" href={`/${lang}/mission?${jobId ? `job=${encodeURIComponent(jobId)}&` : ""}demo=1`}>
-              {t("state.offline.demo")}
-            </ActionLink>
-          }
-        >
-          {t("state.offline.body")}
-        </Note>
-      </div>
+    <div className="mb-8">
+      <Note
+        title={t("state.offline.title")}
+        action={
+          <ActionLink kind="primary" size="sm" href={`/${lang}/mission?demo=1`}>
+            {t("state.offline.demo")}
+          </ActionLink>
+        }
+      >
+        {t("state.offline.body")}
+      </Note>
     </div>
   );
 }
@@ -82,6 +82,7 @@ function Home({ lang, roomCode }: { lang: Locale; roomCode?: string }) {
   const search = useSearchParams();
   const start = useStartMission();
   const missions = useMyMissions();
+  const online = useMissionOnline();
   const { t } = useMissionText();
   const query = demoQuery(search);
 
@@ -92,7 +93,8 @@ function Home({ lang, roomCode }: { lang: Locale; roomCode?: string }) {
 
   return (
     <div className={cx(column, "mt-10 sm:mt-14")}>
-      <Composer roomCode={roomCode} onStart={onStart} />
+      {online ? null : <OfflineNote lang={lang} />}
+      <Composer roomCode={roomCode} disabled={!online} onStart={onStart} />
       {missions.length ? (
         <section aria-labelledby="recent-title" className="mt-12">
           <h2 id="recent-title" className={eyebrow}>
@@ -150,7 +152,7 @@ function JobView({ lang, jobId }: { lang: Locale; jobId: string }) {
           ) : job.status === "failed" ? (
             <Note title={t("state.failed.title")}>{job.error ?? t("state.failed.body")}</Note>
           ) : null}
-          {job.status === "done" ? <ResultPanel result={job.result} lang={lang} /> : null}
+          {job.status === "done" ? <ResultPanel result={job.result} lang={lang} planBudget={planBudget(steps)} /> : null}
           {job.status === "done" ? <Proposals proposals={proposals} onResolve={mission.resolve} /> : null}
         </div>
       )}

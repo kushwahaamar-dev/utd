@@ -93,7 +93,8 @@
     "reject": "Rechazado",
     "reasons": "Por qué",
     "noOutput": "Aún sin salida",
-    "to": "a"
+    "to": "a",
+    "fixes": "Qué cambiar"
   },
   "announce": {
     "step": "{role}: {title}",
