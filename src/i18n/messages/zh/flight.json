@@ -36,7 +36,9 @@
     "fpv": "FPV 眼镜",
     "wind": "风",
     "gamepad": "手柄",
-    "legend": "操作说明"
+    "legend": "操作说明",
+    "fullscreen": "全屏",
+    "exitFullscreen": "退出全屏"
   },
   "pendingDesign": "设计已更改：回到起降坪后生效，本次飞行继续。",
   "stats": {
@@ -148,13 +150,15 @@
       "roll": "← / →",
       "arm": "空格",
       "fpv": "V",
-      "reset": "R"
+      "reset": "R",
+      "fullscreen": "F"
     },
     "throttleAlt": "在定高模式下，油门表示爬升速率，松开后自动回中。",
     "throttleManual": "在自稳和手动模式下，油门停在你松手的位置，就像真正的油门杆。",
     "acroNote": "手动模式：摇杆控制旋转速率，不会自动帮你改平。",
     "angleNote": "自稳模式：摇杆控制倾斜角度，松开后飞机自动改平。",
-    "focusNote": "当飞行场或其按钮获得焦点时，按键才会生效。"
+    "focusNote": "当飞行场或其按钮获得焦点时，按键才会生效。",
+    "fullscreen": "开启或退出全屏"
   },
   "sticks": {
     "left": "油门与偏航摇杆",
@@ -332,5 +336,70 @@
     "shareText": "iynk 每日无人机挑战：{craft}，赛道 {course}。",
     "shareBeat": "iynk 每日无人机挑战：{craft}，赛道 {course}。你能打败 {time} 秒吗？",
     "board": "{course}，{date} 的挑战"
+  },
+  "stress": {
+    "title": "压力测试",
+    "timeline": "测试时间线",
+    "calm": "目前风平浪静",
+    "tests": "当前生效",
+    "kinds": {
+      "gusts": "阵风",
+      "degrade": "电机衰减",
+      "sag": "电池压降",
+      "night": "夜晚",
+      "fog": "起雾",
+      "downdraft": "下沉气流",
+      "gps": "GPS 丢失"
+    },
+    "hints": {
+      "gusts": "风越来越大：迎着风倾斜",
+      "degrade": "一台电机推力下降：带着它降落",
+      "sag": "电池电压下陷：猛推油门可能触发切断",
+      "night": "天黑了：亮灯的窗户就是你的地标",
+      "fog": "看到的城市变少了：相信箭头和地图",
+      "downdraft": "气流把你压向街道：加油门",
+      "gps": "现在没有东西替你定点了"
+    },
+    "started": "{kind}：{hint}",
+    "ended": "{kind}结束了",
+    "report": {
+      "title": "成绩单",
+      "grade": "{grade} 级",
+      "score": "{score} 分",
+      "rows": {
+        "survived": "坚持时间",
+        "checkpoints": "检查点",
+        "tilt": "最大倾角",
+        "volts": "电池最低电压",
+        "peak": "峰值电流",
+        "ended": "结束方式"
+      },
+      "values": {
+        "survived": "{t} 秒 / {limit} 秒",
+        "checkpoints": "{hits} / {total}",
+        "tilt": "{deg}°",
+        "volts": "每节 {v} V",
+        "peak": "{a} A"
+      },
+      "ended": {
+        "crashed": "{what}",
+        "landed": "安全降落",
+        "complete": "飞完全部检查点并降落",
+        "timeout": "时间到，仍在飞行"
+      },
+      "physicsTitle": "物理做了什么",
+      "tilt": "你最大倾斜了 {deg}°。倾斜会把推力转向一侧：在 {deg}° 时只有 {cos}% 的推力还在托住飞机，所以大幅倾斜如果不加油门就会掉高度。",
+      "sag": "电池在 {a} A 下压降到每节 {v} V（电调在 {cut} V 切断）。压降等于电流乘以电池内阻，所以小电池压降更大，而这次测试把它放大了 {x} 倍。",
+      "degrade": "有一台电机损失了最多 {loss}% 的推力。这套配置悬停需要 {hover}% 油门，推重比为 {tw}:1，那台电机变弱后约剩 {tw2}:1。手头的推力储备越少，电机一衰减就越快不够用。",
+      "gusts": "阵风增强到了 {w} 米/秒。为了守住位置，飞机要迎风倾斜，风越大，推力花在对抗上的就越多，爬升的就越少。",
+      "downdraft": "下沉气流以约 {g} 米/秒² 把飞机往下拉。只有富余的油门才能对付它，所以推重比高的配置几乎不受影响。",
+      "dark": "夜晚和雾会让建筑消失。小地图和指向下一个检查点的箭头仍然会给你指路。",
+      "bench": {
+        "strong": "这套配置的推重比是 {tw}:1：储备充足。",
+        "weak": "这套配置的推重比只有 {tw}:1。储备这么少，电机一衰减或电池一压降就会更早掉下来。到无人机实验室换一套配置再测一次。"
+      },
+      "again": "再飞一次",
+      "close": "关闭"
+    }
   }
 }

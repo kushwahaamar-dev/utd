@@ -36,7 +36,9 @@
     "fpv": "FPV goggles",
     "wind": "Wind",
     "gamepad": "Gamepad",
-    "legend": "Controls"
+    "legend": "Controls",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Exit full screen"
   },
   "pendingDesign": "Design changed: it applies when you reset to the pad, so this flight keeps going.",
   "stats": {
@@ -148,13 +150,15 @@
       "roll": "← / →",
       "arm": "Space",
       "fpv": "V",
-      "reset": "R"
+      "reset": "R",
+      "fullscreen": "F"
     },
     "throttleAlt": "In altitude-hold modes the throttle asks for a climb rate and springs back to hover.",
     "throttleManual": "In angle and acro modes the throttle stays where you leave it, like a real throttle stick.",
     "acroNote": "Acro: the sticks set the rotation rate and nothing levels the craft for you.",
     "angleNote": "Angle: the sticks set the tilt and the craft levels itself when you let go.",
-    "focusNote": "Keys work while the range or its buttons have focus."
+    "focusNote": "Keys work while the range or its buttons have focus.",
+    "fullscreen": "Full screen on and off"
   },
   "sticks": {
     "left": "Throttle and yaw stick",
@@ -332,5 +336,70 @@
     "shareText": "iynk daily drone challenge: {craft} on {course}.",
     "shareBeat": "iynk daily drone challenge: {craft} on {course}. Can you beat {time} s?",
     "board": "{course}, challenge of {date}"
+  },
+  "stress": {
+    "title": "Stress test",
+    "timeline": "Test timeline",
+    "calm": "Calm so far",
+    "tests": "Active now",
+    "kinds": {
+      "gusts": "Gusts",
+      "degrade": "Motor fading",
+      "sag": "Pack sag",
+      "night": "Night",
+      "fog": "Fog",
+      "downdraft": "Downdraft",
+      "gps": "GPS lost"
+    },
+    "hints": {
+      "gusts": "the wind is building: lean into it",
+      "degrade": "one motor is losing thrust: land through it",
+      "sag": "the pack is sagging: punch-outs can trip the cut-off",
+      "night": "dark falls: the lit windows are your landmarks",
+      "fog": "you see less of the city: trust the arrow and the map",
+      "downdraft": "air is pushing you toward the street: add throttle",
+      "gps": "nothing holds your position now"
+    },
+    "started": "{kind}: {hint}",
+    "ended": "{kind} is over",
+    "report": {
+      "title": "Report card",
+      "grade": "Grade {grade}",
+      "score": "{score} points",
+      "rows": {
+        "survived": "Time survived",
+        "checkpoints": "Checkpoints",
+        "tilt": "Max tilt",
+        "volts": "Lowest pack voltage",
+        "peak": "Peak current",
+        "ended": "How it ended"
+      },
+      "values": {
+        "survived": "{t} s of {limit}",
+        "checkpoints": "{hits} of {total}",
+        "tilt": "{deg}°",
+        "volts": "{v} V per cell",
+        "peak": "{a} A"
+      },
+      "ended": {
+        "crashed": "{what}",
+        "landed": "Landed safely",
+        "complete": "Flew every checkpoint and landed",
+        "timeout": "Time up, still flying"
+      },
+      "physicsTitle": "What the physics did",
+      "tilt": "You tilted up to {deg}°. Tilting turns thrust sideways: at {deg}° only {cos}% of it still holds the craft up, so a hard lean costs height unless you add throttle.",
+      "sag": "The pack sagged to {v} V per cell at {a} A (the ESCs cut out at {cut} V). Sag is current times the pack's internal resistance, so a smaller pack sags more, and this test made it {x} times worse.",
+      "degrade": "A motor lost up to {loss}% of its thrust. This build hovers at {hover}% throttle and has {tw}:1 thrust to weight, which leaves about {tw2}:1 with that motor weak. The less thrust a build has in hand, the sooner a failing motor leaves it with too little.",
+      "gusts": "Gusts built to {w} m/s. To hold its place the craft leans into the wind, and the stronger the wind the more of its thrust goes on fighting it instead of climbing.",
+      "downdraft": "The downdraft pulled the craft down at about {g} m/s². Only throttle you have spare can answer it, which is why a build with a high thrust to weight shrugs it off.",
+      "dark": "Night and fog take the buildings away. The minimap and the arrow to the next checkpoint still show the way.",
+      "bench": {
+        "strong": "This build has {tw}:1 thrust to weight: plenty in hand.",
+        "weak": "This build has only {tw}:1 thrust to weight. With so little spare, a fading motor or a sagging pack takes it down sooner. Change the build in the Drone Lab and fly the test again."
+      },
+      "again": "Fly it again",
+      "close": "Close"
+    }
   }
 }

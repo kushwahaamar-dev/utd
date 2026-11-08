@@ -5,7 +5,7 @@ export { ghostAt, ghostFromLog, GHOST_DT, finishOf, isGhostTrack, lapClock, load
 export * from "./input";
 export { LIMITS, ocv, cellResistance, NOMINAL_CELL } from "./battery";
 export { buildSolids, collide, moverPose, sweptBox, throughGate, passCheckpoint } from "./world";
-export { calmFx, ramp, stressFx, type StressFx } from "./stress";
+export { calmFx, ramp, stressFacts, stressFx, stressGrade, type StressFx, type StressGrade } from "./stress";
 export { fromCalc } from "./from-calc";
 export { sfxFor, type SfxName } from "./sfx";
 export { BREAKS, causeOf, crashReplay, fixFor, type BreakId, type CrashCause, type CrashFix, type CrashReplay } from "./crash";

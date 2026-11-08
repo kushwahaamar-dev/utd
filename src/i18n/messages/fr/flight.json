@@ -36,7 +36,9 @@
     "fpv": "Lunettes FPV",
     "wind": "Vent",
     "gamepad": "Manette",
-    "legend": "Commandes"
+    "legend": "Commandes",
+    "fullscreen": "Plein écran",
+    "exitFullscreen": "Quitter le plein écran"
   },
   "pendingDesign": "Conception modifiée : elle s'applique au retour sur la plateforme, ce vol continue donc.",
   "stats": {
@@ -148,13 +150,15 @@
       "roll": "← / →",
       "arm": "Espace",
       "fpv": "V",
-      "reset": "R"
+      "reset": "R",
+      "fullscreen": "F"
     },
     "throttleAlt": "En maintien d'altitude, les gaz demandent une vitesse de montée et reviennent seuls au centre.",
     "throttleManual": "En modes angle et acro, les gaz restent là où vous les laissez, comme un vrai manche.",
     "acroNote": "Acro : les manches règlent la vitesse de rotation et rien ne remet le drone à plat pour vous.",
     "angleNote": "Angle : les manches règlent l'inclinaison et le drone se remet à plat dès que vous lâchez.",
-    "focusNote": "Les touches marchent quand le terrain ou ses boutons ont le focus."
+    "focusNote": "Les touches marchent quand le terrain ou ses boutons ont le focus.",
+    "fullscreen": "Plein écran, oui ou non"
   },
   "sticks": {
     "left": "Manche des gaz et du lacet",
@@ -332,5 +336,70 @@
     "shareText": "Défi drone du jour iynk : {craft} sur {course}.",
     "shareBeat": "Défi drone du jour iynk : {craft} sur {course}. Saurez-vous battre {time} s ?",
     "board": "{course}, défi du {date}"
+  },
+  "stress": {
+    "title": "Test de résistance",
+    "timeline": "Chronologie du test",
+    "calm": "Calme pour l'instant",
+    "tests": "En cours",
+    "kinds": {
+      "gusts": "Rafales",
+      "degrade": "Moteur faible",
+      "sag": "Batterie affaissée",
+      "night": "Nuit",
+      "fog": "Brouillard",
+      "downdraft": "Courant descendant",
+      "gps": "GPS perdu"
+    },
+    "hints": {
+      "gusts": "le vent monte : penchez-vous contre lui",
+      "degrade": "un moteur perd de la poussée : posez-vous avec",
+      "sag": "la batterie s'affaisse : les gaz à fond peuvent déclencher la coupure",
+      "night": "la nuit tombe : les fenêtres allumées sont vos repères",
+      "fog": "vous voyez moins la ville : fiez-vous à la flèche et à la carte",
+      "downdraft": "l'air vous pousse vers la rue : donnez des gaz",
+      "gps": "plus rien ne maintient votre position"
+    },
+    "started": "{kind} : {hint}",
+    "ended": "{kind} est terminé",
+    "report": {
+      "title": "Bulletin",
+      "grade": "Note {grade}",
+      "score": "{score} points",
+      "rows": {
+        "survived": "Temps tenu",
+        "checkpoints": "Points de passage",
+        "tilt": "Inclinaison max",
+        "volts": "Tension mini de la batterie",
+        "peak": "Courant de pointe",
+        "ended": "Fin du vol"
+      },
+      "values": {
+        "survived": "{t} s sur {limit}",
+        "checkpoints": "{hits} sur {total}",
+        "tilt": "{deg}°",
+        "volts": "{v} V par élément",
+        "peak": "{a} A"
+      },
+      "ended": {
+        "crashed": "{what}",
+        "landed": "Atterrissage réussi",
+        "complete": "Tous les points passés, puis atterrissage",
+        "timeout": "Temps écoulé, toujours en vol"
+      },
+      "physicsTitle": "Ce que la physique a fait",
+      "tilt": "Vous avez incliné jusqu'à {deg}°. Incliner tourne la poussée sur le côté : à {deg}°, seuls {cos} % la tiennent encore en l'air, donc une forte inclinaison coûte de l'altitude si vous ne donnez pas de gaz.",
+      "sag": "La batterie est tombée à {v} V par élément sous {a} A (les ESC coupent à {cut} V). L'affaissement, c'est le courant fois la résistance interne : une petite batterie s'affaisse plus, et ce test l'a aggravé {x} fois.",
+      "degrade": "Un moteur a perdu jusqu'à {loss} % de sa poussée. Cette config vole à {hover} % des gaz et a un rapport poussée/poids de {tw}:1, soit environ {tw2}:1 avec ce moteur faible. Moins il reste de poussée en réserve, plus vite un moteur qui lâche la laisse à court.",
+      "gusts": "Les rafales sont montées à {w} m/s. Pour tenir sa place, le drone se penche contre le vent, et plus il souffle, plus de poussée sert à lutter au lieu de monter.",
+      "downdraft": "Le courant descendant a tiré le drone vers le bas d'environ {g} m/s². Seuls les gaz en réserve y répondent, d'où un rapport poussée/poids élevé qui s'en moque.",
+      "dark": "La nuit et le brouillard effacent les bâtiments. La mini-carte et la flèche vers le prochain point montrent toujours la route.",
+      "bench": {
+        "strong": "Cette config a un rapport poussée/poids de {tw}:1 : largement de quoi faire.",
+        "weak": "Cette config n'a que {tw}:1 de poussée/poids. Avec si peu de marge, un moteur faible ou une batterie affaissée la fait tomber plus tôt. Changez la config dans le Labo drone et refaites le test."
+      },
+      "again": "Revoler",
+      "close": "Fermer"
+    }
   }
 }

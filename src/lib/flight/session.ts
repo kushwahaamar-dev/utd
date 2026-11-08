@@ -1,6 +1,6 @@
 import { LIMITS } from "./battery";
 import { advance, createSim, dispatch, drainEvents, frameOf, type SimState } from "./sim";
-import type { CalcOutputs, Course, CraftFaults, FlightAction, FlightCraft, FlightEvent, FlightFrame } from "./types";
+import type { CalcOutputs, Course, CraftFaults, FlightAction, FlightCraft, FlightEvent, FlightFrame, StressKind, StressOutcome } from "./types";
 
 /** What the page shows around the range; changes a few times a second at most. */
 export interface FlightSnapshot {
@@ -27,6 +27,8 @@ export interface FlightSnapshot {
   laps: number;
   crashes: number;
   splits: number[];
+  /** A stress test's clock and what is in force; null on every other course. */
+  stress: { t: number; active: StressKind[]; end: StressOutcome | null; hits: number; maxTilt: number; minCell: number; peakAmps: number } | null;
 }
 
 /** What a session started from: replaying its log from here gives the same flight. */
@@ -78,6 +80,17 @@ function snapshotOf(s: SimState): FlightSnapshot {
     laps: s.laps,
     crashes: s.crashes,
     splits: s.splits.slice(),
+    stress: s.course.stress
+      ? {
+          t: s.stressEnd ? round(s.stressAt, 10) : s.armed ? round(s.t, 10) : 0,
+          active: [...new Set((s.course.stress.events ?? []).filter((_, i) => s.stressOn[i]).map((e) => e.kind))],
+          end: s.stressEnd,
+          hits: s.stats.hits,
+          maxTilt: round(s.stats.maxTilt, 10),
+          minCell: round(s.stats.minCell, 100),
+          peakAmps: round(s.stats.peakAmps, 10),
+        }
+      : null,
   };
 }
 

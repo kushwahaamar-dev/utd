@@ -33,6 +33,10 @@ export function sfxFor(e: FlightEvent): SfxName[] | null {
     case "outOfField":
     case "farOut":
       return ["buzz"];
+    case "stress":
+      return e.on ? ["buzz"] : null;
+    case "stressEnd":
+      return e.outcome === "landed" || e.outcome === "complete" ? ["ding"] : null;
     case "launch":
     case "transition":
       return ["whoosh"];

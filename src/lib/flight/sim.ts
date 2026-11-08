@@ -95,6 +95,7 @@ export interface SimState {
   fx: StressFx;
   stressOn: boolean[]; // which of the course's scheduled events are running
   stressEnd: StressOutcome | null;
+  stressAt: number; // s into the test when it ended
   stats: FlightStats;
 }
 
@@ -198,6 +199,7 @@ export function resetFlight(s: SimState) {
   s.fx = calmFx();
   s.stressOn = (s.course.stress?.events ?? []).map(() => false);
   s.stressEnd = null;
+  s.stressAt = 0;
   s.stats = freshStats(s);
   const sw = s.craft.swarm;
   s.followers = [];
@@ -311,6 +313,7 @@ function tryArm(s: SimState) {
   s.phase = "climb";
   s.stressOn = s.stressOn.map(() => false);
   s.stressEnd = null;
+  s.stressAt = 0;
   s.stats = freshStats(s);
   s.fx = calmFx();
   emit(s, { type: "armed", mode: s.mode.id });
@@ -376,6 +379,7 @@ function stressStep(s: SimState) {
 function endStress(s: SimState, outcome: StressOutcome) {
   if (!s.course.stress || s.stressEnd !== null) return;
   s.stressEnd = outcome;
+  s.stressAt = s.t;
   emit(s, { type: "stressEnd", outcome });
 }
 

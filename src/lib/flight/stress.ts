@@ -1,4 +1,5 @@
-import type { StressEvent, StressKind, StressSpec } from "./types";
+import type { CalcOutputs, StressEvent, StressKind, StressOutcome, StressSpec } from "./types";
+import { DEG } from "./math";
 
 // Stress tests: a schedule of trouble keyed to the flight time (seconds since arming), so the same inputs replay to
 // the same flight. Every event eases in and out over RAMP seconds instead of switching, the way weather and a tiring
@@ -44,4 +45,34 @@ export function stressFx(spec: StressSpec, t: number): StressFx {
     if (k > 0) fx[FIELD[e.kind]] = Math.max(fx[FIELD[e.kind]], e.level * k);
   }
   return fx;
+}
+
+export type StressGrade = "S" | "A" | "B" | "C" | "D";
+
+/** The report card's score: survival and precision, with a bonus for putting it down safely. */
+export function stressGrade(r: { t: number; limit: number; hits: number; total: number; outcome: StressOutcome }): { grade: StressGrade; score: number } {
+  const survived = r.outcome === "complete" ? 1 : Math.min(1, r.t / Math.max(1, r.limit));
+  const precision = r.total > 0 ? Math.min(1, r.hits / r.total) : 0;
+  const down = r.outcome === "landed" || r.outcome === "complete" ? 1 : 0;
+  const score = Math.round(100 * (0.45 * survived + 0.45 * precision + 0.1 * down));
+  const grade: StressGrade = score >= 95 ? "S" : score >= 80 ? "A" : score >= 60 ? "B" : score >= 35 ? "C" : "D";
+  return { grade, score };
+}
+
+/** The numbers the report card's physics paragraphs quote, from the build and what the test did to it. */
+export function stressFacts(calc: CalcOutputs, spec: StressSpec, stats: { maxTilt: number }) {
+  const level = (kind: StressKind) => spec.events.find((e) => e.kind === kind)?.level ?? 0;
+  const tw = 1 / Math.max(1e-6, calc.hoverThrottle * calc.hoverThrottle);
+  // the same law the sim flies: a failing motor fades faster the harder it works
+  const loss = Math.min(1, level("degrade") * (0.7 + calc.hoverThrottle));
+  return {
+    cos: Math.round(Math.cos(Math.min(89, stats.maxTilt) * DEG) * 100),
+    tw,
+    tw2: tw * Math.max(0, 1 - loss / Math.max(1, calc.motors)),
+    loss: Math.round(loss * 100),
+    hover: Math.round(calc.hoverThrottle * 100),
+    sagTimes: 1 + level("sag"),
+    wind: level("gusts"),
+    down: level("downdraft"),
+  };
 }

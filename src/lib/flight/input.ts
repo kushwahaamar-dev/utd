@@ -14,9 +14,10 @@ export const FLIGHT_KEYS = new Set([
   "Space",
   "KeyR",
   "KeyV",
+  "KeyF",
 ]);
 
-/** Held keys that move a stick (Space, R and V are one-shot commands). */
+/** Held keys that move a stick (Space, R, V and F are one-shot commands). */
 export const STICK_KEYS = new Set(["KeyW", "KeyS", "KeyA", "KeyD", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]);
 
 export const MANUAL_THROTTLE_RATE = 0.32; // stick travel per second while W or S is held

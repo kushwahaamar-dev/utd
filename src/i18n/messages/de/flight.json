@@ -36,7 +36,9 @@
     "fpv": "FPV-Brille",
     "wind": "Wind",
     "gamepad": "Gamepad",
-    "legend": "Steuerung"
+    "legend": "Steuerung",
+    "fullscreen": "Vollbild",
+    "exitFullscreen": "Vollbild beenden"
   },
   "pendingDesign": "Das Design hat sich geändert: Es gilt ab dem nächsten Zurücksetzen auf den Landeplatz, dieser Flug geht also weiter.",
   "stats": {
@@ -148,13 +150,15 @@
       "roll": "← / →",
       "arm": "Leertaste",
       "fpv": "V",
-      "reset": "R"
+      "reset": "R",
+      "fullscreen": "F"
     },
     "throttleAlt": "In den Modi mit Höhenhaltung fordert das Gas eine Steigrate an und federt in die Mitte zurück.",
     "throttleManual": "Im Angle- und Acro-Modus bleibt das Gas, wo du es lässt, wie ein echter Gasknüppel.",
     "acroNote": "Acro: Die Knüppel stellen die Drehrate ein und nichts richtet die Drohne für dich auf.",
     "angleNote": "Angle: Die Knüppel stellen die Neigung ein und die Drohne richtet sich beim Loslassen selbst auf.",
-    "focusNote": "Die Tasten wirken, solange der Flugplatz oder seine Schaltflächen den Fokus haben."
+    "focusNote": "Die Tasten wirken, solange der Flugplatz oder seine Schaltflächen den Fokus haben.",
+    "fullscreen": "Vollbild an und aus"
   },
   "sticks": {
     "left": "Knüppel für Gas und Gieren",
@@ -332,5 +336,70 @@
     "shareText": "iynk-Drohnen-Challenge des Tages: {craft} auf {course}.",
     "shareBeat": "iynk-Drohnen-Challenge des Tages: {craft} auf {course}. Kannst du {time} s schlagen?",
     "board": "{course}, Challenge vom {date}"
+  },
+  "stress": {
+    "title": "Stresstest",
+    "timeline": "Zeitplan des Tests",
+    "calm": "Bisher ruhig",
+    "tests": "Gerade aktiv",
+    "kinds": {
+      "gusts": "Böen",
+      "degrade": "Motor lässt nach",
+      "sag": "Akku bricht ein",
+      "night": "Nacht",
+      "fog": "Nebel",
+      "downdraft": "Fallwind",
+      "gps": "GPS weg"
+    },
+    "hints": {
+      "gusts": "der Wind nimmt zu: lehn dich hinein",
+      "degrade": "ein Motor verliert Schub: lande damit",
+      "sag": "der Akku bricht ein: Vollgas kann die Abschaltung auslösen",
+      "night": "es wird dunkel: die beleuchteten Fenster sind deine Orientierung",
+      "fog": "du siehst weniger von der Stadt: vertrau Pfeil und Karte",
+      "downdraft": "die Luft drückt dich zur Straße: gib Gas",
+      "gps": "nichts hält mehr deine Position"
+    },
+    "started": "{kind}: {hint}",
+    "ended": "{kind} ist vorbei",
+    "report": {
+      "title": "Zeugnis",
+      "grade": "Note {grade}",
+      "score": "{score} Punkte",
+      "rows": {
+        "survived": "Überlebte Zeit",
+        "checkpoints": "Kontrollpunkte",
+        "tilt": "Maximale Neigung",
+        "volts": "Tiefste Akkuspannung",
+        "peak": "Spitzenstrom",
+        "ended": "Wie es endete"
+      },
+      "values": {
+        "survived": "{t} s von {limit}",
+        "checkpoints": "{hits} von {total}",
+        "tilt": "{deg}°",
+        "volts": "{v} V pro Zelle",
+        "peak": "{a} A"
+      },
+      "ended": {
+        "crashed": "{what}",
+        "landed": "Sicher gelandet",
+        "complete": "Alle Punkte geflogen und gelandet",
+        "timeout": "Zeit um, noch im Flug"
+      },
+      "physicsTitle": "Was die Physik getan hat",
+      "tilt": "Du hast dich bis {deg}° geneigt. Neigen dreht den Schub zur Seite: bei {deg}° hält nur noch {cos} % davon das Fluggerät oben, ein starkes Anlehnen kostet also Höhe, wenn du kein Gas gibst.",
+      "sag": "Der Akku brach auf {v} V pro Zelle ein, bei {a} A (die ESCs schalten bei {cut} V ab). Der Einbruch ist Strom mal Innenwiderstand, ein kleinerer Akku bricht also stärker ein, und dieser Test hat ihn {x}-mal schlimmer gemacht.",
+      "degrade": "Ein Motor verlor bis zu {loss} % seines Schubs. Dieser Aufbau schwebt bei {hover} % Gas und hat {tw}:1 Schub-Gewicht, mit dem schwachen Motor bleiben etwa {tw2}:1. Je weniger Schub in Reserve, desto früher reicht er bei einem nachlassenden Motor nicht mehr.",
+      "gusts": "Die Böen stiegen auf {w} m/s. Um die Position zu halten, lehnt sich das Fluggerät in den Wind, und je stärker er weht, desto mehr Schub geht ins Dagegenhalten statt ins Steigen.",
+      "downdraft": "Der Fallwind zog das Fluggerät mit etwa {g} m/s² nach unten. Nur Reserve-Gas kann dagegen halten, darum steckt ein Aufbau mit hohem Schub-Gewicht ihn weg.",
+      "dark": "Nacht und Nebel nehmen die Gebäude weg. Minikarte und Pfeil zum nächsten Kontrollpunkt zeigen weiter den Weg.",
+      "bench": {
+        "strong": "Dieser Aufbau hat {tw}:1 Schub-Gewicht: viel in Reserve.",
+        "weak": "Dieser Aufbau hat nur {tw}:1 Schub-Gewicht. Mit so wenig Reserve holt ihn ein nachlassender Motor oder ein einbrechender Akku früher herunter. Ändere den Aufbau im Drohnenlabor und fliege den Test noch einmal."
+      },
+      "again": "Nochmal fliegen",
+      "close": "Schließen"
+    }
   }
 }

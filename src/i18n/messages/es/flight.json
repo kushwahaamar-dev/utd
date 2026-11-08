@@ -36,7 +36,9 @@
     "fpv": "Gafas FPV",
     "wind": "Viento",
     "gamepad": "Mando",
-    "legend": "Controles"
+    "legend": "Controles",
+    "fullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa"
   },
   "pendingDesign": "El diseño ha cambiado: se aplica al volver a la plataforma, así que este vuelo sigue.",
   "stats": {
@@ -148,13 +150,15 @@
       "roll": "← / →",
       "arm": "Espacio",
       "fpv": "V",
-      "reset": "R"
+      "reset": "R",
+      "fullscreen": "F"
     },
     "throttleAlt": "En los modos de mantener altitud, el acelerador pide una velocidad de subida y vuelve solo al centro.",
     "throttleManual": "En los modos ángulo y acro, el acelerador se queda donde lo dejas, como una palanca real.",
     "acroNote": "Acro: las palancas fijan la velocidad de giro y nada nivela el dron por ti.",
     "angleNote": "Ángulo: las palancas fijan la inclinación y el dron se nivela solo al soltarlas.",
-    "focusNote": "Las teclas funcionan mientras el campo o sus botones tienen el foco."
+    "focusNote": "Las teclas funcionan mientras el campo o sus botones tienen el foco.",
+    "fullscreen": "Activar o salir de pantalla completa"
   },
   "sticks": {
     "left": "Palanca de acelerador y guiñada",
@@ -332,5 +336,70 @@
     "shareText": "Reto diario de drones de iynk: {craft} en {course}.",
     "shareBeat": "Reto diario de drones de iynk: {craft} en {course}. ¿Puedes bajar de {time} s?",
     "board": "{course}, reto del {date}"
+  },
+  "stress": {
+    "title": "Prueba de estrés",
+    "timeline": "Cronología de la prueba",
+    "calm": "En calma por ahora",
+    "tests": "Activo ahora",
+    "kinds": {
+      "gusts": "Ráfagas",
+      "degrade": "Motor flojo",
+      "sag": "Batería hundida",
+      "night": "Noche",
+      "fog": "Niebla",
+      "downdraft": "Corriente descendente",
+      "gps": "GPS perdido"
+    },
+    "hints": {
+      "gusts": "el viento crece: inclínate contra él",
+      "degrade": "un motor pierde empuje: aterriza con él así",
+      "sag": "la batería se hunde: los acelerones pueden activar el corte",
+      "night": "cae la noche: las ventanas encendidas son tus referencias",
+      "fog": "ves menos de la ciudad: fíate de la flecha y del mapa",
+      "downdraft": "el aire te empuja hacia la calle: da más gas",
+      "gps": "nada mantiene ya tu posición"
+    },
+    "started": "{kind}: {hint}",
+    "ended": "{kind} ha terminado",
+    "report": {
+      "title": "Informe",
+      "grade": "Nota {grade}",
+      "score": "{score} puntos",
+      "rows": {
+        "survived": "Tiempo aguantado",
+        "checkpoints": "Puntos de control",
+        "tilt": "Inclinación máxima",
+        "volts": "Voltaje mínimo de la batería",
+        "peak": "Corriente máxima",
+        "ended": "Cómo terminó"
+      },
+      "values": {
+        "survived": "{t} s de {limit}",
+        "checkpoints": "{hits} de {total}",
+        "tilt": "{deg}°",
+        "volts": "{v} V por celda",
+        "peak": "{a} A"
+      },
+      "ended": {
+        "crashed": "{what}",
+        "landed": "Aterrizaje seguro",
+        "complete": "Todos los puntos y aterrizaje",
+        "timeout": "Se acabó el tiempo, aún volando"
+      },
+      "physicsTitle": "Qué hizo la física",
+      "tilt": "Te inclinaste hasta {deg}°. Inclinar gira el empuje hacia un lado: a {deg}° solo el {cos}% sigue sosteniendo el dron, así que una inclinación fuerte cuesta altura si no das más gas.",
+      "sag": "La batería cayó a {v} V por celda con {a} A (los ESC cortan a {cut} V). La caída es corriente por resistencia interna, así que una batería pequeña cae más, y esta prueba la empeoró {x} veces.",
+      "degrade": "Un motor perdió hasta el {loss}% de su empuje. Este montaje vuela con el {hover}% de gas y tiene una relación empuje-peso de {tw}:1, que queda en unos {tw2}:1 con ese motor flojo. Cuanto menos empuje de reserva, antes se queda corto con un motor que falla.",
+      "gusts": "Las ráfagas llegaron a {w} m/s. Para mantener su sitio el dron se inclina contra el viento, y cuanto más fuerte sopla, más empuje gasta en pelear en vez de subir.",
+      "downdraft": "La corriente descendente tiró del dron con unos {g} m/s². Solo el gas que te sobra puede responderle, por eso un montaje con mucha relación empuje-peso casi no la nota.",
+      "dark": "La noche y la niebla esconden los edificios. El minimapa y la flecha al siguiente punto siguen mostrando el camino.",
+      "bench": {
+        "strong": "Este montaje tiene {tw}:1 de empuje a peso: de sobra.",
+        "weak": "Este montaje solo tiene {tw}:1 de empuje a peso. Con tan poca reserva, un motor flojo o una batería hundida lo tumba antes. Cambia el montaje en el Laboratorio de drones y repite la prueba."
+      },
+      "again": "Volver a volar",
+      "close": "Cerrar"
+    }
   }
 }
