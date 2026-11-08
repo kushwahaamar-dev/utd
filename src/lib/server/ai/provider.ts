@@ -422,19 +422,37 @@ export function jsonSchemaOf(schema: z.ZodType): Record<string, unknown> {
   return rest;
 }
 
+/** The JSON object inside a reply that may carry a code fence or a sentence around it. */
+function jsonText(text: string): string {
+  const body = text.trim().replace(/^```(?:json)?\s*|\s*```$/g, "");
+  const first = body.indexOf("{");
+  const last = body.lastIndexOf("}");
+  return first >= 0 && last > first ? body.slice(first, last + 1) : body;
+}
+
 /**
  * A chat whose reply must be JSON matching `schema`. The API constrains
- * decoding to the schema; the reply is still validated here.
+ * decoding to the schema when it takes response_format; if it refuses that,
+ * the schema goes in the prompt instead. The reply is validated either way.
  */
 export async function chatJson<S extends z.ZodType>(
   schema: S,
   name: string,
   opts: Omit<ChatOptions, "json" | "tools">,
 ): Promise<{ data: z.output<S>; usage: Usage }> {
-  const result = await completeChat({ ...opts, json: { name, schema: jsonSchemaOf(schema) } });
+  const jsonSpec = jsonSchemaOf(schema);
+  let result: ChatResult;
+  try {
+    result = await completeChat({ ...opts, json: { name, schema: jsonSpec } });
+  } catch (error) {
+    if (!(error instanceof AiError) || error.code !== "upstream_failed") throw error;
+    log("nemotron", `${name}: response_format refused, putting the schema in the prompt`);
+    const ask = `Reply with only a JSON object that matches this JSON Schema, with no other text:\n${JSON.stringify(jsonSpec)}`;
+    result = await completeChat({ ...opts, messages: [...opts.messages, { role: "user", content: ask }] });
+  }
   let value: unknown;
   try {
-    value = JSON.parse(result.text.trim().replace(/^```(?:json)?\s*|\s*```$/g, ""));
+    value = JSON.parse(jsonText(result.text));
   } catch {
     throw new AiError("bad_output", `${name}: reply is not JSON`);
   }

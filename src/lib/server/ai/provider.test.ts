@@ -224,6 +224,17 @@ describe("chat (non-streaming) and chatJson", () => {
     expect(JSON.stringify(calls[0].body)).not.toContain("$schema");
   });
 
+  it("puts the schema in the prompt when the API refuses response_format", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { calls } = fakeFetch(apiError(400, "invalid_request_error"), completion('Here it is: {"answer":"42"}'));
+    const { chatJson } = await load();
+    const { data } = await chatJson(z.object({ answer: z.string() }), "probe", { messages });
+    expect(data).toEqual({ answer: "42" });
+    expect(calls[0].body).toHaveProperty("response_format");
+    expect(calls[1].body).not.toHaveProperty("response_format");
+    expect(JSON.stringify(calls[1].body)).toContain("JSON Schema");
+  });
+
   it("rejects a reply that is not the asked-for JSON", async () => {
     fakeFetch(completion("Sure! Here you go."), completion('{"answer":3}'));
     const { chatJson } = await load();
