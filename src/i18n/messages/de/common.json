@@ -1,0 +1,62 @@
+{
+  "site": {
+    "name": "iynk",
+    "tagline": "Entdecken · Verstehen · Bauen",
+    "description": "Ein praktisches Hardware-Labor im Browser: Boards, Roboter und Drohnen bauen, verdrahten, programmieren, kaputt machen und fliegen."
+  },
+  "a11y": {
+    "skipToContent": "Zum Hauptinhalt springen"
+  },
+  "notFound": {
+    "metaTitle": "Seite nicht gefunden",
+    "title": "Diese Seite liegt nicht auf der Werkbank",
+    "body": "Vielleicht ist die Adresse falsch geschrieben, oder die Seite ist umgezogen. Wähle ein Labor, um weiterzumachen.",
+    "home": "Zurück zur Übersicht",
+    "boards": "Board-Labor",
+    "robotics": "Robotik-Labor",
+    "drones": "Drohnen-Labor"
+  },
+  "progress": {
+    "count": "{done}/{total}",
+    "label": "{done} von {total} erledigt"
+  },
+  "untranslated": {
+    "title": "Noch nicht übersetzt",
+    "body": "Der Text dieser Seite ist noch nicht ins Deutsche übersetzt und wird deshalb auf Englisch angezeigt."
+  },
+  "client": {
+    "figure": {
+      "loading": "Die Abbildung wird geladen …",
+      "failed": "Die Abbildung wurde nicht geladen. Lade die Seite neu, um es noch einmal zu versuchen.",
+      "controls": "Steuerung der Abbildung",
+      "controlsHint": "Alles, was du in der Abbildung drücken kannst, als Schaltflächen.",
+      "buttons": "Schaltflächen",
+      "parts": "Bauteile"
+    },
+    "dock": {
+      "label": "Labor-Werkzeuge",
+      "open": "Werkzeuge öffnen",
+      "close": "Werkzeuge schließen",
+      "tabs": {
+        "partner": "Partner",
+        "together": "Gemeinsam",
+        "real": "In echt bauen",
+        "passport": "Pass",
+        "hardware": "Hardware"
+      }
+    },
+    "sound": {
+      "label": "Ton",
+      "turnOn": "Ton einschalten",
+      "turnOff": "Ton ausschalten"
+    },
+    "motion": {
+      "label": "Bewegung reduzieren"
+    },
+    "usage": {
+      "label": "Anonyme Nutzungszahlen",
+      "body": "iynk zählt, was in den Laboren passiert (eine bestandene Lektion, ein gebauter Schritt, ein ausprobierter Fehler), für die Live-Zähler und Bestenlisten. Jedes Ereignis trägt eine zufällige ID für diesen Browser, nie deinen Namen oder deinen Code.",
+      "toggle": "Anonyme Nutzungszahlen teilen"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "site": {
+    "name": "iynk",
+    "tagline": "Explorer · Comprendre · Construire",
+    "description": "Un labo d’électronique pratique dans le navigateur : assemblez, câblez, programmez, cassez et faites voler cartes, robots et drones."
+  },
+  "a11y": {
+    "skipToContent": "Aller au contenu principal"
+  },
+  "notFound": {
+    "metaTitle": "Page introuvable",
+    "title": "Cette page n’est pas sur l’établi",
+    "body": "L’adresse est peut-être mal saisie, ou la page a été déplacée. Choisissez un labo pour continuer.",
+    "home": "Retour au tableau de bord",
+    "boards": "Labo des cartes",
+    "robotics": "Labo de robotique",
+    "drones": "Labo des drones"
+  },
+  "progress": {
+    "count": "{done}/{total}",
+    "label": "{done} sur {total} terminés"
+  },
+  "untranslated": {
+    "title": "Pas encore traduit",
+    "body": "Le texte de cette page n’est pas encore traduit en français, il s’affiche donc en anglais."
+  },
+  "client": {
+    "figure": {
+      "loading": "Chargement de la figure…",
+      "failed": "La figure ne s’est pas chargée. Rechargez la page pour réessayer.",
+      "controls": "Commandes de la figure",
+      "controlsHint": "Tout ce que vous pouvez actionner dans la figure, sous forme de boutons.",
+      "buttons": "Boutons",
+      "parts": "Pièces"
+    },
+    "dock": {
+      "label": "Outils du labo",
+      "open": "Ouvrir les outils",
+      "close": "Fermer les outils",
+      "tabs": {
+        "partner": "Partenaire",
+        "together": "Ensemble",
+        "real": "Construire pour de vrai",
+        "passport": "Passeport",
+        "hardware": "Matériel"
+      }
+    },
+    "sound": {
+      "label": "Son",
+      "turnOn": "Activer le son",
+      "turnOff": "Couper le son"
+    },
+    "motion": {
+      "label": "Réduire les animations"
+    },
+    "usage": {
+      "label": "Statistiques d’usage anonymes",
+      "body": "iynk compte ce qui se passe dans les labos (une leçon réussie, une étape montée, une panne essayée) pour les compteurs en direct et les classements. Chaque événement porte un identifiant aléatoire propre à ce navigateur, jamais votre nom ni votre code.",
+      "toggle": "Partager les statistiques d’usage anonymes"
+    }
+  }
+}

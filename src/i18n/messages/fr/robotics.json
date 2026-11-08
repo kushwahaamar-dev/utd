@@ -1,0 +1,330 @@
+{
+  "meta": {
+    "indexTitle": "Labo de robotique",
+    "indexDescription": "Treize bancs sur un parcours de robotique de six mois : montez chaque carte pièce par pièce, mettez-la sous tension, cassez-la exprès et réparez-la, de la loi d'Ohm à un cerveau de robot sous ROS 2.",
+    "benchDescription": "{name} : {teaches}"
+  },
+  "index": {
+    "kicker": "Labo de robotique",
+    "title": "Montez, alimentez, cassez, réparez",
+    "count": {
+      "one": "{count} banc",
+      "other": "{count} bancs"
+    },
+    "lede": "Treize bancs dessinés à l'encre, dans l'ordre d'un parcours de robotique de six mois. Chacun vous guide dans le montage, vous laisse provoquer les pannes qui piègent ceux qui montent pour de vrai, et se termine par des exercices pratiques, vérifiés en exécutant du code, et un petit quiz.",
+    "fig": "Fig. {n}",
+    "progress": "{done}/{total}",
+    "progressLabel": "{done} sur {total} étapes, exercices et quiz terminés",
+    "onMat": "Sur le tapis : {board}",
+    "ownSupply": "Pas de contrôleur : le banc tourne sur sa propre alimentation",
+    "open": "Ouvrir le banc {name}",
+    "months": {
+      "m0": "Commencez ici",
+      "m1": "Mois 1 · électronique",
+      "m2": "Mois 2 · microcontrôleurs",
+      "m3": "Mois 3 · moteurs et drivers",
+      "m4": "Mois 4 · capteurs",
+      "m5": "Mois 5 · alimentation et cerveau ROS 2"
+    },
+    "tagsLabel": "Thèmes",
+    "progressName": "Progression",
+    "steps": {
+      "one": "{count} étape",
+      "other": "{count} étapes"
+    },
+    "tasks": {
+      "one": "{count} exercice",
+      "other": "{count} exercices"
+    },
+    "quizzes": {
+      "one": "{count} quiz",
+      "other": "{count} quiz"
+    }
+  },
+  "benches": {
+    "uno-r3-build": {
+      "name": "Arduino Uno R3",
+      "teaches": "Découvrez la carte : montez-la à partir d'un circuit imprimé nu, passez les composants CMS à la refusion, soudez les composants traversants, téléversez un sketch et cassez-la exprès."
+    },
+    "led-resistor": {
+      "name": "LED + résistance",
+      "teaches": "La loi d'Ohm au multimètre : choisissez une résistance, prévoyez le courant, mesurez-le, et voyez ce que font une résistance court-circuitée ou une LED à l'envers."
+    },
+    "transistor-switch": {
+      "name": "Interrupteur à transistor",
+      "teaches": "La logique commande la puissance : une broche du Nano commute un moteur à travers un TIP120, et une diode de roue libre protège le transistor de la pointe de tension à la coupure."
+    },
+    "esp32-s3-build": {
+      "name": "ESP32-S3 DevKitC-1",
+      "teaches": "Le Wi-Fi et deux cœurs : montez la carte de développement, allumez la LED RGB sur GPIO38 et servez une page web depuis la puce."
+    },
+    "tb6612fng": {
+      "name": "Driver TB6612FNG",
+      "teaches": "Un pont en H à MOSFET : sens, vitesse en PWM, frein et veille pour deux moteurs à courant continu depuis un seul Nano."
+    },
+    "l298n": {
+      "name": "Driver L298N",
+      "teaches": "Le module classique, et pourquoi l'éviter : ses commutateurs bipolaires font chuter environ 2 V et les changent en chaleur, et les cavaliers d'activation comptent."
+    },
+    "a4988": {
+      "name": "Driver pas à pas A4988",
+      "teaches": "Le micropas sur un NEMA 17 : réglez la limite de courant avec Vref avant que le moteur tourne, puis pas, sens et pas de 1/16."
+    },
+    "pca9685": {
+      "name": "Carte servo PCA9685",
+      "teaches": "Seize canaux PWM sur I2C : des impulsions servo à 50 Hz, et une alimentation séparée pour le courant des servos calés."
+    },
+    "mpu6050": {
+      "name": "Centrale inertielle MPU-6050",
+      "teaches": "Un gyroscope et un accéléromètre sur I2C : regardez dériver l'angle du gyroscope, puis fusionnez les deux avec un filtre complémentaire."
+    },
+    "hc-sr04": {
+      "name": "Ultrasons HC-SR04",
+      "teaches": "Temps de vol : un déclenchement de 10 µs, une impulsion d'écho, et distance = durée de l'écho × 343 m/s ÷ 2."
+    },
+    "qtr-8rc": {
+      "name": "Capteur de ligne QTR-8RC",
+      "teaches": "Huit capteurs de réflectance lus par temps de décharge RC, une position de ligne pondérée et un suiveur de ligne aux Kp et Kd réglables."
+    },
+    "lm2596": {
+      "name": "Module abaisseur LM2596",
+      "teaches": "Alimentation et brown-out : tournez le trimmer pour régler la sortie depuis une LiPo, puis regardez un moteur calé faire chuter un rail partagé."
+    },
+    "pi5-ros2": {
+      "name": "Raspberry Pi 5",
+      "teaches": "Le cerveau ROS 2 : l'alimentation USB-C officielle de 27 W (5,1 V, 5 A), les drapeaux de sous-tension, et des nœuds qui communiquent par topics."
+    }
+  },
+  "tags": {
+    "build": "montage",
+    "smd": "CMS",
+    "tht": "traversant",
+    "ohms-law": "loi d'Ohm",
+    "meter": "multimètre",
+    "transistor": "transistor",
+    "motor": "moteur",
+    "wifi": "Wi-Fi",
+    "rgb-led": "LED RGB",
+    "motor-driver": "driver de moteurs",
+    "pwm": "PWM",
+    "heat": "chaleur",
+    "stepper": "pas à pas",
+    "microstepping": "micropas",
+    "i2c": "I2C",
+    "servo": "servo",
+    "imu": "IMU",
+    "filters": "filtres",
+    "ultrasonic": "ultrasons",
+    "timing": "chronométrage",
+    "line-sensor": "capteur de ligne",
+    "rc-timing": "temps de décharge RC",
+    "power": "alimentation",
+    "buck": "convertisseur abaisseur",
+    "brownout": "brown-out",
+    "linux": "Linux",
+    "ros2": "ROS 2"
+  },
+  "bench": {
+    "kicker": "Fig. {n} · Labo de robotique",
+    "back": "Tous les bancs",
+    "progress": "{done}/{total}",
+    "progressLabel": "{done} sur {total} étapes, exercices et quiz terminés sur ce banc",
+    "figureTitle": "{name} : banc interactif",
+    "figureHint": "Cliquez sur les pièces de la figure, ou utilisez les boutons de pièces en dessous. Appuyez sur Échap dans la figure pour revenir ici.",
+    "overview": "Présentation du banc",
+    "boardLink": "Ouvrir la page de la carte {board}",
+    "nextBench": "Banc suivant : {name}",
+    "prevBench": "Banc précédent : {name}",
+    "sources": "Sources",
+    "progressName": "Progression",
+    "figureHeading": "Le banc",
+    "focusFigure": "Entrer dans la figure",
+    "selected": "Pièce sélectionnée",
+    "walk": "Autres bancs",
+    "tabs": {
+      "label": "Panneaux du banc",
+      "steps": "Étapes",
+      "faults": "Casser",
+      "status": "État",
+      "quiz": "Quiz"
+    }
+  },
+  "steps": {
+    "heading": "Monter et casser",
+    "doIt": "Faire",
+    "redo": "Refaire",
+    "byHand": "À faire dans la figure",
+    "done": "Fait",
+    "current": "À suivre",
+    "kinds": {
+      "build": "Monter",
+      "break": "Casser",
+      "test": "Tester"
+    },
+    "faultSeen": "Panne constatée. Maintenant, réparez-la : {fix}",
+    "outOfOrder": "Terminez d'abord l'étape précédente : {step}",
+    "quizAfter": "Un quiz suit cette étape",
+    "sent": "Envoyé au banc : {step}",
+    "allDone": "Toutes les étapes sont faites. Essayez maintenant les exercices pratiques.",
+    "byHandNotice": "À faire dans la figure : {step}",
+    "stepDone": "Fait : {step}"
+  },
+  "faults": {
+    "heading": "Casser exprès",
+    "intro": "Chaque panne est de celles qui piègent ceux qui montent pour de vrai. Déclenchez-la, lisez le symptôme sur le banc, puis réparez.",
+    "trigger": "Déclencher",
+    "repair": "Réparer",
+    "clear": "Effacer toutes les pannes",
+    "active": "Active",
+    "symptom": "Symptôme",
+    "why": "Pourquoi ça arrive",
+    "fix": "Solution",
+    "kinds": {
+      "reverse-polarity": "polarité inversée",
+      "brownout": "brown-out",
+      "wrong-voltage": "mauvaise tension",
+      "cold-solder": "soudure froide",
+      "short": "court-circuit",
+      "missing-part": "pièce manquante",
+      "reversed-part": "pièce à l'envers",
+      "overcurrent": "surintensité",
+      "level-mismatch": "niveaux logiques incompatibles",
+      "boot-strap": "broche de strapping",
+      "floating-input": "entrée flottante",
+      "thermal": "surchauffe",
+      "config": "mauvais réglage"
+    }
+  },
+  "status": {
+    "heading": "État en direct",
+    "figure": "Banc",
+    "states": {
+      "off": "Éteint",
+      "no-power": "Pas d'alimentation",
+      "powered": "Sous tension",
+      "running": "En marche",
+      "uploading": "Téléversement",
+      "brownout": "Brown-out",
+      "fault": "Panne",
+      "reset": "En reset"
+    },
+    "on": "Allumé",
+    "off": "Éteint",
+    "high": "HIGH",
+    "low": "LOW",
+    "running": "En marche",
+    "stopped": "Arrêté",
+    "none": "Pas encore de mesure",
+    "rails": "Rails",
+    "units": {
+      "ma": "{v} mA",
+      "volts": "{v} V",
+      "percent": "{v} %",
+      "rpm": "{v} tr/min",
+      "deg": "{v}°",
+      "cm": "{v} cm",
+      "hz": "{v} Hz"
+    },
+    "fault": "Panne : {msg}",
+    "faultFix": "Solution : {fix}"
+  },
+  "current": {
+    "heading": "Consommation",
+    "of": "{ma} mA sur {limit} mA",
+    "supply": "{label} · {volts} V",
+    "headroom": "{ma} mA de marge",
+    "limit": "Limite {limit}",
+    "over": "{ma} mA au-dessus de la limite : l'alimentation chute et la carte fait un brown-out",
+    "loads": "Qui consomme",
+    "idle": "Rien ne consomme sur cette alimentation pour l'instant",
+    "load": "{ma} mA"
+  },
+  "serial": {
+    "heading": "Moniteur série",
+    "notes": "Notes du banc",
+    "terminal": "Terminal (SSH)",
+    "empty": "Rien d'affiché pour l'instant. Mettez le banc sous tension et sa sortie apparaît ici.",
+    "clear": "Effacer"
+  },
+  "modes": {
+    "heading": "Sur le banc",
+    "pick": "Programme",
+    "upload": "Téléverser",
+    "switch": "Changer",
+    "running": "En marche",
+    "selected": "Sélectionné",
+    "bytes": "Le sketch utilise {bytes} octets d'espace programme",
+    "instant": "Immédiat : bascule tout de suite, sans téléversement",
+    "code": "Code : {title}",
+    "copy": "Copier le code",
+    "copied": "Copié"
+  },
+  "tasks": {
+    "heading": "Exercices pratiques",
+    "count": "{done}/{total} exercices",
+    "intro": "Écrivez le code, puis lancez les vérifications. L'exécution utilise une horloge virtuelle et un monde scripté : le même code donne toujours le même résultat.",
+    "editor": "Code pour {title}",
+    "run": "Lancer les vérifications",
+    "runningNow": "En cours…",
+    "resetCode": "Revenir au code de départ",
+    "solution": "Charger la solution de référence",
+    "solutionLoaded": "Solution de référence chargée",
+    "undo": "Annuler",
+    "hints": "Indices",
+    "checks": "Vérifications",
+    "passed": "Les {total} vérifications passent. Exercice terminé.",
+    "partial": "{passed} vérifications réussies sur {total}",
+    "notRun": "Pas encore lancé",
+    "pass": "Réussi",
+    "fail": "Échec",
+    "error": "Ligne {line} : {message}",
+    "runtime": "L'exécution s'est arrêtée : {message}",
+    "serialOut": "Sortie série de l'exécution",
+    "noSerial": "L'exécution n'a rien affiché",
+    "done": "Fait",
+    "language": {
+      "arduino-cpp": "Arduino C++",
+      "micropython": "MicroPython",
+      "python": "Python",
+      "verilog": "Verilog"
+    },
+    "passedNotice": "Exercice terminé : {title}"
+  },
+  "quiz": {
+    "heading": "Testez-vous",
+    "after": "Après : {step}",
+    "final": "Quiz de fin de banc",
+    "open": "Faire le quiz",
+    "retake": "Le refaire",
+    "question": "Question {n} sur {total}",
+    "check": "Vérifier la réponse",
+    "next": "Question suivante",
+    "finish": "Voir mon score",
+    "close": "Fermer",
+    "right": "Exact.",
+    "wrong": "Pas tout à fait. La réponse est : {answer}",
+    "score": "{score}/{total} justes",
+    "best": "Record : {score}/{total}",
+    "notTaken": "Pas encore fait",
+    "unlocks": "Débloqué après : {step}",
+    "ready": "Un quiz est prêt : {title}",
+    "choose": "Choisissez une réponse",
+    "unlocksAll": "Débloqué quand toutes les étapes sont faites"
+  },
+  "keys": {
+    "open": "Raccourcis clavier",
+    "heading": "Raccourcis clavier",
+    "intro": "Ils fonctionnent partout sur la page, sauf pendant la saisie dans un éditeur de code.",
+    "close": "Fermer",
+    "list": {
+      "help": "Afficher cette liste",
+      "next": "Faire l'étape de montage suivante",
+      "figure": "Placer le focus dans la figure",
+      "escape": "Quitter la figure ou fermer une fenêtre",
+      "quiz": "Ouvrir le quiz qui est prêt",
+      "serial": "Aller à la sortie série",
+      "tasks": "Aller aux exercices pratiques",
+      "run": "Lancer les vérifications pendant l'édition d'un exercice"
+    }
+  }
+}

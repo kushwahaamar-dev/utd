@@ -1,0 +1,330 @@
+{
+  "meta": {
+    "indexTitle": "Laboratorio de robótica",
+    "indexDescription": "Trece bancos en una hoja de ruta de robótica de seis meses: monta cada placa pieza a pieza, dale corriente, averíala a propósito y arréglala, desde la ley de Ohm hasta un cerebro de robot con ROS 2.",
+    "benchDescription": "{name}: {teaches}"
+  },
+  "index": {
+    "kicker": "Laboratorio de robótica",
+    "title": "Móntalo, dale corriente, averíalo, arréglalo",
+    "count": {
+      "one": "{count} banco",
+      "other": "{count} bancos"
+    },
+    "lede": "Trece bancos entintados a mano, en el orden de una hoja de ruta de robótica de seis meses. Cada uno te guía por el montaje, te deja provocar los fallos que pillan a los que montan de verdad y termina con tareas prácticas que compruebas ejecutando código y con un cuestionario corto.",
+    "fig": "Fig. {n}",
+    "progress": "{done}/{total}",
+    "progressLabel": "{done} de {total} pasos, tareas y cuestionarios completados",
+    "onMat": "En la alfombrilla: {board}",
+    "ownSupply": "Sin controlador: el banco funciona con su propia fuente",
+    "open": "Abrir el banco {name}",
+    "months": {
+      "m0": "Empieza aquí",
+      "m1": "Mes 1 · electrónica",
+      "m2": "Mes 2 · microcontroladores",
+      "m3": "Mes 3 · motores y drivers",
+      "m4": "Mes 4 · sensores",
+      "m5": "Mes 5 · alimentación y el cerebro ROS 2"
+    },
+    "tagsLabel": "Temas",
+    "progressName": "Progreso",
+    "steps": {
+      "one": "{count} paso",
+      "other": "{count} pasos"
+    },
+    "tasks": {
+      "one": "{count} tarea",
+      "other": "{count} tareas"
+    },
+    "quizzes": {
+      "one": "{count} quiz",
+      "other": "{count} quizzes"
+    }
+  },
+  "benches": {
+    "uno-r3-build": {
+      "name": "Arduino Uno R3",
+      "teaches": "Conoce la placa: móntala desde la PCB desnuda, suelda por reflujo las piezas SMD, suelda las de inserción, carga un sketch y averíala a propósito."
+    },
+    "led-resistor": {
+      "name": "LED + resistencia",
+      "teaches": "La ley de Ohm con un multímetro: elige una resistencia, predice la corriente, mídela y mira qué pasa con la resistencia puenteada o con el LED al revés."
+    },
+    "transistor-switch": {
+      "name": "Interruptor con transistor",
+      "teaches": "La lógica gobierna la potencia: un pin de la Nano conmuta un motor a través de un TIP120, y un diodo de protección aleja del transistor el pico del apagado."
+    },
+    "esp32-s3-build": {
+      "name": "ESP32-S3 DevKitC-1",
+      "teaches": "Wi-Fi y dos núcleos: monta la placa de desarrollo, enciende el LED RGB de GPIO38 y sirve una página web desde el chip."
+    },
+    "tb6612fng": {
+      "name": "Driver TB6612FNG",
+      "teaches": "Un puente H de MOSFET: sentido, velocidad por PWM, freno y standby para dos motores de CC desde una sola Nano."
+    },
+    "l298n": {
+      "name": "Driver L298N",
+      "teaches": "El módulo clásico y por qué conviene evitarlo: sus interruptores bipolares pierden unos 2 V y los convierten en calor, y los jumpers de habilitación importan."
+    },
+    "a4988": {
+      "name": "Driver paso a paso A4988",
+      "teaches": "Micropasos en un NEMA 17: fija el límite de corriente con Vref antes de que gire el motor y luego paso, sentido y pasos de 1/16."
+    },
+    "pca9685": {
+      "name": "Placa de servos PCA9685",
+      "teaches": "Dieciséis canales PWM por I2C: pulsos de servo a 50 Hz y una fuente aparte para la corriente de bloqueo de los servos."
+    },
+    "mpu6050": {
+      "name": "IMU MPU-6050",
+      "teaches": "Un giroscopio y un acelerómetro por I2C: mira cómo deriva el ángulo del giroscopio y luego combina los dos con un filtro complementario."
+    },
+    "hc-sr04": {
+      "name": "Ultrasonidos HC-SR04",
+      "teaches": "Tiempo de vuelo: un disparo de 10 µs, un pulso de eco y distancia = tiempo de eco × 343 m/s ÷ 2."
+    },
+    "qtr-8rc": {
+      "name": "Sensor de línea QTR-8RC",
+      "teaches": "Ocho sensores de reflectancia leídos por tiempo de carga RC, una posición de línea ponderada y un seguidor de línea con Kp y Kd ajustables."
+    },
+    "lm2596": {
+      "name": "Módulo reductor LM2596",
+      "teaches": "Alimentación y caídas de tensión: gira el trimmer para fijar la salida desde una LiPo y luego mira cómo un motor bloqueado arrastra hacia abajo una línea compartida."
+    },
+    "pi5-ros2": {
+      "name": "Raspberry Pi 5",
+      "teaches": "El cerebro ROS 2: la fuente USB-C oficial de 27 W (5,1 V, 5 A), los avisos de subtensión y nodos que se comunican por topics."
+    }
+  },
+  "tags": {
+    "build": "montaje",
+    "smd": "SMD",
+    "tht": "inserción",
+    "ohms-law": "ley de Ohm",
+    "meter": "multímetro",
+    "transistor": "transistor",
+    "motor": "motor",
+    "wifi": "Wi-Fi",
+    "rgb-led": "LED RGB",
+    "motor-driver": "driver de motores",
+    "pwm": "PWM",
+    "heat": "calor",
+    "stepper": "motor paso a paso",
+    "microstepping": "micropasos",
+    "i2c": "I2C",
+    "servo": "servo",
+    "imu": "IMU",
+    "filters": "filtros",
+    "ultrasonic": "ultrasonidos",
+    "timing": "temporización",
+    "line-sensor": "sensor de línea",
+    "rc-timing": "tiempo RC",
+    "power": "alimentación",
+    "buck": "convertidor reductor",
+    "brownout": "caída de tensión",
+    "linux": "Linux",
+    "ros2": "ROS 2"
+  },
+  "bench": {
+    "kicker": "Fig. {n} · Laboratorio de robótica",
+    "back": "Todos los bancos",
+    "progress": "{done}/{total}",
+    "progressLabel": "{done} de {total} pasos, tareas y cuestionarios completados en este banco",
+    "figureTitle": "{name}: banco interactivo",
+    "figureHint": "Haz clic en las piezas de la figura o usa los botones de piezas que hay debajo. Pulsa Escape dentro de la figura para volver aquí.",
+    "overview": "Conoce el banco",
+    "boardLink": "Abrir la página de la placa {board}",
+    "nextBench": "Banco siguiente: {name}",
+    "prevBench": "Banco anterior: {name}",
+    "sources": "Fuentes",
+    "progressName": "Progreso",
+    "figureHeading": "El banco",
+    "focusFigure": "Entrar en la figura",
+    "selected": "Pieza seleccionada",
+    "walk": "Más bancos",
+    "tabs": {
+      "label": "Paneles del banco",
+      "steps": "Pasos",
+      "faults": "Averíala",
+      "status": "Estado",
+      "quiz": "Quiz"
+    }
+  },
+  "steps": {
+    "heading": "Monta y avería",
+    "doIt": "Hacerlo",
+    "redo": "Hacerlo otra vez",
+    "byHand": "Hazlo en la figura",
+    "done": "Hecho",
+    "current": "Siguiente",
+    "kinds": {
+      "build": "Montaje",
+      "break": "Averíala",
+      "test": "Prueba"
+    },
+    "faultSeen": "Avería vista. Ahora arréglala: {fix}",
+    "outOfOrder": "Termina primero el paso anterior: {step}",
+    "quizAfter": "Después de este paso hay un cuestionario",
+    "sent": "Enviado al banco: {step}",
+    "allDone": "Todos los pasos están hechos. Prueba ahora las tareas prácticas.",
+    "byHandNotice": "Hazlo en la figura: {step}",
+    "stepDone": "Hecho: {step}"
+  },
+  "faults": {
+    "heading": "Averíala a propósito",
+    "intro": "Cada avería es de las que pillan a quien monta de verdad. Provócala, lee el síntoma en el banco y luego arréglala.",
+    "trigger": "Provocar",
+    "repair": "Reparar",
+    "clear": "Reparar todas las averías",
+    "active": "Activa",
+    "symptom": "Síntoma",
+    "why": "Por qué pasa",
+    "fix": "Solución",
+    "kinds": {
+      "reverse-polarity": "polaridad invertida",
+      "brownout": "caída de tensión",
+      "wrong-voltage": "tensión incorrecta",
+      "cold-solder": "soldadura fría",
+      "short": "cortocircuito",
+      "missing-part": "falta una pieza",
+      "reversed-part": "pieza al revés",
+      "overcurrent": "sobrecorriente",
+      "level-mismatch": "niveles lógicos distintos",
+      "boot-strap": "pin de arranque",
+      "floating-input": "entrada flotante",
+      "thermal": "sobrecalentamiento",
+      "config": "ajuste incorrecto"
+    }
+  },
+  "status": {
+    "heading": "Estado en vivo",
+    "figure": "Banco",
+    "states": {
+      "off": "Apagado",
+      "no-power": "Sin alimentación",
+      "powered": "Alimentado",
+      "running": "En marcha",
+      "uploading": "Cargando",
+      "brownout": "Caída de tensión",
+      "fault": "Avería",
+      "reset": "En reinicio"
+    },
+    "on": "Encendido",
+    "off": "Apagado",
+    "high": "HIGH",
+    "low": "LOW",
+    "running": "En marcha",
+    "stopped": "Parado",
+    "none": "Aún sin lectura",
+    "rails": "Líneas de alimentación",
+    "units": {
+      "ma": "{v} mA",
+      "volts": "{v} V",
+      "percent": "{v} %",
+      "rpm": "{v} rpm",
+      "deg": "{v}°",
+      "cm": "{v} cm",
+      "hz": "{v} Hz"
+    },
+    "fault": "Avería: {msg}",
+    "faultFix": "Solución: {fix}"
+  },
+  "current": {
+    "heading": "Consumo de corriente",
+    "of": "{ma} de {limit} mA",
+    "supply": "{label} · {volts} V",
+    "headroom": "Quedan {ma} mA de margen",
+    "limit": "Límite {limit}",
+    "over": "Supera el límite en {ma} mA: la fuente cae y la placa sufre una caída de tensión",
+    "loads": "Qué la consume",
+    "idle": "Ahora mismo nada consume corriente de esta fuente",
+    "load": "{ma} mA"
+  },
+  "serial": {
+    "heading": "Monitor serie",
+    "notes": "Notas del banco",
+    "terminal": "Terminal (SSH)",
+    "empty": "Aún no se ha imprimido nada. Dale corriente al banco y su salida aparecerá aquí.",
+    "clear": "Borrar"
+  },
+  "modes": {
+    "heading": "En el banco",
+    "pick": "Programa",
+    "upload": "Cargar",
+    "switch": "Cambiar",
+    "running": "En marcha ahora",
+    "selected": "Seleccionado",
+    "bytes": "El sketch usa {bytes} bytes del espacio de almacenamiento de programa",
+    "instant": "Instantáneo: cambia al momento, sin carga",
+    "code": "Código: {title}",
+    "copy": "Copiar código",
+    "copied": "Copiado"
+  },
+  "tasks": {
+    "heading": "Tareas prácticas",
+    "count": "{done}/{total} tareas",
+    "intro": "Escribe el código y luego ejecuta las comprobaciones. La ejecución usa un reloj virtual y un entorno con guion, así que el mismo código da siempre el mismo resultado.",
+    "editor": "Código de {title}",
+    "run": "Ejecutar comprobaciones",
+    "runningNow": "Ejecutando…",
+    "resetCode": "Volver al código inicial",
+    "solution": "Cargar la solución de referencia",
+    "solutionLoaded": "Solución de referencia cargada",
+    "undo": "Deshacer",
+    "hints": "Pistas",
+    "checks": "Comprobaciones",
+    "passed": "Pasan las {total} comprobaciones. Tarea hecha.",
+    "partial": "Pasan {passed} de {total} comprobaciones",
+    "notRun": "Aún sin ejecutar",
+    "pass": "Pasa",
+    "fail": "Falla",
+    "error": "Línea {line}: {message}",
+    "runtime": "La ejecución se detuvo: {message}",
+    "serialOut": "Salida serie de la ejecución",
+    "noSerial": "La ejecución no imprimió nada",
+    "done": "Hecha",
+    "language": {
+      "arduino-cpp": "Arduino C++",
+      "micropython": "MicroPython",
+      "python": "Python",
+      "verilog": "Verilog"
+    },
+    "passedNotice": "Tarea hecha: {title}"
+  },
+  "quiz": {
+    "heading": "Ponte a prueba",
+    "after": "Después de: {step}",
+    "final": "Cuestionario final del banco",
+    "open": "Hacer el cuestionario",
+    "retake": "Volver a hacerlo",
+    "question": "Pregunta {n} de {total}",
+    "check": "Comprobar respuesta",
+    "next": "Siguiente pregunta",
+    "finish": "Ver mi puntuación",
+    "close": "Cerrar",
+    "right": "Correcto.",
+    "wrong": "No exactamente. La respuesta es: {answer}",
+    "score": "{score}/{total} correctas",
+    "best": "Mejor: {score}/{total}",
+    "notTaken": "Aún sin hacer",
+    "unlocks": "Se desbloquea después de: {step}",
+    "ready": "Hay un cuestionario listo: {title}",
+    "choose": "Elige una respuesta",
+    "unlocksAll": "Se desbloquea cuando todos los pasos están hechos"
+  },
+  "keys": {
+    "open": "Atajos de teclado",
+    "heading": "Atajos de teclado",
+    "intro": "Funcionan en cualquier parte de la página, salvo mientras escribes en un editor de código.",
+    "close": "Cerrar",
+    "list": {
+      "help": "Mostrar esta lista",
+      "next": "Hacer el siguiente paso de montaje",
+      "figure": "Llevar el foco a la figura",
+      "escape": "Salir de la figura o cerrar un diálogo",
+      "quiz": "Abrir el cuestionario que está listo",
+      "serial": "Ir a la salida serie",
+      "tasks": "Ir a las tareas prácticas",
+      "run": "Ejecutar las comprobaciones mientras editas una tarea"
+    }
+  }
+}

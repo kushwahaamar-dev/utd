@@ -1,0 +1,62 @@
+{
+  "site": {
+    "name": "iynk",
+    "tagline": "Explora · Comprende · Construye",
+    "description": "Un laboratorio de hardware práctico en el navegador: monta, cablea, programa, rompe y haz volar placas, robots y drones."
+  },
+  "a11y": {
+    "skipToContent": "Saltar al contenido principal"
+  },
+  "notFound": {
+    "metaTitle": "Página no encontrada",
+    "title": "Esta página no está en el banco de trabajo",
+    "body": "Puede que la dirección esté mal escrita o que la página se haya movido. Elige un laboratorio para continuar.",
+    "home": "Volver al panel",
+    "boards": "Laboratorio de placas",
+    "robotics": "Laboratorio de robótica",
+    "drones": "Laboratorio de drones"
+  },
+  "progress": {
+    "count": "{done}/{total}",
+    "label": "{done} de {total} completados"
+  },
+  "untranslated": {
+    "title": "Aún sin traducir",
+    "body": "El texto de esta página todavía no está traducido al español, así que se muestra en inglés."
+  },
+  "client": {
+    "figure": {
+      "loading": "Cargando la figura…",
+      "failed": "La figura no se cargó. Recarga la página para volver a intentarlo.",
+      "controls": "Controles de la figura",
+      "controlsHint": "Todo lo que puedes pulsar en la figura, como botones.",
+      "buttons": "Botones",
+      "parts": "Piezas"
+    },
+    "dock": {
+      "label": "Herramientas del laboratorio",
+      "open": "Abrir herramientas",
+      "close": "Cerrar herramientas",
+      "tabs": {
+        "partner": "Compañero",
+        "together": "Juntos",
+        "real": "Constrúyelo de verdad",
+        "passport": "Pasaporte",
+        "hardware": "Hardware"
+      }
+    },
+    "sound": {
+      "label": "Sonido",
+      "turnOn": "Activar el sonido",
+      "turnOff": "Desactivar el sonido"
+    },
+    "motion": {
+      "label": "Reducir el movimiento"
+    },
+    "usage": {
+      "label": "Recuentos de uso anónimos",
+      "body": "iynk cuenta lo que pasa en los laboratorios (una lección superada, un paso montado, un fallo probado) para los contadores en directo y las clasificaciones. Cada evento lleva un identificador aleatorio de este navegador, nunca tu nombre ni tu código.",
+      "toggle": "Compartir recuentos de uso anónimos"
+    }
+  }
+}

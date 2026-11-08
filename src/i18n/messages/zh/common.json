@@ -1,0 +1,62 @@
+{
+  "site": {
+    "name": "iynk",
+    "tagline": "探索 · 理解 · 动手做",
+    "description": "在浏览器里动手的硬件实验室：搭建、接线、编程、故障排查，还能让开发板、机器人和无人机动起来、飞起来。"
+  },
+  "a11y": {
+    "skipToContent": "跳到主要内容"
+  },
+  "notFound": {
+    "metaTitle": "找不到页面",
+    "title": "工作台上没有这个页面",
+    "body": "网址可能输错了，或者页面已经移动。选择一个实验室继续吧。",
+    "home": "返回总览",
+    "boards": "开发板实验室",
+    "robotics": "机器人实验室",
+    "drones": "无人机实验室"
+  },
+  "progress": {
+    "count": "{done}/{total}",
+    "label": "已完成 {done}/{total}"
+  },
+  "untranslated": {
+    "title": "尚未翻译",
+    "body": "本页文字尚未翻译成中文，因此以英文显示。"
+  },
+  "client": {
+    "figure": {
+      "loading": "正在加载图示…",
+      "failed": "图示没有加载出来。请刷新页面重试。",
+      "controls": "图示控件",
+      "controlsHint": "图示中所有可以按下的部分，都以按钮形式列在这里。",
+      "buttons": "按钮",
+      "parts": "部件"
+    },
+    "dock": {
+      "label": "实验室工具",
+      "open": "打开实验室工具",
+      "close": "关闭实验室工具",
+      "tabs": {
+        "partner": "搭档",
+        "together": "一起",
+        "real": "动手做真的",
+        "passport": "护照",
+        "hardware": "硬件"
+      }
+    },
+    "sound": {
+      "label": "声音",
+      "turnOn": "打开声音",
+      "turnOff": "关闭声音"
+    },
+    "motion": {
+      "label": "减少动态效果"
+    },
+    "usage": {
+      "label": "匿名使用计数",
+      "body": "iynk 会统计实验室里发生的事（通过一节课、完成一个步骤、试一次故障），用于实时计数和排行榜。每条记录只带这个浏览器的随机编号，绝不包含你的名字或代码。",
+      "toggle": "分享匿名使用计数"
+    }
+  }
+}

@@ -1,0 +1,330 @@
+{
+  "meta": {
+    "indexTitle": "Robotik-Labor",
+    "indexDescription": "Dreizehn Werkbänke auf einem sechsmonatigen Robotik-Fahrplan: Bau jedes Board Teil für Teil, versorg es mit Strom, mach es absichtlich kaputt und reparier es, vom ohmschen Gesetz bis zum ROS-2-Robotergehirn.",
+    "benchDescription": "{name}: {teaches}"
+  },
+  "index": {
+    "kicker": "Robotik-Labor",
+    "title": "Bauen, einschalten, kaputt machen, reparieren",
+    "count": {
+      "one": "{count} Werkbank",
+      "other": "{count} Werkbänke"
+    },
+    "lede": "Dreizehn von Hand getuschte Werkbänke in der Reihenfolge eines sechsmonatigen Robotik-Fahrplans. Jede führt dich durch den Bau, lässt dich die Fehler auslösen, über die echte Bastler stolpern, und endet mit Übungsaufgaben, die du prüfst, indem du Code ausführst, und mit einem kurzen Quiz.",
+    "fig": "Abb. {n}",
+    "progress": "{done}/{total}",
+    "progressLabel": "{done} von {total} Schritten, Aufgaben und Quizzen erledigt",
+    "onMat": "Auf der Matte: {board}",
+    "ownSupply": "Kein Controller: Die Werkbank läuft an ihrer eigenen Versorgung",
+    "open": "Werkbank {name} öffnen",
+    "months": {
+      "m0": "Hier anfangen",
+      "m1": "Monat 1 · Elektronik",
+      "m2": "Monat 2 · Mikrocontroller",
+      "m3": "Monat 3 · Motoren und Treiber",
+      "m4": "Monat 4 · Sensoren",
+      "m5": "Monat 5 · Stromversorgung und das ROS-2-Gehirn"
+    },
+    "tagsLabel": "Themen",
+    "progressName": "Fortschritt",
+    "steps": {
+      "one": "{count} Schritt",
+      "other": "{count} Schritte"
+    },
+    "tasks": {
+      "one": "{count} Aufgabe",
+      "other": "{count} Aufgaben"
+    },
+    "quizzes": {
+      "one": "{count} Quiz",
+      "other": "{count} Quizze"
+    }
+  },
+  "benches": {
+    "uno-r3-build": {
+      "name": "Arduino Uno R3",
+      "teaches": "Lerne das Board kennen: Bau es aus einer nackten Platine, löte die SMD-Teile im Reflow-Verfahren, löte die bedrahteten Teile ein, lade einen Sketch hoch und mach es absichtlich kaputt."
+    },
+    "led-resistor": {
+      "name": "LED + Widerstand",
+      "teaches": "Das ohmsche Gesetz mit einem Messgerät: Wähle einen Widerstand, sag den Strom voraus, miss ihn und sieh, was ein überbrückter Widerstand oder eine verkehrt herum eingesetzte LED anrichtet."
+    },
+    "transistor-switch": {
+      "name": "Transistorschalter",
+      "teaches": "Logik steuert Leistung: Ein Pin des Nano schaltet über einen TIP120 einen Motor, und eine Freilaufdiode hält die Abschaltspitze vom Transistor fern."
+    },
+    "esp32-s3-build": {
+      "name": "ESP32-S3 DevKitC-1",
+      "teaches": "WLAN und zwei Kerne: Bau das Dev-Board, lass die RGB-LED an GPIO38 leuchten und liefere vom Chip aus eine Webseite aus."
+    },
+    "tb6612fng": {
+      "name": "Treiber TB6612FNG",
+      "teaches": "Eine MOSFET-H-Brücke: Richtung, PWM-Geschwindigkeit, Bremse und Standby für zwei Gleichstrommotoren an einem Nano."
+    },
+    "l298n": {
+      "name": "Treiber L298N",
+      "teaches": "Das klassische Modul und warum du es meiden solltest: An seinen bipolaren Schaltern fallen rund 2 V ab, die zu Wärme werden, und die Enable-Jumper zählen."
+    },
+    "a4988": {
+      "name": "Schrittmotortreiber A4988",
+      "teaches": "Mikroschritte mit einem NEMA 17: Stell die Strombegrenzung mit Vref ein, bevor der Motor läuft, dann Step, Richtung und 1/16-Schritte."
+    },
+    "pca9685": {
+      "name": "Servo-Board PCA9685",
+      "teaches": "Sechzehn PWM-Kanäle über I2C: 50-Hz-Servoimpulse und eine eigene Versorgung für den Blockierstrom der Servos."
+    },
+    "mpu6050": {
+      "name": "IMU MPU-6050",
+      "teaches": "Ein Gyroskop und ein Beschleunigungssensor über I2C: Sieh zu, wie der Gyro-Winkel wegdriftet, und kombiniere dann beide mit einem Komplementärfilter."
+    },
+    "hc-sr04": {
+      "name": "Ultraschall HC-SR04",
+      "teaches": "Laufzeitmessung: ein 10-µs-Trigger, ein Echo-Impuls und Entfernung = Echozeit × 343 m/s ÷ 2."
+    },
+    "qtr-8rc": {
+      "name": "Liniensensor QTR-8RC",
+      "teaches": "Acht Reflexionssensoren, über RC-Timing gelesen, eine gewichtete Linienposition und ein Linienfolger mit einstellbarem Kp und Kd."
+    },
+    "lm2596": {
+      "name": "Abwärtswandler LM2596",
+      "teaches": "Versorgung und Brown-outs: Dreh am Trimmpoti, um den Ausgang an einem LiPo einzustellen, und sieh dann zu, wie ein blockierter Motor eine gemeinsame Schiene nach unten zieht."
+    },
+    "pi5-ros2": {
+      "name": "Raspberry Pi 5",
+      "teaches": "Das ROS-2-Gehirn: das offizielle 27-W-USB-C-Netzteil (5,1 V, 5 A), die Unterspannungs-Flags und Nodes, die über Topics miteinander reden."
+    }
+  },
+  "tags": {
+    "build": "Aufbau",
+    "smd": "SMD",
+    "tht": "Durchsteckmontage",
+    "ohms-law": "Ohmsches Gesetz",
+    "meter": "Multimeter",
+    "transistor": "Transistor",
+    "motor": "Motor",
+    "wifi": "WLAN",
+    "rgb-led": "RGB-LED",
+    "motor-driver": "Motortreiber",
+    "pwm": "PWM",
+    "heat": "Wärme",
+    "stepper": "Schrittmotor",
+    "microstepping": "Mikroschritte",
+    "i2c": "I2C",
+    "servo": "Servo",
+    "imu": "IMU",
+    "filters": "Filter",
+    "ultrasonic": "Ultraschall",
+    "timing": "Timing",
+    "line-sensor": "Liniensensor",
+    "rc-timing": "RC-Timing",
+    "power": "Stromversorgung",
+    "buck": "Abwärtswandler",
+    "brownout": "Brown-out",
+    "linux": "Linux",
+    "ros2": "ROS 2"
+  },
+  "bench": {
+    "kicker": "Abb. {n} · Robotik-Labor",
+    "back": "Alle Werkbänke",
+    "progress": "{done}/{total}",
+    "progressLabel": "{done} von {total} Schritten, Aufgaben und Quizzen auf dieser Werkbank erledigt",
+    "figureTitle": "{name}: interaktive Werkbank",
+    "figureHint": "Klick Bauteile in der Abbildung an oder nimm die Bauteil-Schaltflächen darunter. Drück in der Abbildung Escape, um hierher zurückzukommen.",
+    "overview": "Die Werkbank im Überblick",
+    "boardLink": "Board-Seite des {board} öffnen",
+    "nextBench": "Nächste Werkbank: {name}",
+    "prevBench": "Vorige Werkbank: {name}",
+    "sources": "Quellen",
+    "progressName": "Fortschritt",
+    "figureHeading": "Die Werkbank",
+    "focusFigure": "In die Abbildung wechseln",
+    "selected": "Ausgewähltes Bauteil",
+    "walk": "Weitere Werkbänke",
+    "tabs": {
+      "label": "Bereiche der Werkbank",
+      "steps": "Schritte",
+      "faults": "Fehler",
+      "status": "Status",
+      "quiz": "Quiz"
+    }
+  },
+  "steps": {
+    "heading": "Bauen und kaputt machen",
+    "doIt": "Ausführen",
+    "redo": "Erneut ausführen",
+    "byHand": "Mach das in der Abbildung",
+    "done": "Erledigt",
+    "current": "Als Nächstes",
+    "kinds": {
+      "build": "Bauen",
+      "break": "Kaputt machen",
+      "test": "Testen"
+    },
+    "faultSeen": "Fehler gesehen. Jetzt beheb ihn: {fix}",
+    "outOfOrder": "Erledige zuerst den Schritt davor: {step}",
+    "quizAfter": "Nach diesem Schritt folgt ein Quiz",
+    "sent": "An die Werkbank geschickt: {step}",
+    "allDone": "Alle Schritte sind erledigt. Probier als Nächstes die Übungsaufgaben.",
+    "byHandNotice": "Mach das in der Abbildung: {step}",
+    "stepDone": "Erledigt: {step}"
+  },
+  "faults": {
+    "heading": "Absichtlich kaputt machen",
+    "intro": "Jeder Fehler ist einer, über den echte Bastler stolpern. Lös ihn aus, lies das Symptom an der Werkbank ab und beheb ihn dann.",
+    "trigger": "Auslösen",
+    "repair": "Reparieren",
+    "clear": "Alle Fehler beheben",
+    "active": "Aktiv",
+    "symptom": "Symptom",
+    "why": "Warum es passiert",
+    "fix": "Lösung",
+    "kinds": {
+      "reverse-polarity": "Verpolung",
+      "brownout": "Brown-out",
+      "wrong-voltage": "falsche Spannung",
+      "cold-solder": "kalte Lötstelle",
+      "short": "Kurzschluss",
+      "missing-part": "fehlendes Bauteil",
+      "reversed-part": "Bauteil verkehrt herum",
+      "overcurrent": "Überstrom",
+      "level-mismatch": "unpassende Logikpegel",
+      "boot-strap": "Strapping-Pin",
+      "floating-input": "offener Eingang",
+      "thermal": "Überhitzung",
+      "config": "falsche Einstellung"
+    }
+  },
+  "status": {
+    "heading": "Live-Status",
+    "figure": "Werkbank",
+    "states": {
+      "off": "Aus",
+      "no-power": "Kein Strom",
+      "powered": "Unter Strom",
+      "running": "Läuft",
+      "uploading": "Upload läuft",
+      "brownout": "Brown-out",
+      "fault": "Fehler",
+      "reset": "Im Reset"
+    },
+    "on": "An",
+    "off": "Aus",
+    "high": "HIGH",
+    "low": "LOW",
+    "running": "Läuft",
+    "stopped": "Gestoppt",
+    "none": "Noch kein Messwert",
+    "rails": "Spannungsschienen",
+    "units": {
+      "ma": "{v} mA",
+      "volts": "{v} V",
+      "percent": "{v} %",
+      "rpm": "{v} U/min",
+      "deg": "{v}°",
+      "cm": "{v} cm",
+      "hz": "{v} Hz"
+    },
+    "fault": "Fehler: {msg}",
+    "faultFix": "Lösung: {fix}"
+  },
+  "current": {
+    "heading": "Stromaufnahme",
+    "of": "{ma} von {limit} mA",
+    "supply": "{label} · {volts} V",
+    "headroom": "{ma} mA Reserve",
+    "limit": "Grenze {limit}",
+    "over": "{ma} mA über der Grenze: Die Versorgung bricht ein und das Board bekommt einen Brown-out",
+    "loads": "Wer den Strom zieht",
+    "idle": "Gerade zieht nichts Strom aus dieser Versorgung",
+    "load": "{ma} mA"
+  },
+  "serial": {
+    "heading": "Serieller Monitor",
+    "notes": "Notizen zur Werkbank",
+    "terminal": "Terminal (SSH)",
+    "empty": "Noch nichts ausgegeben. Versorg die Werkbank mit Strom, dann erscheint ihre Ausgabe hier.",
+    "clear": "Leeren"
+  },
+  "modes": {
+    "heading": "Auf der Werkbank",
+    "pick": "Programm",
+    "upload": "Hochladen",
+    "switch": "Umschalten",
+    "running": "Läuft gerade",
+    "selected": "Ausgewählt",
+    "bytes": "Der Sketch verwendet {bytes} Bytes des Programmspeicherplatzes",
+    "instant": "Sofort: schaltet direkt um, ohne Upload",
+    "code": "Code: {title}",
+    "copy": "Code kopieren",
+    "copied": "Kopiert"
+  },
+  "tasks": {
+    "heading": "Übungsaufgaben",
+    "count": "{done}/{total} Aufgaben",
+    "intro": "Schreib den Code und führ dann die Prüfungen aus. Der Lauf nutzt eine virtuelle Uhr und eine geskriptete Umgebung, deshalb liefert derselbe Code immer dasselbe Ergebnis.",
+    "editor": "Code für {title}",
+    "run": "Prüfungen ausführen",
+    "runningNow": "Läuft …",
+    "resetCode": "Zurück zum Startcode",
+    "solution": "Musterlösung laden",
+    "solutionLoaded": "Musterlösung geladen",
+    "undo": "Rückgängig",
+    "hints": "Tipps",
+    "checks": "Prüfungen",
+    "passed": "Alle {total} Prüfungen bestanden. Aufgabe erledigt.",
+    "partial": "{passed} von {total} Prüfungen bestanden",
+    "notRun": "Noch nicht ausgeführt",
+    "pass": "Bestanden",
+    "fail": "Nicht bestanden",
+    "error": "Zeile {line}: {message}",
+    "runtime": "Der Lauf wurde abgebrochen: {message}",
+    "serialOut": "Serielle Ausgabe des Laufs",
+    "noSerial": "Der Lauf hat nichts ausgegeben",
+    "done": "Erledigt",
+    "language": {
+      "arduino-cpp": "Arduino C++",
+      "micropython": "MicroPython",
+      "python": "Python",
+      "verilog": "Verilog"
+    },
+    "passedNotice": "Aufgabe erledigt: {title}"
+  },
+  "quiz": {
+    "heading": "Teste dich selbst",
+    "after": "Nach: {step}",
+    "final": "Abschlussquiz der Werkbank",
+    "open": "Quiz starten",
+    "retake": "Noch einmal",
+    "question": "Frage {n} von {total}",
+    "check": "Antwort prüfen",
+    "next": "Nächste Frage",
+    "finish": "Mein Ergebnis zeigen",
+    "close": "Schließen",
+    "right": "Richtig.",
+    "wrong": "Nicht ganz. Die Antwort ist: {answer}",
+    "score": "{score}/{total} richtig",
+    "best": "Bestwert: {score}/{total}",
+    "notTaken": "Noch nicht gemacht",
+    "unlocks": "Wird freigeschaltet nach: {step}",
+    "ready": "Ein Quiz ist bereit: {title}",
+    "choose": "Wähle eine Antwort",
+    "unlocksAll": "Wird freigeschaltet, wenn alle Schritte erledigt sind"
+  },
+  "keys": {
+    "open": "Tastenkürzel",
+    "heading": "Tastenkürzel",
+    "intro": "Sie funktionieren überall auf der Seite, außer während du in einem Code-Editor tippst.",
+    "close": "Schließen",
+    "list": {
+      "help": "Diese Liste zeigen",
+      "next": "Den nächsten Bauschritt ausführen",
+      "figure": "Den Fokus in die Abbildung setzen",
+      "escape": "Die Abbildung verlassen oder einen Dialog schließen",
+      "quiz": "Das bereite Quiz öffnen",
+      "serial": "Zur seriellen Ausgabe springen",
+      "tasks": "Zu den Übungsaufgaben springen",
+      "run": "Beim Bearbeiten einer Aufgabe die Prüfungen ausführen"
+    }
+  }
+}

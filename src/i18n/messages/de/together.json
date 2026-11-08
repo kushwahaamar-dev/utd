@@ -1,0 +1,238 @@
+{
+  "panel": {
+    "title": "Gemeinsam",
+    "intro": "Bau das mit Freunden. Alle sehen dieselbe Werkbank, und der Chat wird in die Sprache jeder Person übersetzt.",
+    "introPlain": "Bau das mit Freunden. Alle sehen dieselbe Werkbank, und es tippt immer eine Person.",
+    "start": "Raum öffnen",
+    "joinLabel": "Raumcode oder Einladungslink",
+    "joinPlaceholder": "z. B. k7m2qx",
+    "join": "Beitreten",
+    "badCode": "Das ist kein Raumcode. Codes haben 6 Buchstaben und Ziffern.",
+    "unavailable": "Dieser Browser kann keine Räume öffnen. Versuch es mit einer aktuellen Version von Chrome, Firefox, Safari oder Edge.",
+    "localOnly": "Diese Installation hat keinen Relay-Server, deshalb funktionieren Räume nur zwischen Tabs dieses Browsers.",
+    "connecting": "Raum {code} wird betreten …",
+    "syncing": "Die Werkbank wird vom Gastgeber geholt …",
+    "reconnecting": "Verbindung verloren. Sie wird neu aufgebaut … Deine Änderungen werden synchronisiert, sobald du wieder da bist.",
+    "ended": {
+      "left": "Du hast den Raum verlassen.",
+      "removed": "Der Gastgeber hat dich aus dem Raum entfernt.",
+      "full": "Dieser Raum ist voll. In einen Raum passen 8 Personen.",
+      "wrong-item": "In diesem Raum wird etwas anderes gebaut. Öffne seinen Einladungslink, um beizutreten.",
+      "error": "Der Raum wurde geschlossen."
+    },
+    "again": "Neuen Raum öffnen"
+  },
+  "identity": {
+    "title": "Wer bist du?",
+    "hint": "Die Leute im Raum sehen diesen Namen. Er bleibt auf diesem Gerät.",
+    "name": "Dein Name",
+    "missing": "Gib den Namen ein, den die anderen im Raum sehen.",
+    "color": "Deine Farbe",
+    "save": "Raum betreten",
+    "saveOnly": "Speichern",
+    "rename": "Namen ändern",
+    "cancel": "Abbrechen",
+    "colors": {
+      "tomato": "Tomate",
+      "mustard": "Senf",
+      "mint": "Minze",
+      "cobalt": "Kobalt",
+      "blush": "Rosé"
+    }
+  },
+  "bar": {
+    "label": "Raum {code}",
+    "invite": "Einladen",
+    "inviteTitle": "Leute in Raum {code} einladen",
+    "inviteHint": "Alle mit diesem Link oder QR-Code können beitreten. Kein Konto nötig.",
+    "copy": "Link kopieren",
+    "copied": "Link kopiert",
+    "copyFailed": "Kopieren ging nicht. Markiere den Link und kopiere ihn selbst.",
+    "share": "Teilen",
+    "shareText": "Bau mit mir in iynk, Raum {code}",
+    "qr": "QR-Code für den Einladungslink zu Raum {code}",
+    "qrError": "Der QR-Code ließ sich nicht zeichnen. Kopiere stattdessen den Link.",
+    "close": "Schließen",
+    "people": {
+      "one": "{count} Person hier",
+      "other": "{count} Personen hier"
+    },
+    "you": "du",
+    "host": "Gastgeber",
+    "role": "Deine Rolle",
+    "roles": {
+      "none": "Keine Rolle",
+      "wirer": "Verkabler",
+      "coder": "Coder",
+      "pilot": "Pilot",
+      "watcher": "Zuschauer"
+    },
+    "keyboardYou": "Du hast die Tastatur",
+    "keyboardOther": "{name} hat die Tastatur",
+    "passTo": "Tastatur weitergeben an",
+    "pass": "Weitergeben",
+    "ask": "Um die Tastatur bitten",
+    "take": "Tastatur übernehmen",
+    "asked": "{name} möchte die Tastatur",
+    "denied": "{name} hat die Tastatur. Bitte darum, um den Code zu bearbeiten.",
+    "leave": "Raum verlassen",
+    "remove": "{name} entfernen",
+    "removeConfirm": "{name} aus dem Raum entfernen?",
+    "removeYes": "Entfernen",
+    "status": {
+      "ws": "Live",
+      "broadcast": "Nur dieser Browser",
+      "connecting": "Verbindet",
+      "syncing": "Synchronisiert",
+      "reconnecting": "Verbindet neu",
+      "ended": "Geschlossen"
+    },
+    "peerLanguage": "Spricht {lang}"
+  },
+  "chat": {
+    "title": "Raum-Chat",
+    "empty": "Noch keine Nachrichten. Sag Hallo oder bitte um Hilfe mit einem Bauteil.",
+    "label": "Nachricht",
+    "placeholder": "Nachricht schreiben",
+    "send": "Senden",
+    "count": "{count}/{max}",
+    "translatedFrom": "Übersetzt aus: {lang}",
+    "showOriginal": "Original zeigen",
+    "showTranslation": "Übersetzung zeigen",
+    "translating": "Wird übersetzt …",
+    "translateOff": "Auf dieser Installation ist keine Übersetzung eingerichtet, deshalb erscheinen Nachrichten so, wie sie geschrieben wurden.",
+    "offBoth": "Auf dieser Installation sind weder Übersetzung noch Sprachnachrichten eingerichtet, deshalb erscheinen Nachrichten so, wie sie geschrieben wurden.",
+    "translateFailed": "Diese Nachricht ließ sich nicht übersetzen.",
+    "sending": "Wird gesendet …",
+    "kind": {
+      "voice": "Sprachnachricht",
+      "ai": "Laborpartner"
+    },
+    "voice": {
+      "start": "Sprachnachricht aufnehmen",
+      "stop": "Stoppen und senden",
+      "recording": "Aufnahme … {seconds} s",
+      "transcribing": "Deine Stimme wird in Text umgewandelt …",
+      "off": "Auf dieser Installation sind keine Sprachnachrichten eingerichtet.",
+      "denied": "iynk kann das Mikrofon nicht benutzen. Erlaube es im Browser, um Sprachnachrichten zu senden.",
+      "failed": "Das ließ sich nicht in Text umwandeln. Versuch es noch einmal oder tipp es ein.",
+      "unsupported": "Dieser Browser kann keinen Ton aufnehmen.",
+      "tooLong": "Sprachnachrichten stoppen nach 60 Sekunden."
+    },
+    "system": {
+      "join": "{name} ist beigetreten",
+      "leave": "{name} ist gegangen",
+      "host": "{name} ist jetzt Gastgeber",
+      "removed": "{name} wurde vom Gastgeber entfernt",
+      "baton": "{by} hat die Tastatur an {name} weitergegeben",
+      "batonRequest": "{name} hat um die Tastatur gebeten"
+    },
+    "someone": "Jemand"
+  },
+  "cursors": {
+    "label": "Worauf die anderen zeigen",
+    "point": "Auf die Abbildung zeigen",
+    "stop": "Nicht mehr zeigen",
+    "surface": "Zeigefläche. Fahr über die Abbildung, um den anderen zu zeigen, worauf du zeigst. Pfeiltasten bewegen, Esc beendet."
+  },
+  "languages": {
+    "en": "Englisch",
+    "es": "Spanisch",
+    "fr": "Französisch",
+    "de": "Deutsch",
+    "zh": "Chinesisch",
+    "hi": "Hindi"
+  },
+  "labs": {
+    "board": "Boards",
+    "robotics": "Robotik",
+    "drone": "Drohnen"
+  },
+  "lobby": {
+    "metaTitle": "Gemeinsam bauen",
+    "metaDescription": "Öffne einen Live-Bauraum für jedes Board, jeden Roboter und jede Drohne, finde einen Bau-Buddy und plane mit Muse Spark einen Bauabend.",
+    "eyebrow": "iynk Gemeinsam",
+    "title": "Niemand muss allein bauen",
+    "lede": "Öffne einen Raum für ein Board, einen Roboter oder eine Drohne und schick den Link. Alle sehen dieselbe Werkbank, es tippt immer eine Person, und der Chat zeigt jede Nachricht in deiner Sprache.",
+    "ledePlain": "Öffne einen Raum für ein Board, einen Roboter oder eine Drohne und schick den Link. Alle sehen dieselbe Werkbank, und es tippt immer eine Person.",
+    "notSetUp": "Auf dieser Installation nicht eingerichtet",
+    "aiOff": "Bau-Buddys und der Bauabend-Planer brauchen den KI-Dienst, und der ist auf dieser Installation nicht eingerichtet.",
+    "retry": "Nochmal versuchen",
+    "create": {
+      "title": "Raum öffnen",
+      "hint": "Du bekommst einen Einladungslink und einen QR-Code zum Teilen.",
+      "lab": "Labor",
+      "item": "Was gebaut wird",
+      "go": "Raum öffnen",
+      "empty": "Aus diesem Labor ist noch nichts fertig."
+    },
+    "join": {
+      "title": "Raum beitreten",
+      "hint": "Gib den 6-stelligen Code aus der Einladung ein oder füge den Link ein.",
+      "go": "Beitreten",
+      "looking": "Raum {code} wird gesucht …",
+      "empty": "Gerade ist niemand in Raum {code}. Räume schließen 30 Minuten, nachdem die letzte Person gegangen ist.",
+      "full": "Raum {code} ist voll.",
+      "timeout": "Raum {code} war nicht erreichbar. Prüf den Code und deine Verbindung.",
+      "unknown": "Raum {code} ist offen, hat aber nicht gesagt, was dort gebaut wird. Frag nach dem Einladungslink.",
+      "unavailable": "Dieser Browser kann keine Räume öffnen.",
+      "found": "Gefunden. Der Raum wird geöffnet …"
+    },
+    "buddies": {
+      "title": "Bau-Buddys",
+      "lede": "Sag, was du gebaut hast und was du als Nächstes machen willst. Muse Spark schlägt Leute vor, deren Können zu deinem passt, und sagt, warum.",
+      "privacy": "Dein Profil enthält keine Kontaktdaten und wird nach 24 Stunden gelöscht. Ihr verbindet euch über eine Raumeinladung.",
+      "name": "Dein Name",
+      "interests": "Interessen",
+      "interestsHint": "Trenne sie mit Kommas, z. B. Drohnen, LEDs, Linienfolger",
+      "builtNote": {
+        "one": "Dein Profil führt auch die {count} Lektion oder den Test auf, den du in iynk abgeschlossen hast.",
+        "other": "Dein Profil führt auch die {count} Lektionen und Tests auf, die du in iynk abgeschlossen hast."
+      },
+      "wants": "Was du als Nächstes bauen willst",
+      "submit": "Meine Buddys finden",
+      "finding": "Buddys werden gesucht …",
+      "matches": "Deine Treffer",
+      "none": "Noch keine guten Treffer. Im Laufe des Tages kommen mehr Leute dazu, schau also bald wieder vorbei.",
+      "alone": "Bisher stehst nur du auf der Liste. Lade jemanden ein oder schau später wieder vorbei.",
+      "score": "{score} % Übereinstimmung",
+      "shared": "Ihr mögt beide {interest}",
+      "project": "Gemeinsam bauen: {item}",
+      "invite": "In einen Raum einladen",
+      "inviteTitle": "{item} mit {name} bauen",
+      "inviteHint": "Zeig {name} diesen QR-Code oder schick den Link. Der Raum öffnet sich mit {item}.",
+      "notSetUp": "Die Buddy-Suche braucht die Datenbank und den KI-Dienst, und diese Installation hat nicht beides.",
+      "failed": "Gerade ließen sich keine Buddys finden.",
+      "missing": "Gib deinen Namen ein und was du als Nächstes bauen willst."
+    },
+    "plan": {
+      "title": "Bauabend-Planer",
+      "lede": "Alle sagen, was sie gern bauen würden. Muse Spark wählt ein Projekt, das allen Spaß macht, und gibt jeder Person eine Rolle und eine erste Aufgabe.",
+      "people": "Wer baut mit",
+      "person": "Person {n}",
+      "name": "Name",
+      "lang": "Sprache",
+      "level": "Erfahrung",
+      "levels": {
+        "new": "Neu dabei",
+        "some": "Etwas",
+        "lots": "Viel"
+      },
+      "wants": "Was die Person bauen oder lernen möchte",
+      "add": "Person hinzufügen",
+      "remove": "{name} entfernen",
+      "submit": "Unseren Bauabend planen",
+      "planning": "Wird geplant …",
+      "roles": "Rollen",
+      "firstTask": "Erste Aufgabe",
+      "steps": "Der Plan",
+      "parts": "Bauteile",
+      "start": "Diesen Bau starten",
+      "again": "Neu planen",
+      "notSetUp": "Der Planer braucht den KI-Dienst, und der ist auf dieser Installation nicht eingerichtet.",
+      "failed": "Gerade ließ sich kein Plan erstellen.",
+      "missing": "Gib allen einen Namen und sag, was sie gern bauen würden.",
+      "unknownItem": "Der Plan hat etwas gewählt, das iynk noch nicht hat. Plane neu."
+    }
+  }
+}
