@@ -39,12 +39,12 @@ export async function mintRoom(lab: string, itemId: string): Promise<string> {
           .subscriptionBuilder()
           .onApplied(() => resolve())
           .onError((ctx) => reject(ctx.event ?? new Error("subscription failed")))
-          .subscribe([tables.roomMember.where((m) => m.identity.eq(me))]);
+          .subscribe([tables.myRoomMembers.where((m) => m.identity.eq(me))]);
       }),
       "subscribing",
     );
     const code = new Promise<string>((resolve) => {
-      conn.db.roomMember.onInsert((_ctx, row) => resolve(row.roomCode));
+      conn.db.myRoomMembers.onInsert((_ctx, row) => resolve(row.roomCode));
     });
     await within(conn.reducers.createRoom({ lab, itemId }), "creating the room");
     const roomCode = await within(code, "reading the room code");

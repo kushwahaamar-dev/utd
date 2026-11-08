@@ -8,6 +8,16 @@ const JOBS: Record<string, bigint> = { rooms: 5n * MINUTE, buddies: 10n * MINUTE
 const EMPTY_ROOM_TTL = 30n * MINUTE;
 const ACTIVITY_KEEP = 24n * 60n * MINUTE;
 const BUCKET_KEEP = 60n * MINUTE;
+const JOB_KEEP = 24n * 60n * MINUTE;
+const CHAIN_KEEP = 7n * 24n * 60n * MINUTE;
+const PLAYER_KEEP = 7n * 24n * 60n * MINUTE;
+const LIVE = ["queued", "planning", "running", "reviewing"];
+
+function dropAgentJob(ctx: Ctx, id: bigint) {
+  for (const step of [...ctx.db.agentStep.jobId.filter(id)]) ctx.db.agentStep.id.delete(step.id);
+  for (const proposal of [...ctx.db.agentProposal.jobId.filter(id)]) ctx.db.agentProposal.id.delete(proposal.id);
+  ctx.db.agentJob.id.delete(id);
+}
 
 /** Repeating timers are seeded once, at init, and re-checked on every connect in case a republish dropped one. */
 export function ensureSchedules(ctx: Ctx) {
@@ -45,6 +55,22 @@ export const sweep = spacetimedb.reducer(
       }
       for (const entry of [...ctx.db.searchCache.iter()]) {
         if (entry.expiresAt.microsSinceUnixEpoch <= now) ctx.db.searchCache.key.delete(entry.key);
+      }
+      for (const job of [...ctx.db.agentJob.iter()]) {
+        if (!LIVE.includes(job.status) && now - job.updatedAt.microsSinceUnixEpoch > JOB_KEEP) dropAgentJob(ctx, job.id);
+      }
+      for (const row of [...ctx.db.chainJob.iter()]) {
+        if ((row.status === "confirmed" || row.status === "failed") && now - row.createdAt.microsSinceUnixEpoch > CHAIN_KEEP) {
+          ctx.db.chainJob.id.delete(row.id);
+        }
+      }
+      // Anonymous visitors who left a week ago and never did anything worth keeping.
+      for (const player of [...ctx.db.player.iter()]) {
+        if (player.online || now - player.lastSeen.microsSinceUnixEpoch < PLAYER_KEEP) continue;
+        if (ctx.db.credential.identity.filter(player.identity).next().done === false) continue;
+        if ([...ctx.db.leaderboard.iter()].some((l) => l.identity.equals(player.identity))) continue;
+        ctx.db.player.identity.delete(player.identity);
+        ctx.db.playerWallet.identity.delete(player.identity);
       }
     }
   },

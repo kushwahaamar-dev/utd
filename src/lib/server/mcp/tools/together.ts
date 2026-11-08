@@ -6,6 +6,7 @@ import { MAX_NAME_LENGTH, MAX_PEERS } from "@/lib/realtime/protocol";
 import { features } from "@/lib/server/env";
 import { postRoute } from "../backends";
 import { ENTRIES, LABS, findEntry, itemUrl } from "../content";
+import { rateLimit } from "../../ratelimit";
 import { mintRoom } from "../room-mint";
 import { ToolError, defineTool } from "../registry";
 import { labInput, localeInput } from "./catalog";
@@ -63,7 +64,7 @@ export const createRoom = defineTool({
     locale: localeInput.describe("Language the room page opens in; everyone can switch."),
   }),
   output: z.object({
-    room: z.string().describe("Six-character room code people can also type in."),
+    room: z.string().describe("Eight-character room code people can also type in."),
     link: z.string(),
     lab: z.enum(LABS),
     id: z.string(),
@@ -78,11 +79,15 @@ export const createRoom = defineTool({
     if ((lab === undefined) !== (id === undefined)) throw new ToolError("bad_input", "Give both lab and id, or neither.");
     const target = lab && id ? findEntry(lab, id) : starter;
     if (!target) throw new ToolError("not_found", `iynk has no ${lab} called "${id}". Use search_catalog to find the right id.`);
+    // Every room is a database row that lives at least 30 minutes: a few per caller, a fixed number for everybody.
+    const mine = rateLimit(`mcp:create_room:${ctx.caller ?? "unknown"}`, { limit: 5, windowMs: 10 * 60_000 });
+    const all = rateLimit("mcp:create_room:all", { limit: 120, windowMs: 60 * 60_000 });
+    if (!mine.ok || !all.ok) throw new ToolError("rate_limited", "Too many rooms were opened from here recently. Try again in a few minutes.");
     let room: string;
     try {
       room = await mintRoom(target.lab, target.id);
     } catch (error) {
-      throw new ToolError("upstream", `iynk could not open a room right now (${error instanceof Error ? error.message : "the realtime server did not answer"}). Try again in a moment.`);
+      throw new ToolError("upstream", `iynk could not open a room right now (the realtime server did not answer). Try again in a moment.`);
     }
     const link = new URL(itemUrl(ctx.siteUrl, locale, target.lab, target.id));
     link.searchParams.set(ROOM_PARAM, room);

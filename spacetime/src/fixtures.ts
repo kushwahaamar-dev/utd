@@ -26,3 +26,20 @@ export const runText = (events: unknown[], over: Record<string, unknown> = {}) =
     ...over,
   });
 
+
+/** The inputs a real lap carries: the header the range writes plus a short log that arms the craft. */
+export function lapInputsFor(timeMs: number, over: Record<string, unknown> = {}): string {
+  return JSON.stringify({
+    v: 1,
+    craft: "quad5",
+    course: "race",
+    mode: null,
+    time: timeMs / 1000,
+    steps: Math.round(timeMs / 10) + 300,
+    log: [
+      { step: 0, action: { type: "arm" } },
+      { step: 40, action: { type: "sticks", sticks: { roll: 0, pitch: 0.4, yaw: 0, throttle: 0.6 } } },
+    ],
+    ...over,
+  });
+}

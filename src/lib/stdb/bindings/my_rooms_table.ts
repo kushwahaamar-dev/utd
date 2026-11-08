@@ -12,6 +12,7 @@ import {
 
 export default __t.row({
   code: __t.string().primaryKey(),
+  topic: __t.string(),
   lab: __t.string(),
   itemId: __t.string().name("item_id"),
   host: __t.identity(),

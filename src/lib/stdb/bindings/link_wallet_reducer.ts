@@ -12,4 +12,5 @@ import {
 
 export default {
   wallet: __t.string(),
+  signature: __t.string(),
 };

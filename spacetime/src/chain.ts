@@ -4,13 +4,15 @@ import spacetimedb, { raceCloseTimer } from "./schema";
 import { walletOf } from "./profile";
 import { parseRun, verifyRun } from "./verify";
 import { RUN_KINDS, type RunKind } from "../../src/lib/verify/runlog";
-import { bumpActivity, fail, limit, micros, requireJson, requireScheduler, requireWorker, type Ctx } from "./util";
+import { bumpActivity, fail, limit, limitGlobal, micros, requireJson, requireScheduler, requireWorker, type Ctx } from "./util";
 
 const SIGNATURE = /^[1-9A-HJ-NP-Za-km-z]{64,100}$/;
 const CHAIN_KINDS = ["issue_credential", "submit_result", "settle_race", "create_race"];
 const CHAIN_STATUSES = ["queued", "sent", "confirmed", "failed"];
 const RACE_STATUSES = ["open", "closed", "settled"];
 const MAX_RUN_BYTES = 256 * 1024;
+const MAX_ENTRIES_PER_RACE = 500;
+const MAX_QUEUED_CHAIN_JOBS = 200;
 
 function queueJob(ctx: Ctx, kind: string, payload: unknown, owner?: Ctx["sender"]) {
   const job = ctx.db.chainJob.insert({
@@ -37,6 +39,7 @@ export const submitRun = spacetimedb.reducer(
   { kind: t.string(), itemId: t.string(), sub: t.option(t.string()), run: t.string() },
   (ctx, { kind, itemId, sub, run }) => {
     limit(ctx, "submit_run", 5, 0.1);
+    limitGlobal(ctx, "submit_run", 20, 1);
     if (!(RUN_KINDS as readonly string[]).includes(kind)) fail("unknown run kind");
     const wallet = walletOf(ctx) ?? fail("link a wallet before submitting a run");
     if (run.length > MAX_RUN_BYTES) fail("run log is too large");
@@ -45,6 +48,7 @@ export const submitRun = spacetimedb.reducer(
     const verdict = verifyRun(kind as RunKind, itemId, sub ?? undefined, log);
     if (!verdict.ok) return fail(verdict.reason);
 
+    if ([...ctx.db.chainJob.status.filter("queued")].length >= MAX_QUEUED_CHAIN_JOBS) fail("busy: the chain queue is full, try again soon");
     const me = ctx.sender.toHexString();
     const issued = [...ctx.db.credential.identity.filter(ctx.sender)].some((c) => c.skill === verdict.skillId);
     const queued = [...ctx.db.chainJob.status.filter("queued"), ...ctx.db.chainJob.status.filter("sent")].some((job) => {
@@ -75,11 +79,13 @@ export const submitRun = spacetimedb.reducer(
 
 export const enterRace = spacetimedb.reducer({ raceId: t.u64(), enterSig: t.string() }, (ctx, { raceId, enterSig }) => {
   limit(ctx, "enter_race", 5, 0.1);
+  limitGlobal(ctx, "enter_race", 30, 2);
   const wallet = walletOf(ctx) ?? fail("link a wallet before entering a race");
   const race = ctx.db.race.id.find(raceId) ?? fail("no such race");
   if (race.status !== "open" || race.closesAt.microsSinceUnixEpoch <= micros(ctx)) fail("this race is closed");
   if (!SIGNATURE.test(enterSig)) fail("that is not a transaction signature");
   const entries = [...ctx.db.raceEntry.raceId.filter(raceId)];
+  if (entries.length >= MAX_ENTRIES_PER_RACE) fail("this race is full");
   if (entries.some((e) => e.identity.equals(ctx.sender))) fail("you are already in this race");
   if (entries.some((e) => e.enterSig === enterSig)) fail("that signature is already used");
   ctx.db.raceEntry.insert({
@@ -156,7 +162,6 @@ export const workerChainResult = spacetimedb.reducer(
         sig: sig ?? "",
         at: ctx.timestamp,
       });
-      ctx.db.chainJobOwner.jobId.delete(jobId);
       bumpActivity(ctx, "credential.issued");
     } else if (job.kind === "settle_race") {
       const race = ctx.db.race.id.find(BigInt(String(payload.raceId)));

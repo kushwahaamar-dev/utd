@@ -1,10 +1,13 @@
+import { sha256 } from "@noble/hashes/sha2.js";
 import { t } from "spacetimedb/server";
 import type { Identity } from "spacetimedb";
 import { labSync } from "../../src/lib/realtime/shared-actions";
 import spacetimedb from "./schema";
-import { bumpActivity, byteLength, fail, limit, requireJson, requireName, requirePlayer, requireStringArray, take, type Ctx } from "./util";
+import { bumpActivity, byteLength, fail, limit, limitGlobal, requireJson, requireName, requirePlayer, requireStringArray, take, type Ctx } from "./util";
 
 const ROOM_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyz";
+const ROOM_CODE_LENGTH = 8;
+const MAX_ROOMS = 400;
 const LABS = ["board", "robotics", "drone"] as const;
 const ITEM_ID = /^[a-z0-9][a-z0-9:._-]{0,63}$/;
 const MAX_MEMBERS = 8;
@@ -98,10 +101,26 @@ export function leaveEveryRoom(ctx: Ctx, identity: Identity) {
   for (const m of [...ctx.db.roomMember.identity.filter(identity)]) removeMember(ctx, m.roomCode, identity);
 }
 
+function secretOf(ctx: Ctx): string {
+  try {
+    return (ctx.env.WORKER_SECRET as string | undefined) ?? "";
+  } catch {
+    // The in-memory test host has no environment; the published module always does.
+    return "";
+  }
+}
+
+/**
+ * ctx.random is seeded from the timestamp, so on its own a code could be predicted. The digits come from a hash of
+ * that randomness and the database's WORKER_SECRET, which no client knows; 31^8 codes is also too many to guess.
+ */
 function newCode(ctx: Ctx): string {
+  const secret = secretOf(ctx);
   for (let attempt = 0; attempt < 30; attempt++) {
+    const seed = `${secret}:room:${ctx.timestamp.microsSinceUnixEpoch}:${ctx.sender.toHexString()}:${ctx.random.uint32()}:${attempt}`;
+    const digest = sha256(new TextEncoder().encode(seed));
     let code = "";
-    for (let i = 0; i < 6; i++) code += ROOM_ALPHABET[ctx.random.integerInRange(0, ROOM_ALPHABET.length - 1)];
+    for (let i = 0; i < ROOM_CODE_LENGTH; i++) code += ROOM_ALPHABET[digest[i]! % ROOM_ALPHABET.length];
     if (!ctx.db.room.code.find(code)) return code;
   }
   return fail("could not find a free room code, try again");
@@ -112,14 +131,22 @@ function requireLab(lab: string, itemId: string) {
   if (!ITEM_ID.test(itemId)) fail("bad item id");
 }
 
+function newTopic(ctx: Ctx): string {
+  const digest = sha256(new TextEncoder().encode(`${secretOf(ctx)}:topic:${ctx.timestamp.microsSinceUnixEpoch}:${ctx.sender.toHexString()}:${ctx.random.uint32()}`));
+  return Array.from(digest.slice(0, 8), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export const createRoom = spacetimedb.reducer({ lab: t.string(), itemId: t.string() }, (ctx, { lab, itemId }) => {
   limit(ctx, "create_room", 5, 0.1);
+  limitGlobal(ctx, "create_room", 30, 2);
   requireLab(lab, itemId);
+  if (ctx.db.room.count() >= BigInt(MAX_ROOMS)) fail("busy: too many rooms open right now");
   const player = requirePlayer(ctx);
   if ([...ctx.db.roomMember.identity.filter(ctx.sender)].length >= MAX_ROOMS_PER_IDENTITY) fail("you are in too many rooms");
   const code = newCode(ctx);
   ctx.db.room.insert({
     code,
+    topic: newTopic(ctx),
     lab,
     itemId,
     host: ctx.sender,
@@ -148,6 +175,7 @@ export const joinRoom = spacetimedb.reducer(
   { code: t.string(), lab: t.option(t.string()), itemId: t.option(t.string()) },
   (ctx, { code: rawCode, lab, itemId }) => {
     limit(ctx, "join_room", 10, 0.5);
+    limitGlobal(ctx, "join_room", 100, 30);
     const player = requirePlayer(ctx);
     let room = roomOf(ctx, rawCode);
     const code = room.code;
@@ -211,7 +239,7 @@ export const postSnapshot = spacetimedb.reducer(
   (ctx, { code: rawCode, seq, state }) => {
     limit(ctx, "snapshot", 4, 1);
     const room = roomOf(ctx, rawCode);
-    requireMember(ctx, room.code);
+    if (!room.host.equals(ctx.sender)) fail("not_host");
     requireJson(state, MAX_SNAPSHOT_BYTES, "snapshot");
     if (seq > room.seq) fail("seq is ahead of the room");
     const old = ctx.db.roomSnapshot.roomCode.find(room.code);
@@ -321,7 +349,8 @@ export const sendCursor = spacetimedb.reducer(
     const code = normalizeCode(rawCode);
     if (!memberOf(ctx, code, ctx.sender)) return;
     if (!take(ctx, `${ctx.sender.toHexString()}:cursor`, 3, 20)) return;
-    ctx.db.cursorEvt.insert({ roomCode: code, from: ctx.sender, x, y });
+    const topic = ctx.db.room.code.find(code)?.topic;
+    if (topic) ctx.db.cursorEvt.insert({ topic, from: ctx.sender, x, y });
   },
 );
 
@@ -334,6 +363,7 @@ export const sendPose = spacetimedb.reducer(
       fail("pose is too large");
     }
     if (!take(ctx, `${ctx.sender.toHexString()}:pose`, 3, 20)) return;
-    ctx.db.poseEvt.insert({ roomCode: code, from: ctx.sender, p, q, v, gate });
+    const topic = ctx.db.room.code.find(code)?.topic;
+    if (topic) ctx.db.poseEvt.insert({ topic, from: ctx.sender, p, q, v, gate });
   },
 );

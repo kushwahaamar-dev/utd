@@ -11,7 +11,7 @@ import {
 } from "spacetimedb";
 
 export default __t.row({
-  roomCode: __t.string().name("room_code"),
+  topic: __t.string(),
   from: __t.identity(),
   x: __t.f64(),
   y: __t.f64(),

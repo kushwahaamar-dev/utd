@@ -15,7 +15,6 @@ export default __t.row({
   name: __t.string(),
   color: __t.string(),
   lang: __t.string(),
-  wallet: __t.option(__t.string()),
   online: __t.bool(),
   lastSeen: __t.timestamp().name("last_seen"),
   createdAt: __t.timestamp().name("created_at"),

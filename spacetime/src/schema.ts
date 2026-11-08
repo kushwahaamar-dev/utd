@@ -11,17 +11,24 @@ const player = table(
     name: t.string(),
     color: t.string(),
     lang: t.string(),
-    wallet: t.option(t.string()),
     online: t.bool(),
     lastSeen: t.timestamp(),
     createdAt: t.timestamp(),
   },
 );
 
+// Private: a wallet is linked on purpose, but not published next to the identity.
+const playerWallet = table(
+  { name: "player_wallet" },
+  { identity: t.identity().primaryKey(), wallet: t.string().index("btree") },
+);
+
 const room = table(
-  { name: "room", public: true },
+  { name: "room" },
   {
     code: t.string().primaryKey(),
+    // Opaque id for the room's cursor and pose events, which are public: it says nothing about the join code.
+    topic: t.string(),
     lab: t.string(),
     itemId: t.string(),
     host: t.identity(),
@@ -32,8 +39,10 @@ const room = table(
   },
 );
 
+// Private, like every table that holds a room's contents. Clients read their own rooms through the
+// my_room* views (views.ts), which only ever return rows of rooms the caller sits in.
 const roomMember = table(
-  { name: "room_member", public: true },
+  { name: "room_member" },
   {
     id: t.u64().primaryKey().autoInc(),
     roomCode: t.string().index("btree"),
@@ -50,7 +59,7 @@ const roomMember = table(
 );
 
 const roomAction = table(
-  { name: "room_action", public: true },
+  { name: "room_action" },
   {
     id: t.u64().primaryKey().autoInc(),
     roomCode: t.string().index("btree"),
@@ -62,7 +71,7 @@ const roomAction = table(
 );
 
 const roomSnapshot = table(
-  { name: "room_snapshot", public: true },
+  { name: "room_snapshot" },
   {
     roomCode: t.string().primaryKey(),
     seq: t.u64(),
@@ -73,7 +82,7 @@ const roomSnapshot = table(
 );
 
 const chatMessage = table(
-  { name: "chat_message", public: true },
+  { name: "chat_message" },
   {
     id: t.u64().primaryKey().autoInc(),
     roomCode: t.string().index("btree"),
@@ -87,7 +96,7 @@ const chatMessage = table(
 );
 
 const chatTranslation = table(
-  { name: "chat_translation", public: true },
+  { name: "chat_translation" },
   {
     id: t.u64().primaryKey().autoInc(),
     messageId: t.u64().index("btree"),
@@ -99,13 +108,13 @@ const chatTranslation = table(
 
 const cursorEvt = table(
   { name: "cursor_evt", public: true, event: true },
-  { roomCode: t.string(), from: t.identity(), x: t.f64(), y: t.f64() },
+  { topic: t.string(), from: t.identity(), x: t.f64(), y: t.f64() },
 );
 
 const poseEvt = table(
   { name: "pose_evt", public: true, event: true },
   {
-    roomCode: t.string(),
+    topic: t.string(),
     from: t.identity(),
     p: t.string(),
     q: t.string(),
@@ -204,7 +213,6 @@ const agentJob = table(
 const agentStep = table(
   {
     name: "agent_step",
-    public: true,
     indexes: [{ accessor: "byJobIdx", algorithm: "btree", columns: ["jobId", "idx"] }],
   },
   {
@@ -224,7 +232,7 @@ const agentStep = table(
 );
 
 const agentProposal = table(
-  { name: "agent_proposal", public: true },
+  { name: "agent_proposal" },
   {
     id: t.u64().primaryKey().autoInc(),
     jobId: t.u64().index("btree"),
@@ -279,7 +287,7 @@ const credential = table(
 );
 
 const chainJob = table(
-  { name: "chain_job", public: true },
+  { name: "chain_job" },
   {
     id: t.u64().primaryKey().autoInc(),
     kind: t.string(),
@@ -294,7 +302,7 @@ const chainJob = table(
 // Who a queued credential is for; chain_job itself carries no identity column.
 const chainJobOwner = table(
   { name: "chain_job_owner" },
-  { jobId: t.u64().primaryKey(), identity: t.identity() },
+  { jobId: t.u64().primaryKey(), identity: t.identity().index("btree") },
 );
 
 const rateBucket = table(
@@ -341,6 +349,7 @@ const raceCloseTimer = table(
 const spacetimedb = schema(
   {
     player,
+    playerWallet,
     room,
     roomMember,
     roomAction,
@@ -381,4 +390,4 @@ const spacetimedb = schema(
 );
 
 export default spacetimedb;
-export { sweepTimer, raceCloseTimer };
+export { sweepTimer, raceCloseTimer, roomMember, room, roomAction, roomSnapshot, chatMessage, chatTranslation, agentJob, agentStep, agentProposal, chainJob, playerWallet };

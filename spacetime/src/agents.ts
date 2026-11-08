@@ -1,12 +1,14 @@
 import { t } from "spacetimedb/server";
 import spacetimedb from "./schema";
-import { byteLength, fail, limit, requireJson, requireWorker, registerWorker, type Ctx } from "./util";
+import { byteLength, fail, limit, limitGlobal, requireJson, requireWorker, registerWorker, type Ctx } from "./util";
 
 const KINDS = ["build", "diagnose", "partner", "plan", "match"];
 const LIVE = ["queued", "planning", "running", "reviewing"];
 const STATUSES = [...LIVE, "done", "failed", "cancelled"];
 const MAX_GOAL = 2000;
 const MAX_ACTIVE_PER_OWNER = 3;
+const MAX_ACTIVE_TOTAL = 40;
+const MAX_JOBS_PER_OWNER = 100;
 const MAX_STEP_BYTES = 128 * 1024;
 
 const fit = (text: string) => (byteLength(text) > MAX_STEP_BYTES ? JSON.stringify({ truncated: true }) : text);
@@ -19,6 +21,7 @@ export const startAgentJob = spacetimedb.reducer(
   { kind: t.string(), goal: t.string(), context: t.string(), roomCode: t.option(t.string()) },
   (ctx, { kind, goal, context, roomCode }) => {
     limit(ctx, "agent_job", 5, 1 / 20);
+    limitGlobal(ctx, "agent_job", 20, 0.5);
     if (!KINDS.includes(kind)) fail(`kind must be one of ${KINDS.join(", ")}`);
     const text = goal.trim();
     if (!text) fail("goal is empty");
@@ -27,7 +30,11 @@ export const startAgentJob = spacetimedb.reducer(
     if (roomCode != null && ![...ctx.db.roomMember.roomCode.filter(roomCode)].some((m) => m.identity.equals(ctx.sender))) {
       fail("you are not in that room");
     }
-    const active = [...ctx.db.agentJob.owner.filter(ctx.sender)].filter((j) => LIVE.includes(j.status));
+    const mine = [...ctx.db.agentJob.owner.filter(ctx.sender)];
+    const active = mine.filter((j) => LIVE.includes(j.status));
+    if (mine.length >= MAX_JOBS_PER_OWNER) fail("too many saved jobs; they are cleared after a day");
+    const live = LIVE.reduce((n, status) => n + [...ctx.db.agentJob.status.filter(status)].length, 0);
+    if (live >= MAX_ACTIVE_TOTAL) fail("busy: the agents are at capacity, try again in a minute");
     if (active.length >= MAX_ACTIVE_PER_OWNER) fail("you already have jobs running; wait for one to finish or cancel it");
     ctx.db.agentJob.insert({
       id: 0n,
@@ -46,6 +53,7 @@ export const startAgentJob = spacetimedb.reducer(
 );
 
 export const cancelAgentJob = spacetimedb.reducer({ jobId: t.u64() }, (ctx, { jobId }) => {
+  limit(ctx, "cancel_job", 20, 2);
   const job = jobFor(ctx, jobId);
   if (!job.owner.equals(ctx.sender)) fail("not your job");
   if (!LIVE.includes(job.status)) return;
@@ -63,6 +71,7 @@ export const resolveProposal = spacetimedb.reducer({ proposalId: t.u64(), accept
 
 export const workerRegister = spacetimedb.reducer({ secret: t.string() }, (ctx, { secret }) => {
   limit(ctx, "worker_register", 5, 0.1);
+  limitGlobal(ctx, "worker_register", 10, 0.05);
   registerWorker(ctx, secret);
 });
 
@@ -77,8 +86,8 @@ export const workerJobStatus = spacetimedb.reducer(
     ctx.db.agentJob.id.update({
       ...job,
       status,
-      result: result ?? job.result,
-      error: error ?? job.error,
+      result: result === undefined ? job.result : fit(result),
+      error: error === undefined ? job.error : error.slice(0, 500),
       updatedAt: ctx.timestamp,
     });
   },

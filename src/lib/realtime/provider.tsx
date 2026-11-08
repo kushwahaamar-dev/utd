@@ -159,7 +159,7 @@ function RoomCreator({
 }) {
   const stdb = useStdb();
   const actions = useStdbActions();
-  const [rows, ready] = useTable(tables.roomMember.where((m) => m.identity.eq(stdb.identity ?? (NONE as never))), { enabled: !!stdb.identity });
+  const [rows, ready] = useTable(tables.myRoomMembers.where((m) => m.identity.eq(stdb.identity ?? (NONE as never))), { enabled: !!stdb.identity });
   const before = useRef<Set<string> | null>(null);
   const online = stdb.status === "online" && ready;
 

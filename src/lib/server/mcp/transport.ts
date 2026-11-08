@@ -124,7 +124,7 @@ async function dispatch(req: Request): Promise<Response> {
   if (incoming.kind !== "request") return answer(202);
 
   const msg = incoming.message;
-  const ctx: ToolContext = { siteUrl: env.NEXT_PUBLIC_SITE_URL };
+  const ctx: ToolContext = { siteUrl: env.NEXT_PUBLIC_SITE_URL, caller: clientIp(req) };
   if (msg.method !== "initialize" && metaVersion(msg.params) !== undefined) return answer(...(await modern(msg, req, ctx)));
 
   const header = req.headers.get("mcp-protocol-version") ?? DEFAULT_LEGACY_VERSION;

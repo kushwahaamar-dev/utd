@@ -43,7 +43,7 @@ describe.skipIf(!process.env.STDB_E2E)("worker against SpacetimeDB", () => {
 
     await until(() => [...client.db.agentJob.iter()].some((j) => j.kind === "build" && j.status === "done"));
     const job = [...client.db.agentJob.iter()].find((j) => j.kind === "build" && j.status === "done")!;
-    const steps = [...client.db.agentStep.iter()].filter((s) => s.jobId === job.id).sort((a, b) => a.idx - b.idx);
+    const steps = [...client.db.myAgentSteps.iter()].filter((s) => s.jobId === job.id).sort((a, b) => a.idx - b.idx);
     expect(steps[0].role).toBe("planner");
     expect(steps.every((s) => s.status !== "running")).toBe(true);
     expect(steps.some((s) => s.tool === "drone_optimize" && s.status === "ok")).toBe(true);
@@ -56,7 +56,7 @@ describe.skipIf(!process.env.STDB_E2E)("worker against SpacetimeDB", () => {
       roomCode: undefined,
     });
     await until(() => [...client.db.agentJob.iter()].filter((j) => j.kind === "diagnose" && j.status === "done").length >= 1);
-    expect([...client.db.agentProposal.iter()].map((p) => p.kind)).toEqual(expect.arrayContaining(["propose_change", "highlight_part"]));
+    expect([...client.db.myAgentProposals.iter()].map((p) => p.kind)).toEqual(expect.arrayContaining(["propose_change", "highlight_part"]));
     client.disconnect();
     worker.stop();
   });

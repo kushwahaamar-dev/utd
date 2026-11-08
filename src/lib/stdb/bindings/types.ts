@@ -141,7 +141,7 @@ export const Credential = __t.object("Credential", {
 export type Credential = __Infer<typeof Credential>;
 
 export const CursorEvt = __t.object("CursorEvt", {
-  roomCode: __t.string(),
+  topic: __t.string(),
   from: __t.identity(),
   x: __t.f64(),
   y: __t.f64(),
@@ -171,23 +171,58 @@ export const Leaderboard = __t.object("Leaderboard", {
 });
 export type Leaderboard = __Infer<typeof Leaderboard>;
 
+export const MyAgentProposals = __t.object("MyAgentProposals", {});
+export type MyAgentProposals = __Infer<typeof MyAgentProposals>;
+
+export const MyAgentSteps = __t.object("MyAgentSteps", {});
+export type MyAgentSteps = __Infer<typeof MyAgentSteps>;
+
+export const MyChainJobs = __t.object("MyChainJobs", {});
+export type MyChainJobs = __Infer<typeof MyChainJobs>;
+
+export const MyChat = __t.object("MyChat", {});
+export type MyChat = __Infer<typeof MyChat>;
+
+export const MyChatTranslations = __t.object("MyChatTranslations", {});
+export type MyChatTranslations = __Infer<typeof MyChatTranslations>;
+
 export const MyProgress = __t.object("MyProgress", {});
 export type MyProgress = __Infer<typeof MyProgress>;
+
+export const MyRoomActions = __t.object("MyRoomActions", {});
+export type MyRoomActions = __Infer<typeof MyRoomActions>;
+
+export const MyRoomMembers = __t.object("MyRoomMembers", {});
+export type MyRoomMembers = __Infer<typeof MyRoomMembers>;
+
+export const MyRoomSnapshots = __t.object("MyRoomSnapshots", {});
+export type MyRoomSnapshots = __Infer<typeof MyRoomSnapshots>;
+
+export const MyRooms = __t.object("MyRooms", {});
+export type MyRooms = __Infer<typeof MyRooms>;
+
+export const MyWallet = __t.object("MyWallet", {});
+export type MyWallet = __Infer<typeof MyWallet>;
 
 export const Player = __t.object("Player", {
   identity: __t.identity(),
   name: __t.string(),
   color: __t.string(),
   lang: __t.string(),
-  wallet: __t.option(__t.string()),
   online: __t.bool(),
   lastSeen: __t.timestamp(),
   createdAt: __t.timestamp(),
 });
 export type Player = __Infer<typeof Player>;
 
+export const PlayerWallet = __t.object("PlayerWallet", {
+  identity: __t.identity(),
+  wallet: __t.string(),
+});
+export type PlayerWallet = __Infer<typeof PlayerWallet>;
+
 export const PoseEvt = __t.object("PoseEvt", {
-  roomCode: __t.string(),
+  topic: __t.string(),
   from: __t.identity(),
   p: __t.string(),
   q: __t.string(),
@@ -254,6 +289,7 @@ export type RateBucket = __Infer<typeof RateBucket>;
 
 export const Room = __t.object("Room", {
   code: __t.string(),
+  topic: __t.string(),
   lab: __t.string(),
   itemId: __t.string(),
   host: __t.identity(),
@@ -318,4 +354,10 @@ export const SweepTimer = __t.object("SweepTimer", {
   job: __t.string(),
 });
 export type SweepTimer = __Infer<typeof SweepTimer>;
+
+export const WorkerAgentJobs = __t.object("WorkerAgentJobs", {});
+export type WorkerAgentJobs = __Infer<typeof WorkerAgentJobs>;
+
+export const WorkerChainJobs = __t.object("WorkerChainJobs", {});
+export type WorkerChainJobs = __Infer<typeof WorkerChainJobs>;
 

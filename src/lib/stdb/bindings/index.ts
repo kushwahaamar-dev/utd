@@ -76,25 +76,28 @@ import * as TranslateMessageProcedure from "./translate_message_procedure";
 // Import all table schema definitions
 import ActivityMinuteRow from "./activity_minute_table";
 import AgentJobRow from "./agent_job_table";
-import AgentProposalRow from "./agent_proposal_table";
-import AgentStepRow from "./agent_step_table";
 import BuddyProfileRow from "./buddy_profile_table";
-import ChainJobRow from "./chain_job_table";
-import ChatMessageRow from "./chat_message_table";
-import ChatTranslationRow from "./chat_translation_table";
 import CredentialRow from "./credential_table";
 import CursorEvtRow from "./cursor_evt_table";
 import LapRow from "./lap_table";
 import LeaderboardRow from "./leaderboard_table";
+import MyAgentProposalsRow from "./my_agent_proposals_table";
+import MyAgentStepsRow from "./my_agent_steps_table";
+import MyChainJobsRow from "./my_chain_jobs_table";
+import MyChatRow from "./my_chat_table";
+import MyChatTranslationsRow from "./my_chat_translations_table";
 import MyProgressRow from "./my_progress_table";
+import MyRoomActionsRow from "./my_room_actions_table";
+import MyRoomMembersRow from "./my_room_members_table";
+import MyRoomSnapshotsRow from "./my_room_snapshots_table";
+import MyRoomsRow from "./my_rooms_table";
+import MyWalletRow from "./my_wallet_table";
 import PlayerRow from "./player_table";
 import PoseEvtRow from "./pose_evt_table";
 import RaceRow from "./race_table";
 import RaceEntryRow from "./race_entry_table";
-import RoomRow from "./room_table";
-import RoomActionRow from "./room_action_table";
-import RoomMemberRow from "./room_member_table";
-import RoomSnapshotRow from "./room_snapshot_table";
+import WorkerAgentJobsRow from "./worker_agent_jobs_table";
+import WorkerChainJobsRow from "./worker_chain_jobs_table";
 
 /** Type-only namespace exports for generated type groups. */
 
@@ -135,38 +138,6 @@ const tablesSchema = __schema({
       { name: 'agent_job_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, AgentJobRow),
-  agentProposal: __table({
-    name: 'agent_proposal',
-    indexes: [
-      { accessor: 'id', name: 'agent_proposal_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { accessor: 'jobId', name: 'agent_proposal_job_id_idx_btree', algorithm: 'btree', columns: [
-        'jobId',
-      ] },
-    ],
-    constraints: [
-      { name: 'agent_proposal_id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, AgentProposalRow),
-  agentStep: __table({
-    name: 'agent_step',
-    indexes: [
-      { accessor: 'id', name: 'agent_step_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { accessor: 'jobId', name: 'agent_step_job_id_idx_btree', algorithm: 'btree', columns: [
-        'jobId',
-      ] },
-      { accessor: 'byJobIdx', name: 'agent_step_job_id_idx_idx_btree', algorithm: 'btree', columns: [
-        'jobId',
-        'idx',
-      ] },
-    ],
-    constraints: [
-      { name: 'agent_step_id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, AgentStepRow),
   buddyProfile: __table({
     name: 'buddy_profile',
     indexes: [
@@ -181,51 +152,6 @@ const tablesSchema = __schema({
       { name: 'buddy_profile_identity_key', constraint: 'unique', columns: ['identity'] },
     ],
   }, BuddyProfileRow),
-  chainJob: __table({
-    name: 'chain_job',
-    indexes: [
-      { accessor: 'id', name: 'chain_job_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { accessor: 'status', name: 'chain_job_status_idx_btree', algorithm: 'btree', columns: [
-        'status',
-      ] },
-    ],
-    constraints: [
-      { name: 'chain_job_id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, ChainJobRow),
-  chatMessage: __table({
-    name: 'chat_message',
-    indexes: [
-      { accessor: 'id', name: 'chat_message_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { accessor: 'roomCode', name: 'chat_message_room_code_idx_btree', algorithm: 'btree', columns: [
-        'roomCode',
-      ] },
-    ],
-    constraints: [
-      { name: 'chat_message_id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, ChatMessageRow),
-  chatTranslation: __table({
-    name: 'chat_translation',
-    indexes: [
-      { accessor: 'id', name: 'chat_translation_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { accessor: 'messageId', name: 'chat_translation_message_id_idx_btree', algorithm: 'btree', columns: [
-        'messageId',
-      ] },
-      { accessor: 'roomCode', name: 'chat_translation_room_code_idx_btree', algorithm: 'btree', columns: [
-        'roomCode',
-      ] },
-    ],
-    constraints: [
-      { name: 'chat_translation_id_key', constraint: 'unique', columns: ['id'] },
-    ],
-  }, ChatTranslationRow),
   credential: __table({
     name: 'credential',
     indexes: [
@@ -337,59 +263,41 @@ const tablesSchema = __schema({
       { name: 'race_entry_id_key', constraint: 'unique', columns: ['id'] },
     ],
   }, RaceEntryRow),
-  room: __table({
-    name: 'room',
+  myAgentProposals: __table({
+    name: 'my_agent_proposals',
     indexes: [
-      { accessor: 'code', name: 'room_code_idx_btree', algorithm: 'btree', columns: [
-        'code',
-      ] },
     ],
     constraints: [
-      { name: 'room_code_key', constraint: 'unique', columns: ['code'] },
     ],
-  }, RoomRow),
-  roomAction: __table({
-    name: 'room_action',
+  }, MyAgentProposalsRow),
+  myAgentSteps: __table({
+    name: 'my_agent_steps',
     indexes: [
-      { accessor: 'id', name: 'room_action_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { accessor: 'roomCode', name: 'room_action_room_code_idx_btree', algorithm: 'btree', columns: [
-        'roomCode',
-      ] },
     ],
     constraints: [
-      { name: 'room_action_id_key', constraint: 'unique', columns: ['id'] },
     ],
-  }, RoomActionRow),
-  roomMember: __table({
-    name: 'room_member',
+  }, MyAgentStepsRow),
+  myChainJobs: __table({
+    name: 'my_chain_jobs',
     indexes: [
-      { accessor: 'id', name: 'room_member_id_idx_btree', algorithm: 'btree', columns: [
-        'id',
-      ] },
-      { accessor: 'identity', name: 'room_member_identity_idx_btree', algorithm: 'btree', columns: [
-        'identity',
-      ] },
-      { accessor: 'roomCode', name: 'room_member_room_code_idx_btree', algorithm: 'btree', columns: [
-        'roomCode',
-      ] },
     ],
     constraints: [
-      { name: 'room_member_id_key', constraint: 'unique', columns: ['id'] },
     ],
-  }, RoomMemberRow),
-  roomSnapshot: __table({
-    name: 'room_snapshot',
+  }, MyChainJobsRow),
+  myChat: __table({
+    name: 'my_chat',
     indexes: [
-      { accessor: 'roomCode', name: 'room_snapshot_room_code_idx_btree', algorithm: 'btree', columns: [
-        'roomCode',
-      ] },
     ],
     constraints: [
-      { name: 'room_snapshot_room_code_key', constraint: 'unique', columns: ['roomCode'] },
     ],
-  }, RoomSnapshotRow),
+  }, MyChatRow),
+  myChatTranslations: __table({
+    name: 'my_chat_translations',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyChatTranslationsRow),
   myProgress: __table({
     name: 'my_progress',
     indexes: [
@@ -397,6 +305,55 @@ const tablesSchema = __schema({
     constraints: [
     ],
   }, MyProgressRow),
+  myRoomActions: __table({
+    name: 'my_room_actions',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyRoomActionsRow),
+  myRoomMembers: __table({
+    name: 'my_room_members',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyRoomMembersRow),
+  myRoomSnapshots: __table({
+    name: 'my_room_snapshots',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyRoomSnapshotsRow),
+  myRooms: __table({
+    name: 'my_rooms',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyRoomsRow),
+  myWallet: __table({
+    name: 'my_wallet',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, MyWalletRow),
+  workerAgentJobs: __table({
+    name: 'worker_agent_jobs',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, WorkerAgentJobsRow),
+  workerChainJobs: __table({
+    name: 'worker_chain_jobs',
+    indexes: [
+    ],
+    constraints: [
+    ],
+  }, WorkerChainJobsRow),
 });
 
 /** The schema information for all reducers in this module. This is defined the same way as the reducers would have been defined in the server, except the body of the reducer is omitted in code generation. */

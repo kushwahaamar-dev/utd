@@ -56,6 +56,11 @@ export async function startWorker(options: WorkerOptions): Promise<{ stop(): voi
       .withDatabaseName(options.database)
       .onConnect((c) => resolve(c))
       .onConnectError((_ctx, error) => reject(error))
+      .onDisconnect((_ctx, error) => {
+        if (stopped) return;
+        log(`disconnected from SpacetimeDB${error ? `: ${error.message}` : ""}`);
+        process.exit(1);
+      })
       .build();
   });
 
@@ -82,7 +87,7 @@ export async function startWorker(options: WorkerOptions): Promise<{ stop(): voi
     while (!stopped && running.size < options.concurrency && waiting.length) {
       const row = waiting.shift()!;
       // A job cancelled while it waited is not started.
-      const fresh = conn.db.agentJob.id.find(row.id);
+      const fresh = conn.db.workerAgentJobs.id.find(row.id);
       if (!fresh || fresh.status !== "queued") continue;
       void runOne(fresh);
     }
@@ -100,7 +105,7 @@ export async function startWorker(options: WorkerOptions): Promise<{ stop(): voi
     try {
       while (!stopped && chainQueue.length) {
         const row = chainQueue.shift()!;
-        const fresh = conn.db.chainJob.id.find(row.id);
+        const fresh = conn.db.workerChainJobs.id.find(row.id);
         if (!fresh || fresh.status !== "queued") continue;
         let payload: unknown = {};
         try {
@@ -125,27 +130,27 @@ export async function startWorker(options: WorkerOptions): Promise<{ stop(): voi
     void pumpChain().catch((error) => log(`chain queue: ${error instanceof Error ? error.message : error}`));
   }
 
-  conn.db.agentJob.onInsert((_ctx, row) => enqueue(row));
-  conn.db.agentJob.onUpdate((_ctx, _old, row) => {
+  conn.db.workerAgentJobs.onInsert((_ctx, row) => enqueue(row));
+  conn.db.workerAgentJobs.onUpdate((_ctx, _old, row) => {
     if (row.status === "cancelled") running.get(row.id)?.cancel();
   });
-  conn.db.chainJob.onInsert((_ctx, row) => enqueueChain(row));
+  conn.db.workerChainJobs.onInsert((_ctx, row) => enqueueChain(row));
 
   await new Promise<void>((resolve, reject) => {
     conn
       .subscriptionBuilder()
       .onApplied(() => resolve())
       .onError((ctx) => reject(ctx.event ?? new Error("subscription failed")))
-      .subscribe([tables.agentJob, tables.chainJob]);
+      .subscribe([tables.workerAgentJobs, tables.workerChainJobs]);
   });
 
   // A previous worker run can leave jobs in flight; nothing will finish them now.
-  for (const row of conn.db.agentJob.iter()) {
+  for (const row of conn.db.workerAgentJobs.iter()) {
     if (LIVE.has(row.status)) {
       await conn.reducers.workerJobStatus({ jobId: row.id, status: "failed", error: "The worker restarted while this job was running. Start it again." });
     } else enqueue(row);
   }
-  for (const row of conn.db.chainJob.iter()) enqueueChain(row);
+  for (const row of conn.db.workerChainJobs.iter()) enqueueChain(row);
 
   log(`worker ready: ${waiting.length + running.size} queued jobs, concurrency ${options.concurrency}${options.chain ? ", chain on" : ", chain off"}`);
   return {

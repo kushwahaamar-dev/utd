@@ -39,7 +39,7 @@ describe.skipIf(!process.env.STDB_LIVE)("against a running server (STDB_LIVE=1)"
     });
     await host.reducers.createRoom({ lab: "board", itemId: "uno-r3" });
     const code = await waitFor(() => {
-      const row = [...host.db.room.iter()].find((r) => host.identity && r.host.isEqual(host.identity));
+      const row = [...host.db.myRooms.iter()].find((r) => host.identity && r.host.isEqual(host.identity));
       if (!row) throw new Error("no room yet");
       return row.code;
     });

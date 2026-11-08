@@ -36,4 +36,5 @@ export {
 } from "./chain";
 export { init, sweep } from "./schedules";
 export { translateMessage, searchOffers, searchWeb } from "./procedures";
-export { myProgress } from "./views";
+export { myProgress, myWallet, myRooms, myRoomActions, myRoomSnapshots, myChat, myChatTranslations, myAgentSteps, myAgentProposals, myRoomMembers, myChainJobs, workerChainJobs, workerAgentJobs } from "./views";
+export * from "./visibility";

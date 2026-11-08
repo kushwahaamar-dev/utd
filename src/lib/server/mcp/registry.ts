@@ -23,6 +23,8 @@ export class ToolError extends Error {
 export type ToolContext = {
   /** Absolute site origin for the links a tool returns, e.g. https://iynk.tech. */
   siteUrl: string;
+  /** Who is calling (the client IP as the proxy reports it), for per-caller limits. */
+  caller?: string;
 };
 
 export type Tool<I extends z.ZodType = z.ZodType, O extends z.ZodType = z.ZodType> = {

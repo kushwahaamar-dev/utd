@@ -50,12 +50,12 @@ export function usePlayers() {
 }
 
 export function useRoom(code: string | null | undefined) {
-  const [rows, ready] = useTable(tables.room.where((r) => r.code.eq(code ?? NONE)), { enabled: !!code });
+  const [rows, ready] = useTable(tables.myRooms.where((r) => r.code.eq(code ?? NONE)), { enabled: !!code });
   return { room: rows[0] as Room | undefined, ready };
 }
 
 export function useRoomMembers(code: string | null | undefined) {
-  const [rows, ready] = useTable(tables.roomMember.where((m) => m.roomCode.eq(code ?? NONE)), { enabled: !!code });
+  const [rows, ready] = useTable(tables.myRoomMembers.where((m) => m.roomCode.eq(code ?? NONE)), { enabled: !!code });
   const members = useMemo(() => [...rows].sort((a, b) => (a.id < b.id ? -1 : 1)) as RoomMember[], [rows]);
   return { members, ready };
 }
@@ -63,7 +63,7 @@ export function useRoomMembers(code: string | null | undefined) {
 /** The room's shared actions after `sinceSeq`, in the total order the module assigned. */
 export function useRoomActions(code: string | null | undefined, sinceSeq: number | bigint = 0n) {
   const since = BigInt(sinceSeq);
-  const [rows, ready] = useTable(tables.roomAction.where((a) => a.roomCode.eq(code ?? NONE)), { enabled: !!code });
+  const [rows, ready] = useTable(tables.myRoomActions.where((a) => a.roomCode.eq(code ?? NONE)), { enabled: !!code });
   const actions = useMemo(
     () => rows.filter((a) => a.seq > since).sort((a, b) => (a.seq < b.seq ? -1 : 1)) as RoomAction[],
     [rows, since],
@@ -73,19 +73,19 @@ export function useRoomActions(code: string | null | undefined, sinceSeq: number
 
 /** The newest host snapshot, for a late joiner to start from before replaying actions after `snapshot.seq`. */
 export function useRoomSnapshot(code: string | null | undefined) {
-  const [rows, ready] = useTable(tables.roomSnapshot.where((s) => s.roomCode.eq(code ?? NONE)), { enabled: !!code });
+  const [rows, ready] = useTable(tables.myRoomSnapshots.where((s) => s.roomCode.eq(code ?? NONE)), { enabled: !!code });
   return { snapshot: rows[0] as RoomSnapshot | undefined, ready };
 }
 
 export function useChat(code: string | null | undefined) {
-  const [rows, ready] = useTable(tables.chatMessage.where((m) => m.roomCode.eq(code ?? NONE)), { enabled: !!code });
+  const [rows, ready] = useTable(tables.myChat.where((m) => m.roomCode.eq(code ?? NONE)), { enabled: !!code });
   const messages = useMemo(() => [...rows].sort((a, b) => (a.id < b.id ? -1 : 1)) as ChatMessage[], [rows]);
   return { messages, ready };
 }
 
 /** Translations of one room's chat, as messageId -> lang -> text. */
 export function useTranslations(code: string | null | undefined) {
-  const [rows, ready] = useTable(tables.chatTranslation.where((t) => t.roomCode.eq(code ?? NONE)), { enabled: !!code });
+  const [rows, ready] = useTable(tables.myChatTranslations.where((t) => t.roomCode.eq(code ?? NONE)), { enabled: !!code });
   const byMessage = useMemo(() => {
     const out = new Map<bigint, Record<string, string>>();
     for (const row of rows as readonly ChatTranslation[]) {
@@ -155,13 +155,13 @@ export function useAgentJob(id: bigint | number | null | undefined) {
 }
 
 export function useAgentSteps(jobId: bigint | number | null | undefined) {
-  const [rows, ready] = useTable(tables.agentStep.where((s) => s.jobId.eq(BigInt(jobId ?? 0))), { enabled: jobId != null });
+  const [rows, ready] = useTable(tables.myAgentSteps.where((s) => s.jobId.eq(BigInt(jobId ?? 0))), { enabled: jobId != null });
   const steps = useMemo(() => [...rows].sort((a, b) => a.idx - b.idx) as AgentStep[], [rows]);
   return { steps, ready };
 }
 
 export function useAgentProposals(jobId: bigint | number | null | undefined) {
-  const [rows, ready] = useTable(tables.agentProposal.where((p) => p.jobId.eq(BigInt(jobId ?? 0))), { enabled: jobId != null });
+  const [rows, ready] = useTable(tables.myAgentProposals.where((p) => p.jobId.eq(BigInt(jobId ?? 0))), { enabled: jobId != null });
   const proposals = useMemo(() => [...rows].sort((a, b) => (a.id < b.id ? -1 : 1)) as AgentProposal[], [rows]);
   return { proposals, ready };
 }
@@ -193,21 +193,23 @@ export function useCredentials(who: Identity | string | null | undefined) {
 
 /** Calls `onEvent` for every cursor update in the room (an event table: nothing is stored). */
 export function useCursorEvents(code: string | null | undefined, onEvent: (event: CursorEvt) => void) {
+  const topic = useRoom(code).room?.topic;
   const handler = useRef(onEvent);
   useEffect(() => {
     handler.current = onEvent;
   });
-  const callbacks = useMemo(() => ({ onInsert: (row: CursorEvt) => handler.current(row), enabled: !!code }), [code]);
-  useTable(tables.cursorEvt.where((c) => c.roomCode.eq(code ?? NONE)), callbacks);
+  const callbacks = useMemo(() => ({ onInsert: (row: CursorEvt) => handler.current(row), enabled: !!topic }), [topic]);
+  useTable(tables.cursorEvt.where((c) => c.topic.eq(topic ?? NONE)), callbacks);
 }
 
 export function usePoseEvents(code: string | null | undefined, onEvent: (event: PoseEvt) => void) {
+  const topic = useRoom(code).room?.topic;
   const handler = useRef(onEvent);
   useEffect(() => {
     handler.current = onEvent;
   });
-  const callbacks = useMemo(() => ({ onInsert: (row: PoseEvt) => handler.current(row), enabled: !!code }), [code]);
-  useTable(tables.poseEvt.where((p) => p.roomCode.eq(code ?? NONE)), callbacks);
+  const callbacks = useMemo(() => ({ onInsert: (row: PoseEvt) => handler.current(row), enabled: !!topic }), [topic]);
+  useTable(tables.poseEvt.where((p) => p.topic.eq(topic ?? NONE)), callbacks);
 }
 
 export type { Room };

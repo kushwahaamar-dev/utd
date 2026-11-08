@@ -86,6 +86,11 @@ export function limit(ctx: Ctx, action: string, capacity: number, perSecond: num
   }
 }
 
+/** One bucket for everybody, so a swarm of throwaway identities still cannot out-write the database. */
+export function limitGlobal(ctx: Ctx, action: string, capacity: number, perSecond: number, cost = 1) {
+  if (!take(ctx, `global:${action}`, capacity, perSecond, cost)) fail(`busy: too many ${action} right now, try again in a moment`);
+}
+
 export function bumpActivity(ctx: Ctx, kind: string, by = 1) {
   const minuteUs = (micros(ctx) / 60_000_000n) * 60_000_000n;
   const minute = new Timestamp(minuteUs);
@@ -105,12 +110,13 @@ export function requirePlayer(ctx: Ctx) {
     name: `guest-${ctx.random.integerInRange(1000, 9999)}`,
     color: PALETTE[ctx.random.integerInRange(0, PALETTE.length - 1)]!,
     lang: "en",
-    wallet: undefined,
     online: false,
     lastSeen: ctx.timestamp,
     createdAt: ctx.timestamp,
   });
 }
+
+export const MIN_WORKER_SECRET = 16;
 
 function sameBytes(a: string, b: string): boolean {
   let diff = a.length ^ b.length;
@@ -122,6 +128,7 @@ function sameBytes(a: string, b: string): boolean {
 export function registerWorker(ctx: Ctx, secret: string) {
   const expected = ctx.env.WORKER_SECRET;
   if (!expected) fail("worker auth is not configured: set WORKER_SECRET on the database");
+  if ((expected as string).length < MIN_WORKER_SECRET) fail("worker auth is not configured: WORKER_SECRET is too short");
   if (!sameBytes(secret, expected as string)) fail("bad worker secret");
   const row = ctx.db.config.key.find("worker");
   const next = { key: "worker", value: "registered", identity: ctx.sender };

@@ -1,11 +1,13 @@
 import { t } from "spacetimedb/server";
 import spacetimedb from "./schema";
-import { addMillis, bumpActivity, fail, limit, requireJson, requireLang, requireName, requirePlayer, requireStringArray } from "./util";
+import { checkLap } from "./lapcheck";
+import { addMillis, bumpActivity, fail, limit, limitGlobal, requireJson, requireLang, requireName, requirePlayer, requireStringArray, type Ctx } from "./util";
 
 const PROGRESS_KEY = /^[a-z0-9][a-z0-9:._-]{0,95}$/;
 const COURSE = /^[a-z0-9][a-z0-9-]{0,47}$/;
 const LAP_MS = { min: 1_000, max: 60 * 60 * 1000 };
 const MAX_PROGRESS_KEYS = 500;
+const MAX_LAPS_PER_IDENTITY = 40;
 const BUDDY_TTL_MS = 24 * 60 * 60 * 1000;
 const ACTIVITY_KINDS = new Set([
   "flight.start",
@@ -31,7 +33,7 @@ export const recordProgress = spacetimedb.reducer({ key: t.string() }, (ctx, { k
 export const trackActivity = spacetimedb.reducer({ kind: t.string(), count: t.u32() }, (ctx, { kind, count }) => {
   limit(ctx, "track", 30, 3);
   if (!ACTIVITY_KINDS.has(kind)) fail("unknown activity kind");
-  if (count < 1 || count > 100_000) fail("bad count");
+  if (count < 1 || count > 25) fail("bad count");
   bumpActivity(ctx, kind, count);
 });
 
@@ -39,9 +41,11 @@ export const submitLap = spacetimedb.reducer(
   { course: t.string(), timeMs: t.u32(), inputs: t.string(), name: t.option(t.string()) },
   (ctx, { course, timeMs, inputs, name }) => {
     limit(ctx, "lap", 10, 0.2);
+    limitGlobal(ctx, "lap", 60, 10);
     if (!COURSE.test(course)) fail("bad course id");
     if (timeMs < LAP_MS.min || timeMs > LAP_MS.max) fail("lap time is outside what a course can produce");
-    requireJson(inputs, 64 * 1024, "inputs");
+    const parsedInputs = requireJson(inputs, 64 * 1024, "inputs");
+    const check = checkLap(course, timeMs, parsedInputs, Number(ctx.timestamp.microsSinceUnixEpoch / 1000n));
     const player = requirePlayer(ctx);
     const display = name != null ? requireName(name) : player.name;
 
@@ -52,9 +56,12 @@ export const submitLap = spacetimedb.reducer(
       course,
       timeMs,
       inputs,
-      verified: false,
+      verified: check.ok,
       at: ctx.timestamp,
     });
+    pruneLaps(ctx);
+    // Only a lap that passed the checks can set a board time or a race result.
+    if (!check.ok) return;
 
     const best = ctx.db.leaderboard.byCourseIdentity.filter([course, ctx.sender]).next().value;
     if (!best) {
@@ -75,10 +82,24 @@ export const submitLap = spacetimedb.reducer(
   },
 );
 
+/** Replay logs are big; an identity keeps its newest laps and whichever ones a board or a race still points at. */
+function pruneLaps(ctx: Ctx) {
+  const mine = [...ctx.db.lap.identity.filter(ctx.sender)];
+  if (mine.length <= MAX_LAPS_PER_IDENTITY) return;
+  const pinned = new Set<bigint>();
+  for (const row of ctx.db.leaderboard.iter()) if (row.identity.equals(ctx.sender)) pinned.add(row.lapId);
+  for (const row of ctx.db.raceEntry.identity.filter(ctx.sender)) if (row.lapId != null) pinned.add(row.lapId);
+  mine.sort((a, b) => (a.id < b.id ? -1 : 1));
+  for (const old of mine.slice(0, mine.length - MAX_LAPS_PER_IDENTITY)) {
+    if (!pinned.has(old.id)) ctx.db.lap.id.delete(old.id);
+  }
+}
+
 export const upsertBuddy = spacetimedb.reducer(
   { name: t.string(), lang: t.string(), interests: t.string(), built: t.string(), wants: t.string() },
   (ctx, { name, lang, interests, built, wants }) => {
     limit(ctx, "buddy", 5, 0.1);
+    limitGlobal(ctx, "buddy", 30, 2);
     requirePlayer(ctx);
     const cleanWants = wants.trim();
     if (Array.from(cleanWants).length > 280) fail("wants is over 280 characters");

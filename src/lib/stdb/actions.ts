@@ -52,7 +52,7 @@ function makeActions(conn: DbConnection | null) {
 
   return {
     setProfile: async (p: { name: string; color: string; lang: string }) => need().reducers.setProfile(p),
-    linkWallet: async (wallet: string) => need().reducers.linkWallet({ wallet }),
+    linkWallet: async (wallet: string, signature: string) => need().reducers.linkWallet({ wallet, signature }),
 
     createRoom: async (lab: LabKind, itemId: string) => need().reducers.createRoom({ lab, itemId }),
     joinRoom: async (code: string, bind?: { lab: LabKind; itemId: string }) =>
