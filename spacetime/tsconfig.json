@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "types": ["node"],
+    "paths": { "@/*": ["../src/*"] }
+  },
+  "include": ["src/**/*.ts", "../src/lib/verify/**/*.ts", "../src/lib/realtime/shared-actions.ts"],
+  "exclude": ["**/*.test.ts"]
+}

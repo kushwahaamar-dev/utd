@@ -20,7 +20,14 @@
     "pretest": "npm run content",
     "test": "vitest run",
     "e2e": "playwright test",
-    "check": "npm run content:check && npm run typecheck && npm run lint && npm run test && npm run e2e"
+    "check": "npm run content:check && npm run typecheck && npm run lint && npm run test && npm run e2e",
+    "stdb:start": "mkdir -p spacetime/.data && spacetime start --listen-addr 127.0.0.1:3100 --data-dir spacetime/.data",
+    "stdb:build": "spacetime build -p spacetime",
+    "stdb:publish": "WORKER_SECRET=${WORKER_SECRET:-dev-worker-secret} spacetime publish iynk --server http://127.0.0.1:3100 -p spacetime --yes",
+    "stdb:reset": "WORKER_SECRET=${WORKER_SECRET:-dev-worker-secret} spacetime publish iynk --server http://127.0.0.1:3100 -p spacetime --delete-data=always --yes",
+    "stdb:generate": "spacetime generate --lang typescript --out-dir src/lib/stdb/bindings -p spacetime --yes",
+    "stdb:publish:maincloud": "spacetime publish iynk-hackutd --server maincloud -p spacetime --yes",
+    "stdb:logs": "spacetime logs iynk --server http://127.0.0.1:3100 -f"
   },
   "dependencies": {
     "@codemirror/commands": "6.11.1",
@@ -33,6 +40,7 @@
     "@coral-xyz/anchor": "0.31.1",
     "@lezer/highlight": "1.2.5",
     "@modelcontextprotocol/sdk": "1.32.2",
+    "@noble/hashes": "2.4.0",
     "@solana/wallet-adapter-base": "0.9.28",
     "@solana/wallet-adapter-react": "0.15.40",
     "@solana/wallet-adapter-react-ui": "0.9.40",
@@ -44,6 +52,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "server-only": "0.0.1",
+    "spacetimedb": "2.14.1",
     "zod": "4.6.7"
   },
   "devDependencies": {
