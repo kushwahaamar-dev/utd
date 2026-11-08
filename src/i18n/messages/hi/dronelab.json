@@ -319,7 +319,9 @@
     "noBest": "अभी उड़ाया नहीं गया",
     "missing": "इस ड्रोन का उड़ान मैदान अभी बन रहा है।",
     "medalTimes": "स्वर्ण {gold} s · रजत {silver} s · कांस्य {bronze} s",
-    "bestMedal": "सबसे अच्छा: {s} s, {medal}"
+    "bestMedal": "सबसे अच्छा: {s} s, {medal}",
+    "railShow": "कोर्स और बहुत कुछ",
+    "railHide": "पैनल छिपाएँ"
   },
   "keys": {
     "title": "कीबोर्ड शॉर्टकट",

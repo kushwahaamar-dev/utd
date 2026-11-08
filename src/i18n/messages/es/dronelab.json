@@ -319,7 +319,9 @@
     "noBest": "Aún sin volar",
     "missing": "El campo de vuelo de este dron todavía se está construyendo.",
     "medalTimes": "Oro {gold} s · plata {silver} s · bronce {bronze} s",
-    "bestMedal": "Mejor: {s} s, medalla de {medal}"
+    "bestMedal": "Mejor: {s} s, medalla de {medal}",
+    "railShow": "Pruebas y más",
+    "railHide": "Ocultar panel"
   },
   "keys": {
     "title": "Atajos de teclado",

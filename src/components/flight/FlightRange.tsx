@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent, type ReactNode } from "react";
 import { FigureFrame, type FigureEvent, type FigureHandle } from "@/components/figure";
 import { Button, cx, Kbd, Select, Stat, Toggle } from "@/components/ui";
 import type { ParTimes } from "@/content/schema";
@@ -27,8 +27,11 @@ import {
   padSticks,
   readSticks,
   saveGhost,
+  LIMITS,
   STEP,
   STICK_KEYS,
+  stressFacts,
+  stressGrade,
   type BreakId,
   type CalcOutputs,
   type CrashFix,
@@ -42,8 +45,10 @@ import {
   type FlightSession,
   type PadMapping,
   type Sticks,
+  type StressKind,
 } from "@/lib/flight";
 import { GamepadPanel } from "./GamepadPanel";
+import { StressHud, StressReport, type StressReportData } from "./StressPanels";
 import { TouchSticks } from "./TouchSticks";
 
 export type FlightStrings = Messages["flight"];
@@ -83,6 +88,11 @@ export type FlightRangeProps = {
   onPose?: (pose: RangePose) => void;
   /** A crash's fix that changes the build (a fault the bench or Break it put in): the page takes it out. */
   onFix?: (fault: BreakId) => void;
+  /** The page's full screen: F and the cockpit button call `onFullscreen`, `fullscreen` says whether it is on. */
+  fullscreen?: boolean;
+  onFullscreen?: () => void;
+  /** Buttons the page adds at the end of the cockpit row (the side panel's toggle). */
+  trailing?: ReactNode;
   className?: string;
 };
 
@@ -133,6 +143,14 @@ function subscribeCoarse(cb: () => void) {
   return () => mq.removeEventListener("change", cb);
 }
 const isCoarse = () => window.matchMedia(COARSE).matches;
+// from lg the range fills its page: the cockpit and the readouts float over the picture
+const WIDE = "(min-width: 64rem)";
+function subscribeWide(cb: () => void) {
+  const mq = window.matchMedia(WIDE);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+}
+const isWide = () => window.matchMedia(WIDE).matches;
 
 const AUTOPILOT = new Set(["rtl", "mission", "figure8", "qrtl", "rth", "swarm", "transition"]);
 
@@ -150,7 +168,7 @@ const GHOST_PACE = "#1c2948";
 const scoresGates = (course: Course, mode: { task: string }) => course.kind === "gates" || (!course.kind && mode.task === "race");
 const scoresCheckpoints = (course: Course, mode: { task: string }) => (course.kind ? course.kind !== "gates" : mode.task === "range");
 
-export function FlightRange({ craft, course, calc, faults, t: dict, courseText, initialMode, par, onEvent, onFinish, onSession, onFigure, peers, wind, onPose, onFix, className }: FlightRangeProps) {
+export function FlightRange({ craft, course, calc, faults, t: dict, courseText, initialMode, par, onEvent, onFinish, onSession, onFigure, peers, wind, onPose, onFix, fullscreen, onFullscreen, trailing, className }: FlightRangeProps) {
   const locale = useLocale();
   const t = useMemo(() => createTranslator(locale, dict, "flight"), [locale, dict]);
   const label = useCallback((en: string) => courseText?.labels?.[en] ?? en, [courseText]);
@@ -190,6 +208,8 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
   // one panel over the range at a time: the gamepad mapping or the controls legend
   const [panel, setPanel] = useState<"pad" | "legend" | null>(null);
   const coarse = useSyncExternalStore(subscribeCoarse, isCoarse, () => false);
+  const wide = useSyncExternalStore(subscribeWide, isWide, () => true);
+  const immersive = wide && !coarse;
   // on a laptop the cockpit row and the telemetry each stay one row: the row turns Reset, FPV and Wind into icons,
   // the telemetry leaves out DROP_ORDER's numbers one by one (a phone has its own layout for both)
   const [rowRef, rowSteps] = useFitSteps(1, !coarse);
@@ -309,6 +329,8 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
           return e.to === "cruise" ? t("msg.transition") : t("msg.hoverAgain");
         case "mode":
           return t("msg.modeChanged", { mode: modeTitle(e.mode) });
+        case "stress":
+          return e.on ? t("stress.started", { kind: dict.stress.kinds[e.kind], hint: dict.stress.hints[e.kind] }) : t("stress.ended", { kind: dict.stress.kinds[e.kind] });
         default:
           return null;
       }
@@ -373,9 +395,48 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
     }, 0);
   }, [session, playCrash]);
 
+  // a stress test's end screen: built when the test ends, shown once a crash's slow-motion replay is over
+  const [report, setReport] = useState<StressReportData | null>(null);
+  const seen = useRef(new Set<StressKind>());
+  const lastCrash = useRef<string | null>(null);
+  const endStress = useCallback(
+    (outcome: StressReportData["outcome"]) => {
+      const spec = course.stress;
+      if (!spec) return;
+      const sim = session.sim;
+      const total = course.checkpoints.length + course.gates.length;
+      const { grade, score } = stressGrade({ t: sim.stressAt, limit: spec.limit, hits: sim.stats.hits, total, outcome });
+      setReport({
+        outcome,
+        what: lastCrash.current ? ((dict.hit as Record<string, string>)[lastCrash.current] ?? dict.hit.obstacle) : null,
+        t: sim.stressAt,
+        limit: spec.limit,
+        hits: sim.stats.hits,
+        total,
+        grade,
+        score,
+        maxTilt: sim.stats.maxTilt,
+        minCell: sim.stats.minCell,
+        peakAmps: sim.stats.peakAmps,
+        cut: LIMITS[calc.chemistry ?? "lipo"].cut,
+        seen: [...seen.current],
+        facts: stressFacts(calc, spec, sim.stats),
+      });
+    },
+    [course, session, dict, calc],
+  );
+
   const handleEvents = useCallback(
     (events: FlightEvent[]) => {
       for (const e of events) {
+        if (e.type === "armed") {
+          seen.current.clear();
+          lastCrash.current = null;
+          setReport(null);
+        }
+        if (e.type === "crash") lastCrash.current = e.why;
+        if (e.type === "stress" && e.on) seen.current.add(e.kind);
+        if (e.type === "stressEnd") endStress(e.outcome);
         onEvent?.(e);
         const text = describe(e);
         if (text && e.type !== "takeoff") say(text);
@@ -385,7 +446,7 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
         if (e.type === "crash") seeCrash();
       }
     },
-    [describe, onEvent, onFinish, session, say, keepBest, seeCrash],
+    [describe, onEvent, onFinish, session, say, keepBest, seeCrash, endStress],
   );
   const handleRef = useRef(handleEvents);
   useEffect(() => {
@@ -397,6 +458,7 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
       if (a.type === "reset") {
         stopCrash();
         setCrash(null);
+        setReport(null);
       }
       session.dispatch(a);
       handleRef.current(session.tick(0));
@@ -405,6 +467,10 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
     },
     [session, stopCrash],
   );
+  // the page's own message line takes over from the range's note once the cockpit floats over the picture
+  useEffect(() => {
+    frame.current?.send("set", { state: { hud: immersive } });
+  }, [immersive]);
   const toggleFpv = useCallback(() => {
     const next = !fpvRef.current;
     fpvRef.current = next;
@@ -426,8 +492,9 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
       if (code === "Space") act({ type: "toggleArm" });
       else if (code === "KeyR") act({ type: "reset" });
       else if (code === "KeyV") toggleFpv();
+      else if (code === "KeyF") onFullscreen?.();
     },
-    [act, toggleFpv],
+    [act, toggleFpv, onFullscreen],
   );
   const keyDown = useCallback(
     (code: string, repeat: boolean) => {
@@ -649,16 +716,65 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
     </div>
   );
 
+  const spec = course.stress;
+  const stress = snap.stress;
+  const minimap = course.field > 60;
+  const reportShown = report !== null && (report.outcome !== "crashed" || (crash !== null && !replaying));
+  // the message line and the ghost switches: under the range on a phone, floating over the picture from lg
+  const footer = (
+    <div
+      className={cx(
+        "flex shrink-0 flex-wrap items-center gap-x-4 gap-y-0",
+        immersive && "pointer-events-auto max-w-full rounded-ink-sm border-[1.5px] border-rule bg-paper/90 px-3 py-1 shadow-ink-sm",
+      )}
+    >
+      <p role="status" aria-live="polite" className={cx("min-w-0 flex-1 basis-60 truncate text-sm font-semibold", immersive ? "empty:hidden" : "min-h-6")} data-testid="flight-message">
+        {message}
+      </p>
+      <div className="flex max-w-full flex-wrap items-center gap-x-4 gap-y-1" role="group" aria-labelledby="flight-ghosts-title" data-testid="ghosts">
+        <span id="flight-ghosts-title" className="ink-kicker shrink-0">
+          {dict.ghosts.title}
+        </span>
+        <div data-testid="ghost-best" data-on={ghostOn.best && bestGhost !== null} className="min-w-0 max-sm:basis-full sm:whitespace-nowrap">
+          <Toggle
+            checked={ghostOn.best && bestGhost !== null}
+            disabled={!bestGhost}
+            onChange={(on) => setGhostOn((g) => ({ ...g, best: on }))}
+            label={bestGhost ? t("ghosts.best", { time: bestGhost.time.toFixed(2) }) : dict.ghosts.bestNone}
+            className="!gap-2"
+          />
+        </div>
+        {pace && (
+          <div data-testid="ghost-pace" data-on={ghostOn.pace} className="min-w-0 max-sm:basis-full sm:whitespace-nowrap">
+            <Toggle
+              checked={ghostOn.pace}
+              onChange={(on) => setGhostOn((g) => ({ ...g, pace: on }))}
+              label={t("ghosts.pace", { time: pace.time.toFixed(1) })}
+              className="!gap-2"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div
-      className={cx("flex min-h-0 min-w-0 flex-col gap-2", className)}
+      className={cx("relative min-h-0 min-w-0 flex-1", immersive ? "block" : "flex flex-col gap-2", className)}
       data-testid="flight-range"
       data-course={course.id}
+      data-immersive={immersive}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && input.current.keys.clear()}
     >
-      <div ref={rowRef} className="flex shrink-0 items-center gap-1.5 overflow-x-auto [scrollbar-width:none] sm:gap-2">
+      <div
+        ref={rowRef}
+        className={cx(
+          "flex shrink-0 items-center gap-1.5 overflow-x-auto [scrollbar-width:none] sm:gap-2",
+          immersive && "absolute inset-x-3 top-3 z-10 rounded-ink-sm border-[1.5px] border-rule bg-paper/90 p-1.5 shadow-ink-sm",
+        )}
+      >
         {/* the select takes the room the buttons leave (on a laptop at least 9 rem) and a long mode ends in an ellipsis */}
         <div className={coarse ? "min-w-0 flex-1" : "min-w-36 max-w-64"}>
           <Select label={dict.mode} hideLabel value={snap.mode} onChange={(e) => act({ type: "mode", mode: e.target.value })} className="truncate">
@@ -711,11 +827,15 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
             <Button variant="ghost" size="sm" aria-expanded={panel === "legend"} onClick={() => toggle("legend")} className="shrink-0 whitespace-nowrap">
               {dict.buttons.legend}
             </Button>
+            {onFullscreen ? (
+              <CockpitIcon glyph={fullscreen ? "windowed" : "full"} label={fullscreen ? dict.buttons.exitFullscreen : dict.buttons.fullscreen} keys="F" pressed={fullscreen} onClick={onFullscreen} />
+            ) : null}
+            {trailing}
           </>
         )}
       </div>
       {coarse ? strip : null}
-      <div className="relative min-h-0 flex-1">
+      <div className={cx("min-h-0", immersive ? "absolute inset-0" : "relative flex-1")}>
         <FigureFrame
           ref={setFrame}
           src="/figures/flight/range.html"
@@ -726,6 +846,7 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
           controls={false}
           fill
           className="h-full"
+          frameClassName={immersive ? "!rounded-none !border-0 !shadow-none" : undefined}
         />
         {coarse && (
           <TouchSticks
@@ -736,19 +857,40 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
             onRight={(v) => (input.current.right = v)}
           />
         )}
-        <div className={cx("pointer-events-none absolute inset-x-2 flex flex-col items-start gap-2", coarse ? "top-2" : "bottom-2 justify-end")}>
+        {spec && stress ? (
+          <div className={cx("pointer-events-none absolute inset-x-3 flex justify-center", immersive ? "top-[4.25rem]" : "top-2")}>
+            <StressHud spec={spec} t={stress.t} active={stress.active} strings={dict.stress} />
+          </div>
+        ) : null}
+        <div
+          className={cx(
+            "pointer-events-none absolute inset-x-2 flex flex-col items-start gap-2",
+            coarse ? "top-2" : "bottom-2 justify-end",
+            immersive && "inset-x-3 bottom-3",
+            immersive && minimap && "end-[11.5rem]",
+          )}
+        >
           {hintShown || snap.pendingDesign ? (
             <div className="max-w-[min(32rem,100%)] rounded-ink-sm bg-paper/85 px-2.5 py-1 text-xs text-ink shadow-ink-sm">
               {hintShown ? <p className="max-sm:line-clamp-3">{hintShown}</p> : null}
               {snap.pendingDesign ? <p className="font-semibold">{dict.pendingDesign}</p> : null}
             </div>
           ) : null}
-          {crashCard}
+          {reportShown ? null : crashCard}
+          {coarse ? null : footer}
           {coarse ? null : strip}
         </div>
+        {report && reportShown ? (
+          <div className="pointer-events-none absolute inset-0 z-30 grid place-items-center p-3">
+            <StressReport r={report} strings={dict.stress} tr={(key, params) => t(key as never, params)} onAgain={() => act({ type: "reset" })} onClose={() => setReport(null)} />
+          </div>
+        ) : null}
         {panel ? (
           <div
-            className="absolute end-2 top-2 z-20 max-h-[calc(100%-1rem)] w-[min(26rem,calc(100%-1rem))] overflow-y-auto rounded-ink-sm border-2 border-line bg-surface p-3 text-sm shadow-ink-lg animate-ink-fade"
+            className={cx(
+              "absolute end-2 z-20 max-h-[calc(100%-1rem)] w-[min(26rem,calc(100%-1rem))] overflow-y-auto rounded-ink-sm border-2 border-line bg-surface p-3 text-sm shadow-ink-lg animate-ink-fade",
+              immersive ? "top-[4.5rem]" : "top-2",
+            )}
             onKeyDown={(e) => {
               if (e.key === "Escape") {
                 e.stopPropagation();
@@ -764,7 +906,7 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
                   {dict.legend.title}
                 </h3>
                 <dl className="divide-y divide-rule">
-                  {(["throttle", "yaw", "pitch", "roll", "arm", "fpv", "reset"] as const).map((k) => (
+                  {(["throttle", "yaw", "pitch", "roll", "arm", "fpv", "reset", "fullscreen"] as const).map((k) => (
                     <div key={k} className="flex items-center justify-between gap-4 py-1.5">
                       <dt>
                         <Kbd>{dict.legend.keys[k]}</Kbd>
@@ -783,40 +925,7 @@ export function FlightRange({ craft, course, calc, faults, t: dict, courseText, 
           </div>
         ) : null}
       </div>
-      <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-0">
-        <p role="status" aria-live="polite" className="min-h-6 min-w-0 flex-1 basis-60 truncate text-sm font-semibold" data-testid="flight-message">
-          {message}
-        </p>
-        <div
-          className="flex max-w-full flex-wrap items-center gap-x-4 gap-y-1"
-          role="group"
-          aria-labelledby="flight-ghosts-title"
-          data-testid="ghosts"
-        >
-          <span id="flight-ghosts-title" className="ink-kicker shrink-0">
-            {dict.ghosts.title}
-          </span>
-          <div data-testid="ghost-best" data-on={ghostOn.best && bestGhost !== null} className="min-w-0 max-sm:basis-full sm:whitespace-nowrap">
-            <Toggle
-              checked={ghostOn.best && bestGhost !== null}
-              disabled={!bestGhost}
-              onChange={(on) => setGhostOn((g) => ({ ...g, best: on }))}
-              label={bestGhost ? t("ghosts.best", { time: bestGhost.time.toFixed(2) }) : dict.ghosts.bestNone}
-              className="!gap-2"
-            />
-          </div>
-          {pace && (
-            <div data-testid="ghost-pace" data-on={ghostOn.pace} className="min-w-0 max-sm:basis-full sm:whitespace-nowrap">
-              <Toggle
-                checked={ghostOn.pace}
-                onChange={(on) => setGhostOn((g) => ({ ...g, pace: on }))}
-                label={t("ghosts.pace", { time: pace.time.toFixed(1) })}
-                className="!gap-2"
-              />
-            </div>
-          )}
-        </div>
-      </div>
+      {coarse ? footer : null}
     </div>
   );
 }
@@ -828,6 +937,9 @@ const GLYPHS = {
   fpv: "M3 9.5h18v6h-6.5l-2.5-2-2.5 2H3zM3 12H1.5M21 12h1.5",
   // wind: three gusts
   wind: "M3 8.5h10.5a2.5 2.5 0 1 0-2.5-2.5M3 12.5h15a2.5 2.5 0 1 1-2.5 2.5M3 16.5h7",
+  // four corners pulled out, and pushed back in
+  full: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5",
+  windowed: "M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5",
 };
 
 /** A 44 px cockpit button with a glyph, for a row with no room for words (its name stays the full label). */

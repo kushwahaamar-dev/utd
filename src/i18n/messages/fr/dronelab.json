@@ -319,7 +319,9 @@
     "noBest": "Pas encore volé",
     "missing": "Le terrain de vol de ce drone est encore en construction.",
     "medalTimes": "Or {gold} s · argent {silver} s · bronze {bronze} s",
-    "bestMedal": "Record : {s} s, {medal}"
+    "bestMedal": "Record : {s} s, {medal}",
+    "railShow": "Parcours et plus",
+    "railHide": "Masquer le panneau"
   },
   "keys": {
     "title": "Raccourcis clavier",

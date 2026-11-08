@@ -310,7 +310,9 @@
     "noBest": "还没飞过",
     "missing": "这架无人机的飞行场还在建设中。",
     "medalTimes": "金牌 {gold} 秒 · 银牌 {silver} 秒 · 铜牌 {bronze} 秒",
-    "bestMedal": "最佳：{s} 秒，{medal}"
+    "bestMedal": "最佳：{s} 秒，{medal}",
+    "railShow": "赛道及更多",
+    "railHide": "隐藏面板"
   },
   "keys": {
     "title": "键盘快捷键",

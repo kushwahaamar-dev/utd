@@ -319,7 +319,9 @@
     "noBest": "Noch nicht geflogen",
     "missing": "Der Flugplatz für dieses Fluggerät wird noch gebaut.",
     "medalTimes": "Gold {gold} s · Silber {silver} s · Bronze {bronze} s",
-    "bestMedal": "Bestzeit: {s} s, {medal}"
+    "bestMedal": "Bestzeit: {s} s, {medal}",
+    "railShow": "Kurse und mehr",
+    "railHide": "Seitenleiste ausblenden"
   },
   "keys": {
     "title": "Tastenkürzel",

@@ -319,7 +319,9 @@
     "noBest": "Not flown yet",
     "missing": "The flying range for this craft is still being built.",
     "medalTimes": "Gold {gold} s · silver {silver} s · bronze {bronze} s",
-    "bestMedal": "Best: {s} s, {medal}"
+    "bestMedal": "Best: {s} s, {medal}",
+    "railShow": "Courses and more",
+    "railHide": "Hide panel"
   },
   "keys": {
     "title": "Keyboard shortcuts",

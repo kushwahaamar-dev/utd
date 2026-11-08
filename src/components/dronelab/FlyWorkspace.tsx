@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useReducer, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { DroneContent } from "@/content/schema";
 import { Leaderboard, LiveCounter, type DataMessages } from "@/components/data";
 import { LabDock } from "@/components/dock/LabDock";
@@ -13,6 +13,7 @@ import { FlyRaceBanner } from "@/components/solana/FlyRaceBanner";
 import { RacesLink } from "@/components/solana/RacesLink";
 import { SoundToggle } from "@/components/settings";
 import { WorkspaceBar, WorkspaceFrame } from "@/components/shell/workspace";
+import { Button, cx } from "@/components/ui";
 import { Chip } from "@/components/ui/Chip";
 import { Panel } from "@/components/ui/Panel";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
@@ -54,6 +55,14 @@ type Props = {
 };
 
 const noSubscribe = () => () => {};
+const RAIL_KEY = "iynk:fly-rail:v1";
+// where the panel stands when storage is blocked: the choice then lasts for this visit
+let railMemory: boolean | null = null;
+const subscribeFullscreen = (cb: () => void) => {
+  document.addEventListener("fullscreenchange", cb);
+  return () => document.removeEventListener("fullscreenchange", cb);
+};
+const isFullscreen = () => document.fullscreenElement !== null;
 const readSearch = () => window.location.search;
 const noSearch = () => "";
 
@@ -66,6 +75,38 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
   const [store] = useState(() => createFlyStore(content));
   const state = useSyncExternalStore(store.subscribe, store.getState, store.getState);
   const [figure, setFigure] = useState<FigureHandle | null>(null);
+  // the side panel (courses, build, leaderboard) folds away so the range can have the whole screen; the choice is kept
+  const railSubs = useRef(new Set<() => void>());
+  const subscribeRail = useCallback((cb: () => void) => {
+    railSubs.current.add(cb);
+    return () => void railSubs.current.delete(cb);
+  }, []);
+  const readRail = () => {
+    if (railMemory !== null) return railMemory;
+    try {
+      return localStorage.getItem(RAIL_KEY) !== "closed";
+    } catch {
+      return true;
+    }
+  };
+  const railOpen = useSyncExternalStore(subscribeRail, readRail, () => true);
+  const toggleRail = useCallback(() => {
+    railMemory = !readRail();
+    try {
+      localStorage.setItem(RAIL_KEY, railMemory ? "open" : "closed");
+    } catch {
+      // storage blocked: railMemory carries it
+    }
+    railSubs.current.forEach((cb) => cb());
+  }, []);
+  // true full screen: the workspace itself (bar, range and panel) leaves the page, the site header with it
+  const frameRef = useRef<HTMLDivElement>(null);
+  const fullscreen = useSyncExternalStore(subscribeFullscreen, isFullscreen, () => false);
+  const canFullscreen = useSyncExternalStore(noSubscribe, () => document.fullscreenEnabled, () => false);
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    else void frameRef.current?.requestFullscreen().catch(() => {});
+  }, []);
   const id = content.id;
   // every craft flies from its content module (src/lib/flight/registry.ts); the courses keep their content ids
   const range = useMemo(() => flightOf(content), [content]);
@@ -153,7 +194,7 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
 
   const title = t("fly.title", { title: ct(content.title) });
   const rail = (
-    <Panel className="h-full" bodyClassName="overflow-y-auto divide-y divide-rule px-4 [&>*]:py-4">
+    <Panel id="fly-rail" className="h-full" bodyClassName="overflow-y-auto divide-y divide-rule px-4 [&>*]:py-4">
       {content.courses.length > 0 ? (
         <section aria-labelledby={`fly-courses-${id}`}>
           <h2 id={`fly-courses-${id}`} className="font-head text-lg">
@@ -235,9 +276,19 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
 
   return (
     <WorkspaceFrame
+      ref={frameRef}
       phoneStage="full"
-      // on a phone the bar takes two rows: the range fills what is left of the first screen
-      className="max-lg:[&>.ws>.ws-stage]:h-[calc(100svh-var(--header-h)-7rem)]"
+      data-rail={railOpen ? "open" : "closed"}
+      // on a phone the bar takes two rows: the range fills what is left of the first screen. From lg the range takes the
+      // whole screen under the header (no gaps, no frame), the panel is a column that folds away, and true full screen
+      // drops the bar and the header
+      className={cx(
+        "[--rail-w:clamp(20rem,24vw,26rem)] max-lg:[&>.ws>.ws-stage]:h-[calc(100svh-var(--header-h)-7rem)]",
+        "lg:[&>.ws]:gap-0 lg:[&>.ws]:p-0 lg:[&>.ws>.ws-bar]:px-[var(--frame-pad)] lg:[&>.ws>.ws-bar]:py-1",
+        "lg:[&>.ws>.ws-rail]:p-2 lg:[&>.ws>.ws-rail]:ps-0",
+        "lg:[&[data-rail=closed]>.ws]:grid-cols-1 lg:[&[data-rail=closed]>.ws>.ws-rail]:hidden",
+        "[&:fullscreen]:bg-paper [&:fullscreen>.ws]:h-dvh [&:fullscreen>.ws>.ws-bar]:hidden",
+      )}
       bar={
         <WorkspaceBar
           back={{ href: withRoom(`/${lang}/drones/${id}`, room?.id), label: t("fly.back") }}
@@ -284,6 +335,13 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
             onFix={onFix}
             peers={ghosts.peers}
             onPose={ghosts.onPose}
+            fullscreen={fullscreen}
+            onFullscreen={canFullscreen ? toggleFullscreen : undefined}
+            trailing={
+              <Button variant="ghost" size="sm" aria-expanded={railOpen} aria-controls="fly-rail" onClick={toggleRail} className="shrink-0 whitespace-nowrap">
+                {railOpen ? t("fly.railHide") : t("fly.railShow")}
+              </Button>
+            }
             className="h-full"
           />
         ) : (
