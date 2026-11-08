@@ -120,6 +120,8 @@ context 32 KiB, run log 256 KiB, laps 64 KiB. Old jobs, chain jobs and idle anon
 - **Cursor and pose events are public** (positions with an identity, no content, no room code).
 - **Chat text goes to NVIDIA** when a member asks for a translation. Do not put secrets in chat.
 - **CSP keeps `'unsafe-inline'` for scripts** because Next injects inline hydration scripts; no remote script origin is allowed.
+- **CSP allows `'unsafe-eval'`** because the SpacetimeDB client SDK builds its row decoders with `new Function()`.
+  The generated code comes from the module's schema, never from user input, and no remote script origin is allowed.
 - **Next API limits are in memory,** per instance, and use the proxy's client IP header. Behind Caddy that header is
   overwritten, directly exposed it is only a hint.
 - **Dependencies:** `npm audit --omit=dev` reports 15 findings (2 high, 13 moderate), all inside the Solana tooling

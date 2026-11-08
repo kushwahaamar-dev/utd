@@ -26,10 +26,11 @@ const connectSrc = [
   ...(isDev ? ["ws://127.0.0.1:3100", "http://127.0.0.1:3100", "ws://localhost:3100", "http://localhost:3100"] : []),
 ];
 
-// Next injects inline scripts for hydration, so script-src keeps 'unsafe-inline'; everything else is locked down.
+// Next injects inline scripts for hydration, so script-src keeps 'unsafe-inline'. The SpacetimeDB client compiles
+// its row decoders with new Function() from the module's schema, so it needs 'unsafe-eval' in production too.
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""} blob:`,
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
