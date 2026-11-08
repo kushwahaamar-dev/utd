@@ -37,7 +37,7 @@ export function Callout({ tone = "note", variant = "box", title, children, live,
       <div role={role} className={cx("flex items-start gap-2 text-sm text-muted", className)}>
         <Icon name={icon} size={18} className="mt-px shrink-0" />
         <div className="min-w-0">
-          {title ? <span className="font-semibold text-ink">{title} </span> : null}
+          {title ? <span className="font-medium text-ink">{title} </span> : null}
           {children}
         </div>
       </div>
@@ -49,13 +49,13 @@ export function Callout({ tone = "note", variant = "box", title, children, live,
       role={role}
       style={{ borderInlineStartColor: bar }}
       className={cx(
-        "flex items-start gap-2.5 rounded-ink-sm border-[1.5px] border-s-4 border-(--card-line) bg-surface px-3.5 py-3 shadow-(--card-shadow)",
+        "flex items-start gap-2.5 rounded-ink-sm border border-s-4 border-(--card-line) bg-surface px-3.5 py-3 shadow-(--card-shadow)",
         className,
       )}
     >
       <Icon name={icon} size={20} className={cx("mt-px shrink-0", ink)} />
       <div className="min-w-0 flex-1">
-        {title ? <div className="font-body text-sm font-semibold leading-snug">{title}</div> : null}
+        {title ? <div className="font-body text-sm font-medium leading-snug">{title}</div> : null}
         {children ? <div className={cx("text-sm leading-relaxed", title ? "mt-1" : undefined)}>{children}</div> : null}
       </div>
     </div>

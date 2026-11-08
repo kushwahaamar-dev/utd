@@ -68,7 +68,7 @@ async function Landing({ params }: Pick<Props, "params">) {
           <SelectionBox>{focus}</SelectionBox>
           {tail}
         </h1>
-        <p style={riseIndex(1)} className="rise mt-4 text-pretty text-muted">
+        <p style={riseIndex(1)} className="rise mt-6 text-pretty text-muted">
           {t("landing.p1")}
         </p>
         <p style={riseIndex(2)} className="rise mt-4 text-pretty text-muted">

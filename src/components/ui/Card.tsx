@@ -6,7 +6,7 @@ export type Tone = "surface" | "plate" | "tomato" | "mustard" | "mint" | "cobalt
 const tones: Record<Tone, string> = {
   surface: "ink-card",
   plate: "ink-plate",
-  sunken: "rounded-ink border-2 border-dashed border-rule bg-sunken",
+  sunken: "rounded-ink border border-dashed border-line bg-sunken",
   flat: "",
   tomato: "ink-card bg-tomato text-on-color",
   mustard: "ink-card bg-mustard text-on-color",

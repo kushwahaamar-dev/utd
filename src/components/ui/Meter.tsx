@@ -27,7 +27,7 @@ export function Meter({ label, value, min = 0, max, valueText, warn, danger, cla
         <span id={id} className="ink-label">
           {label}
         </span>
-        <span className="tabular whitespace-nowrap font-ui text-sm font-bold">{text}</span>
+        <span className="tabular whitespace-nowrap font-ui text-sm font-semibold">{text}</span>
       </div>
       <div
         role="meter"
@@ -36,11 +36,11 @@ export function Meter({ label, value, min = 0, max, valueText, warn, danger, cla
         aria-valuemax={max}
         aria-valuenow={value}
         aria-valuetext={text}
-        className="relative h-2.5 overflow-hidden rounded-full border-[1.5px] border-line bg-sunken"
+        className="relative h-2.5 overflow-hidden rounded-full border border-line bg-sunken"
       >
         <div
           className={cx(
-            "h-full border-e-[1.5px] border-line transition-[width] duration-300",
+            "h-full border-e border-line transition-[width] duration-300",
             level === "danger" ? "bg-tomato" : level === "warn" ? "bg-mustard" : "bg-mint",
             pct === 0 && "border-e-0",
           )}

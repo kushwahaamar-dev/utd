@@ -69,11 +69,11 @@ export function IconButton({
         tip.onBlur();
       }}
       className={cx(
-        "relative inline-flex shrink-0 items-center justify-center rounded-full border-2 text-ink transition-[transform,box-shadow,background-color] duration-100",
+        "relative inline-flex shrink-0 items-center justify-center rounded-full border text-ink transition-[background-color,border-color,color] duration-150",
         "disabled:cursor-not-allowed disabled:text-muted disabled:opacity-60 aria-pressed:border-line aria-pressed:bg-ink aria-pressed:text-paper",
         size === "sm" ? "size-9 [@media(pointer:coarse)]:size-11" : "size-11",
         variant === "raised"
-          ? "border-line bg-surface shadow-ink-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-ink active:translate-0.5 active:shadow-none"
+          ? "border-line bg-surface hover:border-ink hover:bg-sunken"
           : "border-transparent bg-transparent hover:bg-sunken",
         className,
       )}

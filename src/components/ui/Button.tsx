@@ -8,19 +8,16 @@ export type ButtonSize = "sm" | "md" | "lg";
 // max-w-full: a label longer than its row (a long translation on a phone) wraps instead of pushing the page sideways.
 // Disabled looks the same in every variant, so a disabled primary stops reading as the next thing to press.
 const base =
-  "inline-flex max-w-full select-none items-center justify-center gap-2 text-center rounded-full border-2 font-body font-semibold leading-tight no-underline transition-[transform,box-shadow,background-color] duration-100 " +
-  "disabled:cursor-not-allowed disabled:border-rule disabled:bg-sunken disabled:text-muted disabled:shadow-none disabled:translate-0 " +
-  "aria-disabled:cursor-not-allowed aria-disabled:border-rule aria-disabled:bg-sunken aria-disabled:text-muted aria-disabled:shadow-none aria-disabled:translate-0";
-
-// Raised buttons sit on an offset ink shadow and press down into it.
-const raised = "shadow-ink-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-ink active:translate-x-0.5 active:translate-y-0.5 active:shadow-none";
+  "inline-flex max-w-full select-none items-center justify-center gap-2 text-center rounded-full border font-body font-medium leading-tight no-underline transition-[background-color,border-color,color,filter] duration-150 " +
+  "disabled:cursor-not-allowed disabled:border-rule disabled:bg-sunken disabled:text-muted" +
+  "aria-disabled:cursor-not-allowed aria-disabled:border-rule aria-disabled:bg-sunken aria-disabled:text-muted";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: `border-line bg-mustard text-on-color ${raised}`,
-  secondary: "border-line bg-surface text-ink hover:bg-sunken aria-pressed:bg-ink aria-pressed:text-paper",
+  primary: "border-transparent bg-ink text-paper hover:bg-ink/85",
+  secondary: "border-line bg-surface text-ink hover:border-ink hover:bg-sunken aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper",
   ghost: "border-transparent bg-transparent text-ink hover:bg-sunken aria-pressed:bg-ink aria-pressed:text-paper",
-  danger: `border-line bg-tomato text-on-color ${raised}`,
-  ink: `border-line bg-ink text-paper ${raised}`,
+  danger: "border-transparent bg-tomato text-on-color hover:brightness-95",
+  ink: "border-transparent bg-ink text-paper hover:bg-ink/85",
 };
 
 const sizes: Record<ButtonSize, string> = {

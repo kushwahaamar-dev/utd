@@ -61,8 +61,8 @@ export function NavLinks({ lang, labels, layout, onNavigate }: NavLinksProps) {
               aria-current={active ? "page" : undefined}
               onClick={onNavigate}
               className={cx(
-                "relative flex min-h-11 items-center whitespace-nowrap rounded-md px-2.5 text-sm font-medium tracking-[-0.005em] no-underline transition-colors xl:px-3.5",
-                active ? "text-ink" : "text-muted hover:text-ink",
+                "relative flex min-h-11 items-center whitespace-nowrap rounded-md px-2.5 text-[13.5px] font-normal tracking-[-0.005em] no-underline transition-colors xl:px-3.5",
+                active ? "font-medium text-ink" : "text-muted hover:text-ink",
               )}
             >
               {labels[entry.id]}

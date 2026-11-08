@@ -47,11 +47,11 @@ export function ProgressBadge({ done, total, label, countText, valueText, size =
       <span className="ink-kicker min-w-0">{label}</span>
       <span
         aria-hidden="true"
-        className={cx("relative min-w-16 flex-1 overflow-hidden rounded-full border-[1.5px] border-line bg-sunken", size === "sm" ? "h-2.5" : "h-3")}
+        className={cx("relative min-w-16 flex-1 overflow-hidden rounded-full border border-line bg-sunken", size === "sm" ? "h-2.5" : "h-3")}
       >
         {fill}
       </span>
-      <span aria-hidden="true" className={cx("tabular shrink-0 font-ui font-bold", size === "sm" ? "text-sm" : "text-base")}>
+      <span aria-hidden="true" className={cx("tabular shrink-0 font-ui font-semibold", size === "sm" ? "text-sm" : "text-base")}>
         {countText}
       </span>
     </div>
@@ -79,7 +79,7 @@ function CompactProgress({
       <span aria-hidden="true" className="relative h-1 w-24 overflow-hidden rounded-full bg-sunken">
         {fill}
       </span>
-      <span aria-hidden="true" className="tabular whitespace-nowrap font-ui text-xs font-bold">
+      <span aria-hidden="true" className="tabular whitespace-nowrap font-ui text-xs font-semibold">
         {countText}
       </span>
       <TipBubble open={tip.open} side="bottom" aria-hidden>

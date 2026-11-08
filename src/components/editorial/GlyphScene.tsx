@@ -163,7 +163,7 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
           const o = cell * 4;
           const lum = (0.2126 * data[o] + 0.7152 * data[o + 1] + 0.0722 * data[o + 2]) / 255;
           const weight = Math.min(1, Math.abs(lum - paperLum) / 0.8);
-          const glyph = Math.round(Math.pow(weight, 0.8) * (RAMP.length - 1));
+          const glyph = Math.round(Math.pow(weight, 1.1) * (RAMP.length - 1));
           if (glyph === 0) continue;
           ctx.drawImage(atlas, glyph * gw, 0, gw, gh, Math.round(x * cellW * dpr), Math.round(y * cellH * dpr), gw, gh);
         }
@@ -289,7 +289,7 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
           aria-valuetext={labels[phase]}
           className="time-slider"
         />
-        <div aria-hidden="true" className="mt-1 flex justify-between font-ui text-[11px] leading-4 tracking-[0.06em] text-muted/80">
+        <div aria-hidden="true" className="mt-1 flex justify-between font-ui text-[11px] leading-4 tracking-[0.06em] text-muted">
           {PHASES.map((name) => (
             <span key={name} className={cx("transition-colors", name === phase && "text-ink")}>
               {labels[name]}

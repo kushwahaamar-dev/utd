@@ -24,11 +24,11 @@ export async function SiteHeader({ lang, actions }: SiteHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-rule bg-paper [background-image:var(--grain)]">
+    <header className="sticky top-0 z-30 border-b border-rule bg-paper/85 backdrop-blur-md supports-[backdrop-filter]:bg-paper/75">
       <div className="shell-frame flex h-[57px] items-center gap-5">
         <Link href={`/${lang}`} className="-ms-2 flex min-h-11 shrink-0 items-center rounded-md px-2 text-ink no-underline">
           {/* The wordmark is a drawing: it keeps its face in every language. */}
-          <Logo height={23} />
+          <Logo height={21} />
           <span className="sr-only">{t("brand.home")}</span>
         </Link>
         <span aria-hidden="true" className="hidden h-4 w-px bg-rule lg:block" />

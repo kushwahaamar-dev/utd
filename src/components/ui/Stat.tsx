@@ -22,9 +22,9 @@ export function Stat({ label, value, unit, hint, size = "md", tone = "ink", clas
   return (
     <div className={cx("min-w-0", className)}>
       <div className="ink-kicker">{label}</div>
-      <div className={cx("tabular whitespace-nowrap font-ui font-bold leading-tight", valueSize[size], toneClass[tone])}>
+      <div className={cx("tabular whitespace-nowrap font-ui font-semibold leading-tight", valueSize[size], toneClass[tone])}>
         {value}
-        {unit ? <span className={cx("ms-1 font-semibold text-muted", unitSize[size])}>{unit}</span> : null}
+        {unit ? <span className={cx("ms-1 font-medium text-muted", unitSize[size])}>{unit}</span> : null}
       </div>
       {hint ? <div className="text-sm text-muted">{hint}</div> : null}
     </div>

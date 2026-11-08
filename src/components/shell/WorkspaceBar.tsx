@@ -27,7 +27,7 @@ export function WorkspaceBar({ back, kicker, title, tone, status, actions, class
     <div className={cx("flex min-h-14 flex-wrap items-center gap-x-4 gap-y-1", className)}>
       <Link
         href={back.href}
-        className="-ms-2 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-full px-2 font-body text-sm font-semibold text-muted no-underline hover:bg-sunken hover:text-ink md:justify-start"
+        className="-ms-2 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1 rounded-full px-2 font-body text-sm font-medium text-muted no-underline hover:bg-sunken hover:text-ink md:justify-start"
       >
         <Icon name="chevron-left" size={18} />
         <span className="max-md:sr-only max-w-[14rem] truncate">{back.label}</span>
@@ -35,7 +35,7 @@ export function WorkspaceBar({ back, kicker, title, tone, status, actions, class
       <div className="min-w-0 flex-[1_1_12rem]">
         {kicker || tone ? (
           <div className="ink-kicker flex min-w-0 items-center gap-2">
-            {tone ? <span aria-hidden="true" className={cx("size-2.5 shrink-0 rounded-[3px] border-[1.5px] border-line", SWATCH[tone])} /> : null}
+            {tone ? <span aria-hidden="true" className={cx("size-2.5 shrink-0 rounded-[3px] border border-line", SWATCH[tone])} /> : null}
             {kicker ? <span className="min-w-0 truncate">{kicker}</span> : null}
           </div>
         ) : null}

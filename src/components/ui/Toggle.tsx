@@ -18,7 +18,7 @@ export function Toggle({ checked, onChange, label, description, disabled, classN
   return (
     <div className={cx("flex min-h-11 items-center justify-between gap-4", className)}>
       <span className="min-w-0">
-        <span id={`${id}-l`} className="block font-body text-sm font-semibold">
+        <span id={`${id}-l`} className="block font-body text-sm font-medium">
           {label}
         </span>
         {description ? (
@@ -40,14 +40,14 @@ export function Toggle({ checked, onChange, label, description, disabled, classN
         <span
           aria-hidden="true"
           className={cx(
-            "absolute inset-x-1 inset-y-2 rounded-full border-2 border-line transition-colors",
-            checked ? "bg-mint" : "bg-sunken",
+            "absolute inset-x-1 inset-y-2 rounded-full border border-line transition-colors",
+            checked ? "border-pcb bg-pcb" : "bg-sunken",
           )}
         />
         <span
           aria-hidden="true"
           className={cx(
-            "absolute top-1/2 size-5 -translate-y-1/2 rounded-full border-2 border-line bg-surface shadow-ink-sm transition-[inset-inline-start] duration-150",
+            "absolute top-1/2 size-5 -translate-y-1/2 rounded-full border border-line bg-surface shadow-ink-sm transition-[inset-inline-start] duration-150",
             checked ? "start-9" : "start-2",
           )}
         />

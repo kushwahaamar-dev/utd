@@ -25,7 +25,7 @@ type StageDrawerProps = {
 export function StageDrawer({ title, summary, open, onOpenChange, height = 200, children, className }: StageDrawerProps) {
   const id = useId();
   return (
-    <div className={cx("flex shrink-0 flex-col overflow-hidden rounded-ink-sm border-[1.5px] border-(--card-line) bg-surface", className)}>
+    <div className={cx("flex shrink-0 flex-col overflow-hidden rounded-ink-sm border border-(--card-line) bg-surface", className)}>
       <button
         type="button"
         aria-expanded={open}

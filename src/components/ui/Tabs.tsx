@@ -124,7 +124,7 @@ export function Tabs({ label, tabs, value, defaultValue, onChange, className, pa
               tabIndex={active ? 0 : -1}
               onClick={() => select(tab.id)}
               className={cx(
-                "inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-t-md px-3 font-body text-sm font-semibold transition-colors",
+                "inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap rounded-t-md px-3 font-body text-sm font-medium transition-colors",
                 // The strip scrolls sideways and would clip a ring drawn outside the tab.
                 "focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-(--focus) focus-visible:shadow-none",
                 phoneGrid && "max-sm:whitespace-normal max-sm:px-1.5 max-sm:text-center max-sm:leading-tight",
@@ -135,7 +135,7 @@ export function Tabs({ label, tabs, value, defaultValue, onChange, className, pa
               {tab.badge !== undefined && tab.badge !== null ? (
                 <>
                   {/* a space, so the name reads "Steps 0/17"; it collapses at the label's end, the margin draws the gap */}{" "}
-                  <span className="tabular ms-1.5 rounded-full bg-sunken px-1.5 font-ui text-xs font-semibold">{tab.badge}</span>
+                  <span className="tabular ms-1.5 rounded-full bg-sunken px-1.5 font-ui text-xs font-medium">{tab.badge}</span>
                 </>
               ) : null}
             </button>

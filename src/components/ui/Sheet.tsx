@@ -59,7 +59,7 @@ export function Sheet({ open, onClose, title, closeLabel, side = "bottom", heigh
       >
         {side === "bottom" ? <span aria-hidden="true" className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-rule" /> : null}
         <div className="flex items-center gap-3 border-b-[1.5px] border-rule py-1.5 ps-4 pe-2">
-          <h2 id={`${id}-t`} className="min-w-0 flex-1 font-body text-base font-semibold">
+          <h2 id={`${id}-t`} className="min-w-0 flex-1 font-body text-base font-medium">
             {title}
           </h2>
           <IconButton icon="close" label={closeLabel} onClick={onClose} />
