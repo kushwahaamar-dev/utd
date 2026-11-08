@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, type ReactNode } from "react";
-import { Column } from "@/components/editorial";
+import { Container } from "@/components/editorial";
 import { ActionLink, Note, eyebrow } from "@/components/editorial/Editorial";
 import { cx } from "@/components/ui/cx";
 import type { Locale } from "@/i18n/config";
@@ -39,9 +39,9 @@ function Frame({ lang, head }: { lang: Locale; head?: ReactNode }) {
   // The language layout already mounts the one StdbProvider the live adapter reads.
   return (
     <MissionDataProvider adapter={adapter}>
-      <Column wide className="pb-[clamp(72px,10vw,160px)]">
+      <Container className="pb-[clamp(72px,10vw,160px)]">
         {jobId ? <JobView lang={lang} jobId={jobId} /> : <Home lang={lang} roomCode={roomCode} head={head} />}
-      </Column>
+      </Container>
     </MissionDataProvider>
   );
 }

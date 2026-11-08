@@ -1,5 +1,5 @@
 export { CompactList, ProjectCard, type CardImage, type CompactItem } from "./Cards";
-export { Column, Section, riseIndex } from "./Column";
+export { Cell, Container, Grid, Prose, Section, riseIndex } from "./Layout";
 export { FloatingControls, type FloatingControlsLabels } from "./FloatingControls";
 export { GlyphScene, type GlyphSceneLabels } from "./GlyphScene";
 export { KeyValueFooter, type KeyValueRow } from "./KeyValueFooter";

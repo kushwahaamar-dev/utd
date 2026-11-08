@@ -2,14 +2,17 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import {
-  Column,
+  Cell,
   CompactList,
+  Container,
   FloatingControls,
   GlyphScene,
+  Grid,
   KeyValueFooter,
   LiveNow,
   PcbTraces,
   ProjectCard,
+  Prose,
   SelectionBox,
   Section,
   Stamp,
@@ -57,38 +60,41 @@ async function Landing({ params }: Pick<Props, "params">) {
   return (
     <div className="relative pb-[clamp(96px,12vw,160px)]">
       <PcbTraces />
-      <Column className="relative pt-[clamp(72px,11vw,136px)]">
-        <h1 style={riseIndex(0)} className="rise text-base font-normal leading-[1.6] tracking-[-0.011em] text-muted text-pretty">
-          {lead}
-          <SelectionBox>{focus}</SelectionBox>
-          {tail}
-        </h1>
-        <p style={riseIndex(1)} className="rise mt-6 text-pretty text-muted">
-          {t("landing.p1")}
-        </p>
-        <p style={riseIndex(2)} className="rise mt-4 text-pretty text-muted">
-          {t("landing.p2")}
-        </p>
-      </Column>
+      <Container className="relative pt-[clamp(40px,6vw,96px)]">
+        <Grid className="items-center gap-y-8">
+          <Cell span={4} className="lg:py-10">
+            <h1 style={riseIndex(0)} className="rise text-[clamp(17px,1.5vw,22px)] font-normal leading-[1.55] tracking-[-0.014em] text-muted text-pretty">
+              {lead}
+              <SelectionBox>{focus}</SelectionBox>
+              {tail}
+            </h1>
+            <p style={riseIndex(1)} className="rise mt-6 text-pretty text-muted">
+              {t("landing.p1")}
+            </p>
+            <p style={riseIndex(2)} className="rise mt-4 text-pretty text-muted">
+              {t("landing.p2")}
+            </p>
+          </Cell>
+          <Cell span={8} start={5} className="lg:-me-[calc(var(--shell-pad)*0.6)]">
+            <div style={riseIndex(3)} className="rise">
+              <GlyphScene
+                labels={{
+                  scene: t("landing.scene.alt"),
+                  time: t("landing.scene.time"),
+                  dawn: t("landing.scene.dawn"),
+                  noon: t("landing.scene.noon"),
+                  dusk: t("landing.scene.dusk"),
+                  night: t("landing.scene.night"),
+                }}
+              />
+            </div>
+          </Cell>
+        </Grid>
+      </Container>
 
-      <Column wide className="relative mt-[clamp(32px,5vw,56px)]">
-        <div style={riseIndex(3)} className="rise">
-          <GlyphScene
-            labels={{
-              scene: t("landing.scene.alt"),
-              time: t("landing.scene.time"),
-              dawn: t("landing.scene.dawn"),
-              noon: t("landing.scene.noon"),
-              dusk: t("landing.scene.dusk"),
-              night: t("landing.scene.night"),
-            }}
-          />
-        </div>
-      </Column>
-
-      <Column className="relative">
+      <Container className="relative">
         <Section id={`labs-${lang}`} n="01" motif="chip" tone="tomato" tilt={-4} title={t("landing.labs.title")}>
-          <div className="grid grid-cols-1 gap-x-5 gap-y-9 min-[480px]:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-[clamp(16px,2vw,32px)] gap-y-9 min-[480px]:grid-cols-2 lg:grid-cols-4">
             <ProjectCard
               href={`/${lang}/boards`}
               title={t("landing.labs.board.title")}
@@ -124,8 +130,8 @@ async function Landing({ params }: Pick<Props, "params">) {
           </div>
         </Section>
 
-        <Section id={`mission-${lang}`} n="02" motif="arm" tone="plum" tilt={3} title={t("landing.mission.title")}>
-          <p className="max-w-[44ch] text-pretty text-muted">{t("landing.mission.text")}</p>
+        <Section id={`mission-${lang}`} n="02" motif="arm" tone="plum" tilt={3} title={t("landing.mission.title")} split>
+          <Prose className="text-[17px] leading-[1.6] text-muted">{t("landing.mission.text")}</Prose>
           <ArrowLink href={`/${lang}/mission`} className="mt-3">
             {t("landing.mission.cta")}
           </ArrowLink>
@@ -141,7 +147,7 @@ async function Landing({ params }: Pick<Props, "params">) {
           />
         </Section>
 
-        <Section id={`solana-${lang}`} n="04" motif="chain" tone="copper" tilt={4} title={t("landing.solana.title")}>
+        <Section id={`solana-${lang}`} n="04" motif="chain" tone="copper" tilt={4} title={t("landing.solana.title")} split>
           <CompactList
             items={[
               { title: t("landing.solana.pools.title"), description: t("landing.solana.pools.text"), href: `/${lang}/together`, icon: "target" },
@@ -154,7 +160,7 @@ async function Landing({ params }: Pick<Props, "params">) {
           </div>
         </Section>
 
-        <Section id={`built-${lang}`} n="05" motif="gear" tone="cobalt" tilt={-2} title={t("landing.built.title")}>
+        <Section id={`built-${lang}`} n="05" motif="gear" tone="cobalt" tilt={-2} title={t("landing.built.title")} split>
           <Timeline
             items={(["stdb", "agents", "chain", "cloud"] as const).map((id) => ({
               title: t(`landing.built.${id}.title`),
@@ -165,21 +171,27 @@ async function Landing({ params }: Pick<Props, "params">) {
         </Section>
 
         <footer className="mt-[clamp(88px,11vw,144px)]">
-          <div aria-hidden="true" className="mb-6 flex justify-end gap-1">
-            <Stamp motif="dish" tone="cobalt" value="HU" size={52} tilt={-6} />
-            <Stamp motif="drone" tone="tomato" value="26" size={52} tilt={5} className="-ms-2 mt-3" />
-          </div>
-          <KeyValueFooter
-            rows={[
-              { label: t("landing.footer.builtOn"), value: "Next.js, SpacetimeDB" },
-              { label: t("landing.footer.agents"), value: "NVIDIA Nemotron" },
-              { label: t("landing.footer.chain"), value: "Solana" },
-              { label: t("landing.footer.cloud"), value: "Vultr" },
-              { label: t("landing.footer.source"), value: "kushwahaamar-dev/utd", href: REPO },
-            ]}
-          />
+          <Grid className="items-end">
+            <Cell span={4}>
+              <div aria-hidden="true" className="flex gap-1">
+                <Stamp motif="dish" tone="cobalt" value="HU" size={52} tilt={-6} />
+                <Stamp motif="drone" tone="tomato" value="26" size={52} tilt={5} className="-ms-2 mt-3" />
+              </div>
+            </Cell>
+            <Cell span={8} start={5}>
+              <KeyValueFooter
+                rows={[
+                  { label: t("landing.footer.builtOn"), value: "Next.js, SpacetimeDB" },
+                  { label: t("landing.footer.agents"), value: "NVIDIA Nemotron" },
+                  { label: t("landing.footer.chain"), value: "Solana" },
+                  { label: t("landing.footer.cloud"), value: "Vultr" },
+                  { label: t("landing.footer.source"), value: "kushwahaamar-dev/utd", href: REPO },
+                ]}
+              />
+            </Cell>
+          </Grid>
         </footer>
-      </Column>
+      </Container>
 
       <FloatingControls
         labels={{ font: t("landing.controls.font"), theme: t("landing.controls.theme"), light: t("landing.controls.light"), dark: t("landing.controls.dark") }}

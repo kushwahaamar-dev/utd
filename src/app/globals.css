@@ -215,8 +215,8 @@
   --accent-ink: #a8402b;
 
   /* The site shell (header, footer): up to 1440 px with fluid gutters, as the editorial pages. */
-  --shell-max: 1440px;
-  --shell-pad: clamp(16px, 4vw, 56px);
+  --shell-max: 1600px;
+  --shell-pad: clamp(20px, 4vw, 64px);
 
   /* Page frames (POLISH-SPEC 1.1). The header is 57 px plus its 1 px hairline. */
   --header-h: 58px;
@@ -225,10 +225,6 @@
   --rail-w: clamp(22rem, 30vw, 36rem);
   --stage-h: 46svh;
   --footer-gap: 4rem;
-
-  /* The editorial column: one narrow measure, as wide as the type wants to be read. */
-  --column: 35rem;
-  --column-wide: 47.5rem;
 }
 @media (width >= 40rem) {
   :root { --frame-pad: 1.5rem; }

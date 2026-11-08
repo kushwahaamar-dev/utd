@@ -65,7 +65,7 @@ export function LiveNow({ locale, messages, course, labels, lobbyHref, className
   const top = entries.slice(0, SHOWN);
 
   return (
-    <div className={cx("grid gap-x-8 gap-y-9 min-[520px]:grid-cols-2", className)}>
+    <div className={cx("grid gap-x-[clamp(32px,5vw,80px)] gap-y-9 rounded-2xl border border-(--card-line) bg-surface p-5 min-[520px]:grid-cols-2 sm:p-7 lg:grid-cols-[7fr_5fr] lg:p-9", className)}>
       <div className="min-w-0">
         <h3 className={cx(kicker, "flex items-center gap-2")}>
           {live("title")}
