@@ -12,6 +12,9 @@ const flags = vi.hoisted(() => ({ ai: true, image: true, voice: true, search: tr
 const offers = vi.hoisted(() => vi.fn());
 const solana = vi.hoisted(() => ({ context: { connection: {}, programId: "program" } as object | null, credentialsOf: vi.fn() }));
 
+const mint = vi.hoisted(() => vi.fn<(lab: string, id: string) => Promise<string>>());
+vi.mock("./room-mint", () => ({ mintRoom: mint }));
+
 vi.mock("@/lib/server/env", () => ({ env: { NEXT_PUBLIC_SITE_URL: "https://iynk.test" }, features: flags }));
 
 vi.mock("@/content/index.generated", async () => {
@@ -264,12 +267,18 @@ describe("plan_build_night", () => {
 });
 
 describe("create_room", () => {
-  it("makes a fresh room link on the asked item", async () => {
+  beforeEach(() => {
+    mint.mockReset();
+    mint.mockResolvedValue("k7m2qx");
+  });
+
+  it("makes a fresh room on the module and links to it", async () => {
     const out = await runTool(createRoom, { lab: "drone", id: "quad5", locale: "hi" }, ctx);
     expect(out.ok).toBe(true);
     const data = out.ok ? (out.data as { room: string; link: string; maxPeople: number }) : null;
-    expect(data?.room).toMatch(/^[23456789abcdefghjkmnpqrstuvwxyz]{6}$/);
-    expect(data?.link).toMatch(new RegExp(`/hi/drones/quad5\\?room=${data?.room}$`));
+    expect(mint).toHaveBeenCalledWith("drone", "quad5");
+    expect(data?.room).toBe("k7m2qx");
+    expect(data?.link).toBe("https://iynk.test/hi/drones/quad5?room=k7m2qx");
     expect(data?.maxPeople).toBe(8);
   });
 
@@ -278,9 +287,15 @@ describe("create_room", () => {
     expect(await runTool(createRoom, { lab: "drone" }, ctx)).toMatchObject({ ok: false, code: "bad_input" });
   });
 
-  it("is not set up without the realtime relay", async () => {
+  it("is not set up without the realtime server", async () => {
     flags.realtime = false;
     expect(await runTool(createRoom, {}, ctx)).toMatchObject({ ok: false, code: "not_configured" });
+    expect(mint).not.toHaveBeenCalled();
+  });
+
+  it("says so when the module can't be reached", async () => {
+    mint.mockRejectedValue(new Error("connecting timed out"));
+    expect(await runTool(createRoom, {}, ctx)).toMatchObject({ ok: false, code: "upstream" });
   });
 });
 

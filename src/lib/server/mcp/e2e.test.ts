@@ -11,6 +11,7 @@ vi.mock("@/lib/server/env", () => ({
   features: { ai: false, image: false, voice: false, search: false, solana: false, realtime: true },
 }));
 vi.mock("next/server", () => ({ connection: async () => undefined }));
+vi.mock("./room-mint", () => ({ mintRoom: async () => "k7m2qx" }));
 vi.mock("@/content/index.generated", async () => {
   const { quad5 } = await import("./__fixtures__/content");
   return { loadBoard: async () => null, loadRobotics: async () => null, loadDrone: async (id: string) => (id === "quad5" ? quad5 : null) };

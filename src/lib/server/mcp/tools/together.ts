@@ -1,11 +1,12 @@
 import "server-only";
 import { z } from "zod";
 import { LOCALES } from "@/i18n/config";
-import { createRoom as roomLinkFor, ROOM_PARAM } from "@/lib/realtime/config";
+import { ROOM_PARAM } from "@/lib/realtime/config";
 import { MAX_NAME_LENGTH, MAX_PEERS } from "@/lib/realtime/protocol";
 import { features } from "@/lib/server/env";
 import { postRoute } from "../backends";
 import { ENTRIES, LABS, findEntry, itemUrl } from "../content";
+import { mintRoom } from "../room-mint";
 import { ToolError, defineTool } from "../registry";
 import { labInput, localeInput } from "./catalog";
 
@@ -55,7 +56,7 @@ const [starter] = ENTRIES;
 export const createRoom = defineTool({
   name: "create_room",
   title: "Open a live build room",
-  description: `Makes a link to a fresh iynk build room on one item. Up to ${MAX_PEERS} people open the same link on any device, with no account, and wire, code and fly together, each in their own language. Nothing is stored until someone opens the link, and a room closes 30 minutes after its last person leaves. Without lab and id the room opens on the ${starter.id} board, iynk's first lesson.`,
+  description: `Makes a link to a fresh iynk build room on one item. Up to ${MAX_PEERS} people open the same link on any device, with no account, and wire, code and fly together, each in their own language. The room is made when you ask, and the first person to open the link hosts it; it closes 30 minutes after its last person leaves. Without lab and id the room opens on the ${starter.id} board, iynk's first lesson.`,
   input: z.object({
     lab: labInput.optional(),
     id: z.string().trim().min(1).max(64).optional().describe("Item id from search_catalog or plan_build_night."),
@@ -70,16 +71,21 @@ export const createRoom = defineTool({
   }),
   openWorld: false,
   idempotent: false,
-  async run({ lab, id, locale }) {
+  async run({ lab, id, locale }, ctx) {
     if (!features.realtime) {
-      throw new ToolError("not_configured", "Live rooms are not set up on this deployment (there is no realtime relay), so a link would only join tabs of one browser.");
+      throw new ToolError("not_configured", "Live rooms are not set up on this deployment (there is no SpacetimeDB server to run them).");
     }
     if ((lab === undefined) !== (id === undefined)) throw new ToolError("bad_input", "Give both lab and id, or neither.");
     const target = lab && id ? findEntry(lab, id) : starter;
     if (!target) throw new ToolError("not_found", `iynk has no ${lab} called "${id}". Use search_catalog to find the right id.`);
-    const link = roomLinkFor(target.lab, target.id, locale);
-    const room = new URL(link).searchParams.get(ROOM_PARAM);
-    if (!room) throw new ToolError("internal", "iynk could not make a room link.");
-    return { room, link, lab: target.lab, id: target.id, maxPeople: MAX_PEERS };
+    let room: string;
+    try {
+      room = await mintRoom(target.lab, target.id);
+    } catch (error) {
+      throw new ToolError("upstream", `iynk could not open a room right now (${error instanceof Error ? error.message : "the realtime server did not answer"}). Try again in a moment.`);
+    }
+    const link = new URL(itemUrl(ctx.siteUrl, locale, target.lab, target.id));
+    link.searchParams.set(ROOM_PARAM, room);
+    return { room, link: link.toString(), lab: target.lab, id: target.id, maxPeople: MAX_PEERS };
   },
 });
