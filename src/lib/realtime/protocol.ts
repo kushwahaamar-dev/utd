@@ -9,7 +9,7 @@ export type ChatKind = "text" | "voice" | "ai" | "system";
 export type Action = { type: string; [key: string]: unknown };
 
 export const ROOM_ALPHABET = "23456789abcdefghjkmnpqrstuvwxyz";
-export const ROOM_ID_LENGTH = 6;
+export const ROOM_ID_LENGTH = 8;
 export const MAX_PEERS = 8;
 export const MAX_NAME_LENGTH = 24;
 export const MAX_CHAT_LENGTH = 500;

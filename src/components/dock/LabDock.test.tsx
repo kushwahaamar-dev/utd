@@ -164,7 +164,7 @@ describe("LabDock", () => {
   });
 
   test("a room in the address opens the drawer on Together", async () => {
-    window.history.replaceState(null, "", "/en/boards/nano?room=k7m2qx");
+    window.history.replaceState(null, "", "/en/boards/nano?room=k7m2qxhp");
     renderDock();
     await waitFor(() => {
       expect(screen.getByRole("tab", { name: dock.tabs.together }).getAttribute("aria-selected")).toBe("true");

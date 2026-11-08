@@ -5,7 +5,7 @@
     "introPlain": "Build this with friends. Everyone sees the same bench, and one person types at a time.",
     "start": "Start a room",
     "joinLabel": "Room code or invite link",
-    "joinPlaceholder": "e.g. k7m2qx",
+    "joinPlaceholder": "e.g. k7m2qxhp",
     "join": "Join",
     "badCode": "That isn't a room code. Codes have 6 letters and numbers.",
     "unavailable": "Rooms need a connection to the iynk server and it can't be reached right now. The labs still work on their own; try again in a moment.",

@@ -55,7 +55,7 @@ test("a friend's craft flies a lap beside you as a ghost with their name", async
   const dockA = await openDock(a, false);
   await dockA.getByRole("tab", { name: dockCopy.tabs.together }).click();
   await dockA.getByRole("button", { name: together.panel.start }).click();
-  await expect(a).toHaveURL(/[?&]room=[a-z0-9]{6}/);
+  await expect(a).toHaveURL(/[?&]room=[a-z0-9]{8}/);
 
   const b = await person(browser, baseURL, BO);
   const errorsB = watchErrors(b);

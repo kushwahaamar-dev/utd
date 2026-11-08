@@ -5,7 +5,7 @@
     "introPlain": "和朋友一起组装。每个人看到的是同一个实验台，每次由一个人输入。",
     "start": "开一个房间",
     "joinLabel": "房间代码或邀请链接",
-    "joinPlaceholder": "例如 k7m2qx",
+    "joinPlaceholder": "例如 k7m2qxhp",
     "join": "加入",
     "badCode": "这不是房间代码。代码由 6 个字母和数字组成。",
     "unavailable": "房间需要连接到 iynk 服务器，但现在连不上。实验室本身仍可单独使用，请稍后再试。",

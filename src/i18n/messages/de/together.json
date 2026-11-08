@@ -5,7 +5,7 @@
     "introPlain": "Bau das mit Freunden. Alle sehen dieselbe Werkbank, und es tippt immer eine Person.",
     "start": "Raum öffnen",
     "joinLabel": "Raumcode oder Einladungslink",
-    "joinPlaceholder": "z. B. k7m2qx",
+    "joinPlaceholder": "z. B. k7m2qxhp",
     "join": "Beitreten",
     "badCode": "Das ist kein Raumcode. Codes haben 6 Buchstaben und Ziffern.",
     "unavailable": "Räume brauchen eine Verbindung zum iynk-Server, der gerade nicht erreichbar ist. Die Labore laufen auch allein; versuch es gleich noch einmal.",

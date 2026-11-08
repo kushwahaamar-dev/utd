@@ -5,7 +5,7 @@
     "introPlain": "Constrúyelo con amigos. Todos ven el mismo banco de trabajo y escribe una persona a la vez.",
     "start": "Abrir una sala",
     "joinLabel": "Código de sala o enlace de invitación",
-    "joinPlaceholder": "p. ej. k7m2qx",
+    "joinPlaceholder": "p. ej. k7m2qxhp",
     "join": "Unirse",
     "badCode": "Eso no es un código de sala. Los códigos tienen 6 letras y números.",
     "unavailable": "Las salas necesitan conexión con el servidor de iynk y ahora no responde. Los laboratorios siguen funcionando solos; inténtalo de nuevo en un momento.",

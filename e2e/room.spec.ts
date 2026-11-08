@@ -33,7 +33,7 @@ async function startRoom(page: Page) {
   await dock.getByRole("tab", { name: dockCopy.tabs.together }).click();
   await dock.getByRole("button", { name: together.panel.start }).click();
   await expect(dock.getByText(together.bar.keyboardYou)).toBeVisible();
-  await expect(page).toHaveURL(/[?&]room=[a-z0-9]{6}/);
+  await expect(page).toHaveURL(/[?&]room=[a-z0-9]{8}/);
   return dock;
 }
 
