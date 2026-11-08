@@ -23,13 +23,24 @@ const worker = await startWorker({
   database: config.stdbDatabase,
   secret: config.workerSecret,
   concurrency: config.concurrency,
+  fake: config.fake,
+  fakeDelayMs: config.fakeDelayMs,
   chain: await chain(),
 });
+
+let stopMirror: (() => Promise<void>) | undefined;
+if (chainReady) {
+  const { startRaceMirror } = await import("./races");
+  stopMirror = await startRaceMirror(worker.conn, console.log).catch((error) => {
+    console.error(`race mirror is off: ${error instanceof Error ? error.message : error}`);
+    return undefined;
+  });
+}
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {
     console.log(`${signal}: shutting down`);
     worker.stop();
-    process.exit(0);
+    void (stopMirror?.() ?? Promise.resolve()).finally(() => process.exit(0));
   });
 }
