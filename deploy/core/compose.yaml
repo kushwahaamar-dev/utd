@@ -1,0 +1,90 @@
+# The whole iynk backend on one Vultr VM: SpacetimeDB (the backend), the agent worker (Nemotron + Solana
+# signer), the Next.js web app and Caddy for TLS. scripts/deploy-vultr.sh copies the repo here, writes
+# deploy/core/.env and runs `docker compose up -d --build`.
+name: iynk-core
+
+services:
+  spacetimedb:
+    image: clockworklabs/spacetime:v2.14.1
+    restart: unless-stopped
+    command: ["start", "--listen-addr", "0.0.0.0:3000"]
+    expose:
+      - "3000"
+    volumes:
+      - stdb_data:/home/spacetime/.local/share/spacetime/data
+      - ../../spacetime:/module:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/v1/ping >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "3" }
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: worker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      spacetimedb:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      STDB_URI: ws://spacetimedb:3000
+      STDB_DB: ${STDB_DB:-iynk}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "3" }
+
+  web:
+    build:
+      context: ../..
+      dockerfile: deploy/core/Dockerfile.web
+      args:
+        NEXT_PUBLIC_SITE_URL: https://${DOMAIN:?set DOMAIN in deploy/core/.env}
+        NEXT_PUBLIC_STDB_URI: wss://${DOMAIN}
+        NEXT_PUBLIC_STDB_DB: ${STDB_DB:-iynk}
+        NEXT_PUBLIC_SOLANA_PROGRAM_ID: ${NEXT_PUBLIC_SOLANA_PROGRAM_ID:-}
+        NEXT_PUBLIC_SOLANA_CLUSTER: devnet
+    restart: unless-stopped
+    env_file: .env
+    expose:
+      - "3000"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options: { max-size: "20m", max-file: "3" }
+
+  caddy:
+    image: caddy:2.11.7-alpine
+    restart: unless-stopped
+    depends_on: [spacetimedb, web]
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  stdb_data:
+  caddy_data:
+  caddy_config:

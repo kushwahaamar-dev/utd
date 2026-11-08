@@ -1,0 +1,27 @@
+# One domain for everything. Browsers reach SpacetimeDB only through the subscribe socket, identity,
+# reducer/procedure calls and HTTP routes; publishing and SQL stay inside the VM (scripts/deploy-vultr.sh
+# publishes with `docker compose exec`). Everything else is the Next.js app.
+{$DOMAIN} {
+	encode zstd gzip
+
+	@stdb path_regexp ^/v1/(ping|identity(/.*)?|database/[^/]+/(subscribe|call/[^/]+|route/.*))$
+	handle @stdb {
+		reverse_proxy spacetimedb:3000
+	}
+
+	@stdbOther path /v1/*
+	handle @stdbOther {
+		respond "Not found" 404
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}

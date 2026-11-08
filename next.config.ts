@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // Agents build side by side with NEXT_DIST_DIR=.next-<label> (D12).
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // The Vultr image runs `node server.js` from a standalone build (deploy/core/Dockerfile.web).
+  output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
   // While ~40 agents share one tree, IYNK_BUILD_SKIP_TYPECHECK=1 lets one of
   // them build its routes past another's half-written file; they type-check
   // with `npm run typecheck` instead. Deploy builds always type-check.
