@@ -6,7 +6,7 @@ import { callTool, toolSpecs } from "../tools";
 import { clip } from "../tools/clip";
 import type { AgentJob, JobSink } from "../types";
 import { CriticSchema, PlanSchema, ResultSchema, checkResult, toPlan, type Critique, type JobResult } from "./schemas";
-import { criticPrompt, digest, executorPrompt, finalPrompt, planText, plannerPrompt } from "./prompts";
+import { criticPrompt, digest, executorPrompt, finalPrompt, planText, plannerPrompt, untrusted } from "./prompts";
 
 export const MAX_REVISIONS = 3;
 export const MAX_TOOL_ROUNDS = 6;
@@ -105,7 +105,7 @@ async function planPhase(run: Run): Promise<void> {
   await deps.sink.setStatus("planning");
   const messages: ProviderMessage[] = [
     { role: "system", content: plannerPrompt(job.kind) },
-    { role: "user", content: `Goal: ${job.goal}\n\nContext: ${contextText(job)}` },
+    { role: "user", content: `${untrusted("goal", job.goal)}\n\n${untrusted("context", contextText(job))}` },
   ];
   let thinking = "";
   const plan = await run.step(
@@ -129,8 +129,8 @@ async function executeStep(run: Run, title: string, goal: string, index: number,
     {
       role: "user",
       content: [
-        `Goal: ${job.goal}`,
-        `Context: ${contextText(job)}`,
+        untrusted("goal", job.goal),
+        untrusted("context", contextText(job)),
         `Plan:\n${planText(run.plan, index)}`,
         `Success criteria:\n${run.plan.success_criteria.map((c) => `- ${c}`).join("\n")}`,
         `Findings so far:\n${findings}`,
@@ -223,7 +223,7 @@ async function review(run: Run): Promise<Critique> {
     {
       role: "user",
       content: [
-        `Goal: ${job.goal}`,
+        untrusted("goal", job.goal),
         `Success criteria:\n${run.plan.success_criteria.map((c) => `- ${c}`).join("\n")}`,
         `Executor summaries:\n${run.summaries.map((s) => `- ${s}`).join("\n")}`,
         `Tool evidence:\n${digest(run.evidence)}`,
@@ -249,8 +249,8 @@ async function finalize(run: Run, critique: Critique): Promise<JobResult> {
     {
       role: "user",
       content: [
-        `Goal: ${job.goal}`,
-        `Context: ${contextText(job)}`,
+        untrusted("goal", job.goal),
+        untrusted("context", contextText(job)),
         `Success criteria:\n${run.plan.success_criteria.map((c) => `- ${c}`).join("\n")}`,
         `Executor summaries:\n${run.summaries.map((s) => `- ${s}`).join("\n")}`,
         `Tool evidence:\n${digest(run.evidence, 1800)}`,

@@ -24,6 +24,9 @@ const address = z.string().refine((v) => {
 }, "not an address");
 
 const u64 = z.union([z.string().regex(/^\d{1,20}$/), z.number().int().nonnegative()]).transform((v) => BigInt(v));
+/** A devnet race stake or seed is small: nothing a payload says can move more than this. */
+const MAX_RACE_LAMPORTS = BigInt(1_000_000_000);
+const stake = u64.refine((v) => v <= MAX_RACE_LAMPORTS, "over the 1 SOL cap");
 const hex32 = z.string().regex(/^[0-9a-fA-F]{64}$/);
 
 export const issueCredentialPayload = z.object({
@@ -62,10 +65,10 @@ export const createRacePayload = z.object({
   chainRaceId: u64.optional(),
   /** Course name, hashed into the race's track_hash. */
   course: z.string().min(1).max(128),
-  entryLamports: u64,
-  /** Unix seconds. */
-  closesAt: z.number().int().positive(),
-  seedLamports: u64.default(BigInt(0)),
+  entryLamports: stake,
+  /** Unix seconds, at most 30 days out. */
+  closesAt: z.number().int().positive().refine((v) => v <= Date.now() / 1000 + 30 * 24 * 3600, "more than 30 days out"),
+  seedLamports: stake.default(BigInt(0)),
 });
 
 export type IssueCredentialPayload = z.infer<typeof issueCredentialPayload>;

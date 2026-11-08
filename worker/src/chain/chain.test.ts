@@ -1,7 +1,7 @@
 import { Keypair } from "@solana/web3.js";
 import bs58 from "bs58";
 import { describe, expect, test } from "vitest";
-import { loadChainConfig, parseKeypair } from "./config";
+import { isDevnetUrl, loadChainConfig, parseKeypair } from "./config";
 import { describeError } from "./client";
 import { entryResultFromEvent, fallbackRunHash, mirrorStatus, trackHashOf, upsertRaceArgs } from "./mirror";
 import { createRacePayload, issueCredentialPayload, parsePayload, settleRacePayload, submitResultPayload } from "./payloads";
@@ -49,7 +49,7 @@ describe("payloads", () => {
     expect(parsePayload(settleRacePayload, { onchain, ranking: [{ entryId: "1", wallet, bestMs: null }] }).ok).toBe(true);
   });
   test("create_race coerces u64 strings", () => {
-    const r = parsePayload(createRacePayload, { course: "neon", entryLamports: "10000000", closesAt: 1_800_000_000 });
+    const r = parsePayload(createRacePayload, { course: "neon", entryLamports: "10000000", closesAt: Math.floor(Date.now() / 1000) + 3600 });
     expect(r).toMatchObject({ ok: true, data: { entryLamports: BigInt(10_000_000), seedLamports: BigInt(0) } });
     expect(parsePayload(createRacePayload, { course: "", entryLamports: 1, closesAt: 1 }).ok).toBe(false);
   });
@@ -98,4 +98,24 @@ test("eventsFromLogs merges credential and race events", () => {
   const events = eventsFromLogs([`Program data: ${w.done().toString("base64")}`]);
   expect(events).toHaveLength(1);
   expect(events[0]).toMatchObject({ name: "EntryRefunded", lamports: BigInt(5) });
+});
+
+describe("signing limits", () => {
+  test("a race stake or seed over 1 SOL, or a close date far away, is refused", () => {
+    const soon = Math.floor(Date.now() / 1000) + 3600;
+    expect(parsePayload(createRacePayload, { course: "neon", entryLamports: "2000000000", closesAt: soon }).ok).toBe(false);
+    expect(parsePayload(createRacePayload, { course: "neon", entryLamports: 1000, seedLamports: "5000000000", closesAt: soon }).ok).toBe(false);
+    expect(parsePayload(createRacePayload, { course: "neon", entryLamports: 1000, closesAt: soon + 90 * 24 * 3600 }).ok).toBe(false);
+  });
+
+  test("the issuer key only talks to devnet or a local validator", () => {
+    expect(isDevnetUrl("https://api.devnet.solana.com")).toBe(true);
+    expect(isDevnetUrl("http://127.0.0.1:8899")).toBe(true);
+    expect(isDevnetUrl("https://api.mainnet-beta.solana.com")).toBe(false);
+    expect(isDevnetUrl("not a url")).toBe(false);
+    const key = JSON.stringify(Array.from(Keypair.generate().secretKey));
+    const base = { SOLANA_ISSUER_KEYPAIR: key, SOLANA_PROGRAM_ID: Keypair.generate().publicKey.toBase58() };
+    expect(() => loadChainConfig({ ...base, SOLANA_RPC_URL: "https://api.mainnet-beta.solana.com" })).toThrow("devnet");
+    expect(loadChainConfig({ ...base, SOLANA_RPC_URL: "https://api.devnet.solana.com" }).rpcUrl).toContain("devnet");
+  });
 });

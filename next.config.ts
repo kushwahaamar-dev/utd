@@ -1,6 +1,60 @@
 import type { NextConfig } from "next";
 import { DEFAULT_LOCALE, LANG_COOKIE, LOCALES, acceptLanguagePattern } from "./src/i18n/config";
 
+const isDev = process.env.NODE_ENV !== "production";
+
+/** An http(s)/ws(s) endpoint as both its https and wss forms (SpacetimeDB and Solana RPC speak both). */
+function origins(url: string | undefined): string[] {
+  if (!url) return [];
+  try {
+    const u = new URL(url);
+    const secure = u.protocol === "https:" || u.protocol === "wss:";
+    return secure ? [`https://${u.host}`, `wss://${u.host}`] : [`http://${u.host}`, `ws://${u.host}`];
+  } catch {
+    return [];
+  }
+}
+
+// The browser talks to: this origin, SpacetimeDB (wss for the socket, https for the identity call; Maincloud or the
+// self-hosted domain), and the Solana RPC. The NVIDIA, SerpApi and chain-signing calls all happen server-side.
+const connectSrc = [
+  "'self'",
+  "https://maincloud.spacetimedb.com",
+  "wss://maincloud.spacetimedb.com",
+  ...origins(process.env.NEXT_PUBLIC_STDB_URI),
+  ...origins(process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.devnet.solana.com"),
+  ...(isDev ? ["ws://127.0.0.1:3100", "http://127.0.0.1:3100", "ws://localhost:3100", "http://localhost:3100"] : []),
+];
+
+// Next injects inline scripts for hydration, so script-src keeps 'unsafe-inline'; everything else is locked down.
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""} blob:`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "media-src 'self' blob: data:",
+  `connect-src ${connectSrc.join(" ")}`,
+  "worker-src 'self' blob:",
+  "frame-src 'self'",
+  "frame-ancestors 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "manifest-src 'self'",
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
+].join("; ");
+
+const securityHeaders = [
+  { key: "Content-Security-Policy", value: csp },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // The labs use the microphone (voice), the camera (vision), location (nearby search) and Web Serial (real boards).
+  { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=(self), serial=(self), usb=(), bluetooth=(), payment=(), interest-cohort=()" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+];
+
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
@@ -22,6 +76,7 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      { source: "/:path*", headers: securityHeaders },
       {
         // Figures are same-origin iframes: short cache, no framing by other sites.
         source: "/figures/:path*",

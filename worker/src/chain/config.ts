@@ -20,6 +20,17 @@ export function parseKeypair(raw: string): Keypair {
   return Keypair.fromSecretKey(bytes);
 }
 
+/** The signer is a hot key: it only ever talks to devnet or a local validator. */
+export function isDevnetUrl(url: string): boolean {
+  let host: string;
+  try {
+    host = new URL(url).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return host.includes("devnet") || host === "localhost" || host === "127.0.0.1";
+}
+
 export type ChainConfig = {
   rpcUrl: string;
   programId: PublicKey;
@@ -46,5 +57,9 @@ export function loadChainConfig(env: Env = process.env): ChainConfig {
   } catch (error) {
     throw new Error(error instanceof Error && error.message.startsWith("SOLANA") ? error.message : "SOLANA_ISSUER_KEYPAIR could not be read");
   }
-  return { rpcUrl: env.SOLANA_RPC_URL || DEFAULT_RPC_URL, programId, signer };
+  const rpcUrl = env.SOLANA_RPC_URL || DEFAULT_RPC_URL;
+  if (!isDevnetUrl(rpcUrl) && env.IYNK_ALLOW_NON_DEVNET !== "1") {
+    throw new Error("SOLANA_RPC_URL is not a devnet or local endpoint; the issuer key signs on devnet only");
+  }
+  return { rpcUrl, programId, signer };
 }

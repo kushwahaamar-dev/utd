@@ -60,7 +60,12 @@ __pycache__/
 /spacetime/target/
 /spacetime/dist/
 *.keypair.json
+*.keypair
+*-keypair.json
+keypair*.json
 id.json
+*.key
+/spacetime/spacetime.local.json
 
 # SpacetimeDB local data
 /spacetime/.data/

@@ -28,11 +28,13 @@ function parseContext(text: string): Record<string, unknown> {
   }
 }
 
+const MAX_GOAL_CHARS = 2000;
+
 function toJob(row: JobRow): AgentJob {
   return {
     id: row.id.toString(),
     kind: (JOB_KINDS as readonly string[]).includes(row.kind) ? (row.kind as JobKind) : "partner",
-    goal: row.goal,
+    goal: row.goal.slice(0, MAX_GOAL_CHARS),
     context: parseContext(row.context),
     owner: row.owner.toHexString(),
     roomCode: row.roomCode ?? undefined,

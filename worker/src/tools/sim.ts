@@ -6,6 +6,8 @@ import { defineAgentTool } from "./types";
 
 const MAX_SERIAL_LINES = 24;
 const MAX_NETS = 14;
+// The interpreter runs on the worker's own thread, so one stuck program must not hold it for the default 20 s.
+const SIM_BUDGET_MS = 3000;
 
 const round = (n: number) => Math.round(n * 1000) / 1000;
 
@@ -51,7 +53,7 @@ export const simRun = defineAgentTool({
       job = { board, language: language as Language, source: code, world: { inputs: [], script: [] }, runMs: run_ms, checks: [] };
     }
 
-    const { trace, results } = runChecks(job);
+    const { trace, results } = runChecks(job, { budgetMs: SIM_BUDGET_MS });
     const nets = Object.entries(trace.pins).slice(0, MAX_NETS);
     return {
       simulatedMs: trace.ms,

@@ -1,10 +1,11 @@
 import { DbConnection } from "@/lib/stdb/bindings";
 import { clip } from "../tools/clip";
+import { redact } from "./redact";
 import type { JobSink, JobStatus, StepEnd, StepStart } from "../types";
 
 export type Conn = DbConnection;
 
-const json = (value: unknown) => JSON.stringify(value ?? null);
+const json = (value: unknown) => redact(JSON.stringify(value ?? null));
 
 /** Writes one job's trace into SpacetimeDB through the worker-only reducers, which is what Mission Control reads live. */
 export class StdbSink implements JobSink {
@@ -32,7 +33,7 @@ export class StdbSink implements JobSink {
         jobId: this.jobId,
         status,
         result: patch.result === undefined ? undefined : json(patch.result),
-        error: patch.error,
+        error: patch.error === undefined ? undefined : redact(patch.error),
       }),
     );
   }
