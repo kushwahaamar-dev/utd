@@ -8,7 +8,7 @@ import { DELETE, GET, POST } from "@/app/api/mcp/route";
 
 vi.mock("@/lib/server/env", () => ({
   env: { NEXT_PUBLIC_SITE_URL: "https://iynk.test" },
-  features: { ai: false, image: false, voice: false, search: false, solana: false, db: false, realtime: true },
+  features: { ai: false, image: false, voice: false, search: false, solana: false, realtime: true },
 }));
 vi.mock("next/server", () => ({ connection: async () => undefined }));
 vi.mock("@/content/index.generated", async () => {

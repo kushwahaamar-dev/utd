@@ -112,7 +112,6 @@ The labs, the figures, the interpreters and the flight sim work with no keys at 
 | `META_API_KEY` | the lab partner, translation, voice, story covers, Build Night and Build Buddies matching |
 | `GEMINI_API_KEY` | the fallback model when Meta is busy |
 | `SERPAPI_KEY` | live prices, places, events, videos and datasheet answers |
-| `DATABASE_URL` | leaderboards and Build Buddies (run `node scripts/db-migrate.mjs` once) |
 | `NEXT_PUBLIC_REALTIME_URL` | rooms across devices (without it, rooms work between tabs of one browser) |
 | `SOLANA_ISSUER_KEYPAIR`, `NEXT_PUBLIC_SOLANA_PROGRAM_ID` | Proof of Build on devnet |
 

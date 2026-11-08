@@ -8,7 +8,7 @@ import { priceParts } from "./tools/market";
 import { getPassport } from "./tools/passport";
 import { createRoom, planBuildNight } from "./tools/together";
 
-const flags = vi.hoisted(() => ({ ai: true, image: true, voice: true, search: true, solana: true, db: false, realtime: true }));
+const flags = vi.hoisted(() => ({ ai: true, image: true, voice: true, search: true, solana: true, realtime: true }));
 const offers = vi.hoisted(() => vi.fn());
 const solana = vi.hoisted(() => ({ context: { connection: {}, programId: "program" } as object | null, credentialsOf: vi.fn() }));
 

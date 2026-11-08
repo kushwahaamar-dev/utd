@@ -14,7 +14,6 @@ const flags = vi.hoisted(() => ({
     voice: false,
     search: false,
     solana: false,
-    db: false,
     realtime: false,
     hw: false,
   },

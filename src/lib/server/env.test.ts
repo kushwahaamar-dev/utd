@@ -23,7 +23,6 @@ describe("readEnv", () => {
       voice: false,
       search: false,
       solana: false,
-      db: false,
       realtime: false,
     });
   });
@@ -40,13 +39,11 @@ describe("readEnv", () => {
       NEMOTRON_BASE_URL: "ftp://nope",
       SERPAPI_MONTHLY_BUDGET: "lots",
       SOLANA_ISSUER_KEYPAIR: "[1,2,3]",
-      DATABASE_URL: "mysql://x",
       NEXT_PUBLIC_REALTIME_URL: "https://not-a-socket.example",
       NEXT_PUBLIC_SOLANA_CLUSTER: "mainnet-beta",
     });
     expect(issues.sort()).toEqual(
       [
-        "DATABASE_URL",
         "NEMOTRON_BASE_URL",
         "NEXT_PUBLIC_REALTIME_URL",
         "NEXT_PUBLIC_SOLANA_CLUSTER",
@@ -68,7 +65,6 @@ describe("readEnv", () => {
       SERPAPI_MONTHLY_BUDGET: "50",
       SOLANA_ISSUER_KEYPAIR: keypair,
       NEXT_PUBLIC_SOLANA_PROGRAM_ID: programId,
-      DATABASE_URL: "postgres://u:p@host:5432/db",
       NEXT_PUBLIC_REALTIME_URL: "wss://rt.example/ws",
     });
     expect(issues).toEqual([]);
@@ -82,7 +78,6 @@ describe("readEnv", () => {
       voice: false,
       search: true,
       solana: true,
-      db: true,
       realtime: true,
     });
   });

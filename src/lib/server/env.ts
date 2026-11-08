@@ -12,7 +12,6 @@ import { z } from "zod";
 const text = z.string().trim().min(1);
 const url = z.url({ protocol: /^https?$/ });
 const wsUrl = z.url({ protocol: /^wss?$/ });
-const pgUrl = z.url({ protocol: /^postgres(ql)?$/ });
 const base58 = z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/);
 
 const keypair = z
@@ -41,7 +40,6 @@ const schema = {
   NEXT_PUBLIC_SOLANA_CLUSTER: z.literal("devnet").default("devnet"),
   NEXT_PUBLIC_SOLANA_RPC_URL: url.default("https://api.devnet.solana.com"),
   NEXT_PUBLIC_SOLANA_PROGRAM_ID: base58.optional(),
-  DATABASE_URL: pgUrl.optional(),
   NEXT_PUBLIC_REALTIME_URL: wsUrl.optional(),
   NEXT_PUBLIC_SITE_URL: url.default("http://localhost:3000"),
 } as const;
@@ -56,7 +54,6 @@ export type Features = {
   voice: boolean;
   search: boolean;
   solana: boolean;
-  db: boolean;
   realtime: boolean;
 };
 
@@ -90,7 +87,6 @@ export function featuresOf(e: Env): Features {
     voice: false,
     search: Boolean(e.SERPAPI_KEY),
     solana: Boolean(e.SOLANA_ISSUER_KEYPAIR && e.NEXT_PUBLIC_SOLANA_PROGRAM_ID),
-    db: Boolean(e.DATABASE_URL),
     realtime: Boolean(e.NEXT_PUBLIC_REALTIME_URL),
   };
 }
