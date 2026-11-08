@@ -365,7 +365,7 @@
     "report": {
       "title": "Bulletin",
       "grade": "Note {grade}",
-      "score": "{score} points",
+      "score": "{score} / 100",
       "rows": {
         "survived": "Temps tenu",
         "checkpoints": "Points de passage",

@@ -365,7 +365,7 @@
     "report": {
       "title": "Informe",
       "grade": "Nota {grade}",
-      "score": "{score} puntos",
+      "score": "{score} / 100",
       "rows": {
         "survived": "Tiempo aguantado",
         "checkpoints": "Puntos de control",

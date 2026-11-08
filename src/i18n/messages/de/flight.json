@@ -365,7 +365,7 @@
     "report": {
       "title": "Zeugnis",
       "grade": "Note {grade}",
-      "score": "{score} Punkte",
+      "score": "{score} / 100",
       "rows": {
         "survived": "Überlebte Zeit",
         "checkpoints": "Kontrollpunkte",

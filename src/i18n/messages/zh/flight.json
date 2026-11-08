@@ -365,7 +365,7 @@
     "report": {
       "title": "成绩单",
       "grade": "{grade} 级",
-      "score": "{score} 分",
+      "score": "{score} / 100",
       "rows": {
         "survived": "坚持时间",
         "checkpoints": "检查点",

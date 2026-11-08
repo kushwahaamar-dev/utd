@@ -365,7 +365,7 @@
     "report": {
       "title": "रिपोर्ट कार्ड",
       "grade": "ग्रेड {grade}",
-      "score": "{score} अंक",
+      "score": "{score} / 100",
       "rows": {
         "survived": "टिके रहने का समय",
         "checkpoints": "पड़ाव",

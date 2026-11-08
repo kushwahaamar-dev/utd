@@ -365,7 +365,7 @@
     "report": {
       "title": "Report card",
       "grade": "Grade {grade}",
-      "score": "{score} points",
+      "score": "{score} / 100",
       "rows": {
         "survived": "Time survived",
         "checkpoints": "Checkpoints",
