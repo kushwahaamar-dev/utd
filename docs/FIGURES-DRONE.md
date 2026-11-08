@@ -3,7 +3,7 @@
 Owner: engine:drone. Every drone figure (`figures/drones/<id>.js`) is data for one engine,
 `figures/engine/drone*.js`. Write your craft from this page and from `figures/drones/quad5.js`
 (the worked example). The engine renders exactly what is written here; if you need something the
-format cannot say, write it to `docs/requests/<your-label>.md` and use a `custom` piece meanwhile.
+format cannot say, open an issue and use a `custom` piece meanwhile.
 
 ## Changelog
 

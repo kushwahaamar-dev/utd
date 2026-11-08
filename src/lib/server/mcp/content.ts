@@ -10,7 +10,7 @@ import { getContentText } from "@/i18n/server";
 
 export const LABS = ["board", "robotics", "drone"] as const satisfies readonly Lab[];
 
-/** URL segment (D2) and content folder (D5) of each lab. */
+/** URL segment and content folder of each lab. */
 const LAB_DIR = { board: "boards", robotics: "robotics", drone: "drones" } as const satisfies Record<Lab, ContentLab>;
 
 export type Entry = {

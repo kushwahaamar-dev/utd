@@ -2,7 +2,7 @@ import "server-only";
 import type { Locale } from "@/i18n/config";
 import { LANGUAGE_NAMES } from "./language";
 
-/** Buddy matching: complementary build partners, and a project to start together (HX-CONTRACT H4). */
+/** Buddy matching: complementary build partners, and a project to start together. */
 export function matchPrompt(locale: Locale, catalog: string): string {
   return `You suggest build buddies in iynk, a browser hardware lab where people build boards, robots and drones together.
 

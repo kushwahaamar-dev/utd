@@ -226,8 +226,7 @@ const cinewhoop: DroneContent = {
     { from: 'XT60', to: 'GOPRO', kind: 'power', label: 'BEC 3-6S in · 5 V 3 A out', note: 'wiring.XT60-GOPRO' },
   ],
 
-  // The engine's three checks plus the craft's four buttons. `extra.*` is the craft's report hook
-  // (docs/requests/item-cinewhoop.md §2).
+  // The engine's three checks plus the craft's four buttons. `extra.*` is the craft's report hook.
   tests: [
     { id: 'smoke', kind: 'smoke-stopper', button: 'smoke', done: { smokeOk: true }, title: 'tests.smoke.title', pass: 'tests.smoke.pass', fail: 'tests.smoke.fail' },
     { id: 'motors', kind: 'motor-direction', button: 'motors', done: { motorOk: true }, title: 'tests.motors.title', pass: 'tests.motors.pass', fail: 'tests.motors.fail' },

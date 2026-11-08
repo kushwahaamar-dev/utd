@@ -39,7 +39,7 @@ const SEARCH_FAILURE: Record<SearchError["code"], ToolError> = {
 
 type Line = { request: OfferPartInput; name: string; estimate: number | null };
 
-/** The item's own parts list as hx:search maps it to shopping queries (src/lib/search/bom.ts). */
+/** The item's own parts list as the search code maps it to shopping queries (src/lib/search/bom.ts). */
 async function itemLines(lab: Lab, id: string, pick: DronePick): Promise<Line[]> {
   let bom: BomLine[];
   if (lab === "drone" && isDroneId(id)) {

@@ -24,7 +24,7 @@ import { SERVER_INSTRUCTIONS, TOOLS, serverInfo, toolNamed } from "./tools";
 
 /**
  * Streamable HTTP for /api/mcp: one JSON-RPC message per POST, one JSON answer, nothing kept in between.
- * HTTP-level refusals (origin, size, rate) answer in the API's `{ error }` shape (HX-CONTRACT H2);
+ * HTTP-level refusals (origin, size, rate) answer in the API's `{ error }` shape;
  * protocol errors answer in JSON-RPC.
  */
 

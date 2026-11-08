@@ -178,7 +178,7 @@
     };
   }
 
-  // what the host reads for the wing's own checks (docs/requests/item-wing.md asks the engine to report it as `extra`)
+  // what the host reads for the wing's own checks (reported as `extra`)
   function wingReport(st){
     const w = st.wing || {}, e = w.elev, c = w.cg;
     const elevonOk = !!(e && e.ok && SD.isOn(st, 'SERVOS') && SD.isOn(st, 'FC') && SD.orient(st, 'SERVOS') === e.srv && SD.orient(st, 'FC') === e.fc);

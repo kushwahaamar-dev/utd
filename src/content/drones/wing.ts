@@ -178,7 +178,7 @@ const wing: DroneContent = {
     { from: 'FC', to: 'VTX', kind: 'video', label: 'VTX · CVBS + OSD (AT7456E) · 9 V BEC · SmartAudio', note: 'wiring.FC-VTX' },
   ],
 
-  // Figure buttons and the state they set. The wing's own checks report under `extra` (docs/requests/item-wing.md).
+  // Figure buttons and the state they set. The wing's own checks report under `extra`.
   tests: [
     { id: 'smoke', kind: 'smoke-stopper', button: 'smoke', done: { smokeOk: true }, title: 'tests.smoke.title', pass: 'tests.smoke.pass', fail: 'tests.smoke.fail' },
     { id: 'motors', kind: 'motor-direction', button: 'motors', done: { motorOk: true }, title: 'tests.motors.title', pass: 'tests.motors.pass', fail: 'tests.motors.fail' },

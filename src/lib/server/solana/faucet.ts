@@ -16,7 +16,7 @@ const ENOUGH_LAMPORTS = LAMPORTS_PER_SOL / 20;
 const TREASURY_RESERVE = LAMPORTS_PER_SOL / 5;
 
 // Once per address and once per IP per hour, counted only for grants that
-// went through. In memory per instance, like the shared rate limiter (H2).
+// went through. In memory per instance, like the shared rate limiter.
 const grants = new Map<string, number>();
 const MAX_KEYS = 10_000;
 

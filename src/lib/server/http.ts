@@ -2,7 +2,7 @@ import "server-only";
 import type { z } from "zod";
 
 /**
- * Response and request helpers for every route handler (HX-CONTRACT H2).
+ * Response and request helpers for every route handler.
  * Errors always have the shape `{ error: { code, message } }`. The message is
  * a short English hint for developers; the UI picks its localised text by code.
  */

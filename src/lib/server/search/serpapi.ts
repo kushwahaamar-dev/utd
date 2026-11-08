@@ -21,7 +21,7 @@ import { TtlLru } from "./lru";
 import * as normalize from "./normalize";
 import { rankOffers } from "@/lib/search/rank";
 
-// The SerpApi client (HX-CONTRACT H5; parameters and fields in docs/hacktx/SEARCH.md).
+// The SerpApi client.
 // Every call goes through search(): engine whitelist, our 6 h LRU in front of
 // SerpApi's own 1 h cache (we never send no_cache), a per-process search
 // budget, a timeout, and one retry with jitter on 429 and 5xx.

@@ -1,5 +1,5 @@
-// The /api/ai/* shapes (HX-CONTRACT H4) the partner uses, from hx:server-ai's
-// types module (types only, so nothing server-side reaches the client).
+// The /api/ai/* shapes the partner uses, from the server's AI types module
+// (types only, so nothing server-side reaches the client).
 
 export type {
   ApiErrorBody,

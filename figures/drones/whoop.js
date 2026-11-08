@@ -52,7 +52,7 @@
     return out;
   };
 
-  // 0702 motors drawn at their real size (docs/requests/item-whoop.md 1): flange, bell, the copper stator in
+  // 0702 motors drawn at their real size: flange, bell, the copper stator in
   // see-through, three spokes that turn with the rotor, and the 1 mm shaft while the props are off
   const motorsDraw = ctx => {
     const out = [], mt = ctx.design.motor, R = mt.bell[0] / 2, hb = mt.bell[1], k = ctx.k;

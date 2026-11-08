@@ -107,7 +107,7 @@ export async function runTool(tool: Tool, args: unknown, ctx: ToolContext): Prom
   }
 }
 
-/** HTTP status for a tool failure on the REST surface (HX-CONTRACT H2). */
+/** HTTP status for a tool failure on the REST surface. */
 export const STATUS_OF: Record<ToolErrorCode, number> = {
   bad_input: 400,
   not_found: 404,

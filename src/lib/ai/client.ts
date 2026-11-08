@@ -1,4 +1,4 @@
-// Typed client for /api/ai/* (HX-CONTRACT H4): an SSE reader for the chat
+// Typed client for /api/ai/*: an SSE reader for the chat
 // stream, plain JSON calls for the rest, and one error type whose code the UI
 // turns into a state ("not set up here", "busy", "offline", ...).
 

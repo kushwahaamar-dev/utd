@@ -2,7 +2,7 @@ import "server-only";
 import type { Locale } from "@/i18n/config";
 import { LANGUAGE_NAMES } from "./language";
 
-/** The Build Night planner: a group's wishes become one project everyone enjoys (HX-CONTRACT H4). */
+/** The Build Night planner: a group's wishes become one project everyone enjoys. */
 export function planPrompt(locale: Locale, catalog: string): string {
   return `You plan a Build Night for a group of friends in iynk, a browser hardware lab with boards, robotics benches and drones.
 

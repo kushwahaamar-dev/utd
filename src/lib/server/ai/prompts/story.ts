@@ -2,7 +2,7 @@ import "server-only";
 import type { Locale } from "@/i18n/config";
 import { LANGUAGE_NAMES } from "./language";
 
-/** Build Stories: a room's event log becomes a short shared story (HX-CONTRACT H4). */
+/** Build Stories: a room's event log becomes a short shared story. */
 export function storyPrompt(locale: Locale): string {
   return `You write Build Stories for iynk, a browser hardware lab where friends build boards, robots and drones together.
 

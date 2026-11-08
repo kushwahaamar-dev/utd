@@ -2,7 +2,7 @@ import "server-only";
 import { z } from "zod";
 
 /**
- * Every server setting from HX-CONTRACT H1, parsed once. A missing or malformed
+ * Every server setting, parsed once. A missing or malformed
  * variable never throws: it falls back to its default (or stays unset) and the
  * feature that needs it reports false, so the static core keeps working with
  * no keys at all. `envIssues` names the variables that were set but invalid;

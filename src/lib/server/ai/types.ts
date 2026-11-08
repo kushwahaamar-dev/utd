@@ -1,4 +1,4 @@
-// Request, response and event shapes of /api/ai/* (HX-CONTRACT H4).
+// Request, response and event shapes of /api/ai/*.
 // Types only and no "server-only": client code imports them with `import type`.
 
 import type { LabKind } from "@/components/dock/types";
@@ -14,7 +14,7 @@ export type ChatMessage =
   | { role: "assistant"; content: string; tool_calls?: ChatToolCall[] }
   | { role: "tool"; content: string; tool_call_id: string };
 
-/** `done` holds progress keys (D7), so the partner can send the learner to someone who passed. */
+/** `done` holds progress keys, so the partner can send the learner to someone who passed. */
 export type ChatPeer = { id: string; name: string; lang: Locale; done: string[] };
 
 export type ChatRequest = {

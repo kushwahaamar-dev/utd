@@ -1,4 +1,4 @@
-// The lab partner's tools (HX-CONTRACT H4). One zod schema per tool is the
+// The lab partner's tools. One zod schema per tool is the
 // source of truth: the JSON Schema the model sees is derived from it, and the
 // same schema validates the model's arguments wherever the tool runs.
 // Shared by the server (/api/ai/chat) and the client, so nothing here may
@@ -6,7 +6,7 @@
 
 import { z } from "zod";
 
-/** The LabDock tabs (H3), in the order hx:dock shows them. */
+/** The LabDock tabs, in the order the dock shows them. */
 export const DOCK_TABS = ["partner", "together", "real", "passport", "hardware"] as const;
 export type DockTab = (typeof DOCK_TABS)[number];
 

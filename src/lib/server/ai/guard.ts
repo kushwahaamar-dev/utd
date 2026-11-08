@@ -10,7 +10,7 @@ const IMAGE_BUDGET = { limit: 60, windowMs: 60 * 60 * 1000 };
 
 /**
  * The checks every /api/ai/* route runs before it reads the body: our origin
- * only (H11), the feature is set up, the caller's per-minute limit, and the
+ * only, the feature is set up, the caller's per-minute limit, and the
  * instance-wide hourly budget.
  */
 export function guardAi(req: Request, route: string, perMinute: number, feature: keyof Features = "ai"): Response | null {

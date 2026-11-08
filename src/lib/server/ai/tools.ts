@@ -6,9 +6,9 @@ import { SearchError, offers, web } from "@/lib/server/search/serpapi";
 import type { ToolSpec } from "./provider";
 
 /**
- * The partner's server-side tools (HX-CONTRACT H4), run inside /api/ai/chat.
- * Definitions and argument validation come from src/lib/ai/tools.ts (hx:partner);
- * the searches are hx:search's SerpApi client.
+ * The partner's server-side tools, run inside /api/ai/chat.
+ * Definitions and argument validation come from src/lib/ai/tools.ts;
+ * the searches use the SerpApi client.
  */
 
 export type Citation = { url: string; title: string; snippet: string };

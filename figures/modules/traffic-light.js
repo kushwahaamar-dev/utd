@@ -120,7 +120,7 @@ function make(order){
     faults: ['cold:PINS'],
     xr: { flow, notes: [['LED_R', 'DIE IN A REFLECTOR CUP']] },
     tags: [['LED_R', 34, -26], ['LED_Y', 38, -6], ['LED_G', 40, 16], ['PINS', -34, 22], ['R_Y', -40, -16]],
-    // what a bench or circuit needs to drive the module from its pins (docs/requests/parts-modules.md)
+    // what a bench or circuit needs to drive the module from its pins
     elec: {
       pins: Object.fromEntries(pins.map(n => [n, n === 'GND' ? { role: 'gnd' }
         : { role: 'in', load: { type: 'led', part: LEDS.find(r => r[3] === n)[0], ohms: R_SERIES, vf: VF[LEDS.find(r => r[3] === n)[2]], to: 'GND', imax: .02 } }])),

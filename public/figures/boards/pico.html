@@ -4221,7 +4221,7 @@ const SCRIPTS = {
   blink: 'from machine import Pin\nimport time\nled = Pin("LED", Pin.OUT)\next = Pin(15, Pin.OUT)\nwhile True:\n    led.toggle()\n    ext.toggle()\n    time.sleep(0.5)\n',
   bootsel: 'import rp2\nfrom machine import Pin\nled = Pin("LED", Pin.OUT)\nwhile True:\n    led.value(rp2.bootsel_button())\n',
   temp: 'from machine import ADC\nimport time\nsensor = ADC(4)\nwhile True:\n    v = sensor.read_u16() * 3.3 / 65535\n    print("temperature", round(27 - (v - 0.706) / 0.001721, 1), "C")\n    time.sleep(1)\n',
-  wifi: 'import network, time\nfrom machine import Pin\nled = Pin("LED", Pin.OUT)\nwlan = network.WLAN(network.STA_IF)\nwlan.active(True)\nwlan.connect("HackTX", "hackathon")\nwhile not wlan.isconnected():\n    led.toggle()\n    time.sleep(0.25)\nled.on()\nprint("connected", wlan.ifconfig()[0])\n',
+  wifi: 'import network, time\nfrom machine import Pin\nled = Pin("LED", Pin.OUT)\nwlan = network.WLAN(network.STA_IF)\nwlan.active(True)\nwlan.connect("HackUTD", "hackathon")\nwhile not wlan.isconnected():\n    led.toggle()\n    time.sleep(0.25)\nled.on()\nprint("connected", wlan.ifconfig()[0])\n',
 };
 // the on-chip sensor: a fixed, slowly wandering ADC reading, converted with the datasheet formula
 const tempLine = k => { const raw = 14000 - 8 * (k % 4), v = raw * 3.3 / 65535; return 'temperature ' + (27 - (v - .706) / .001721).toFixed(1) + ' C'; };
@@ -4382,7 +4382,7 @@ function make(key){
     circuits: circuits(v),
     variant: key,
     variants: Object.fromEntries(Object.entries(VAR).map(([k, x]) => [k, { name: x.name, patch: () => make(k) }])),
-    // pin voltage limits, for an engine "external voltage on a pin" fault (docs/requests/item-pico.md)
+    // pin voltage limits, for an engine "external voltage on a pin" fault
     levels: { vmax: 3.63, tolerant: v.two ? LEFT.concat(RIGHT).filter(n => /^GP(\d|1\d|2[0-5])$/.test(n)) : [] },
   };
 }

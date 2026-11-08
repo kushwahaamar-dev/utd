@@ -40,7 +40,7 @@ export const getPassport = defineTool({
     if (!solana) throw new ToolError("not_configured", "Proof of Build (the Solana program) is not set up on this deployment.");
     let found: Awaited<ReturnType<typeof credentialsOf>>;
     try {
-      // The read context's connection already times out and retries each RPC call (H2).
+      // The read context's connection already times out and retries each RPC call.
       found = await credentialsOf(solana.connection, solana.programId, new PublicKey(learner));
     } catch {
       throw new ToolError("upstream", "Solana devnet did not answer. Try again in a moment.");

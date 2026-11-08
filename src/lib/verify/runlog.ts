@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// The run log a lab page hands to the module's submit_run reducer (HX-CONTRACT H6). The
+// The run log a lab page hands to the module's submit_run reducer. The
 // server never trusts `result`: it replays `inputs` and reaches its own verdict.
 
 export const RUN_KINDS = ["board-lessons", "board-lesson", "drone-safety", "robotics-bench", "flight-course"] as const;

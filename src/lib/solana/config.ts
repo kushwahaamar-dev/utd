@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 
 // Client-side Solana settings. NEXT_PUBLIC_ values are inlined at build time,
-// so they are read here by their literal names. iynk is devnet-only (H11).
+// so they are read here by their literal names. iynk is devnet-only.
 
 export const CLUSTER = "devnet";
 

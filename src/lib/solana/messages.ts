@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import { createTranslator, type Translate } from "@/i18n/translate";
 
-// The "solana" UI namespace (H3). Pages load it on the server and pass it
+// The "solana" UI namespace. Pages load it on the server and pass it
 // down; dock panels and the tip button load it on the client, one chunk per
 // language, the same way the core's namespaces load.
 

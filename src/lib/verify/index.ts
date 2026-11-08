@@ -8,7 +8,7 @@ import { skillIdFor } from "./skill";
 export { RUN_KINDS, runLogSchema, type RunKind, type RunLog, type VerifyResult } from "./runlog";
 export { skillIdFor, parseSkillId, skillHash } from "./skill";
 
-/** Kinds the server can re-run today; the others wait for the core's pure checks (see docs/hacktx/SOLANA-APP.md). */
+/** Kinds the server can re-run today; the others wait for the core's pure checks. */
 export const VERIFIABLE: readonly RunKind[] = ["drone-safety"];
 
 /** The bench tests a craft has: from its content module, else the engine's defaults (FIGURES-DRONE §8). */
@@ -26,7 +26,7 @@ export async function droneTestsFor(id: DroneId): Promise<DroneTestSet> {
 }
 
 /**
- * Re-runs a lab run on the server (H6). It trusts nothing the client says
+ * Re-runs a lab run on the server. It trusts nothing the client says
  * about the outcome: the verdict and the score come from the replay alone.
  */
 export async function verifyRun(kind: RunKind, itemId: string, sub: string | undefined, run: RunLog): Promise<VerifyResult> {

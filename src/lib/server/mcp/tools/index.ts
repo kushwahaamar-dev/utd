@@ -6,7 +6,7 @@ import { priceParts } from "./market";
 import { getPassport } from "./passport";
 import { createRoom, planBuildNight } from "./together";
 
-/** HX-CONTRACT H10, in the order a conversation tends to use them. */
+/** The MCP tools, in the order a conversation tends to use them. */
 export const TOOLS: readonly Tool[] = [searchCatalog, getItem, droneCalc, priceParts, planBuildNight, createRoom, getPassport];
 
 const byName = new Map(TOOLS.map((tool) => [tool.name, tool]));

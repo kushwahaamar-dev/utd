@@ -4,7 +4,7 @@ import { DEFAULT_LOCALE, LANG_COOKIE, LOCALES, acceptLanguagePattern } from "./s
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
-  // Agents build side by side with NEXT_DIST_DIR=.next-<label> (D12).
+  // Agents build side by side with NEXT_DIST_DIR=.next-<label>.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   // The Vultr image runs `node server.js` from a standalone build (deploy/core/Dockerfile.web).
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,

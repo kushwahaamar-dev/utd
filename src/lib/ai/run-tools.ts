@@ -1,4 +1,4 @@
-// Runs the partner's client tools (H4) against the page: the figure, the lab
+// Runs the partner's client tools against the page: the figure, the lab
 // store, the room and the dock. Each run returns the tool result the model
 // gets back and the card the panel shows.
 
@@ -7,7 +7,7 @@ import type { FigureHandle } from "@/components/figure/protocol";
 import { applyChange } from "./bench";
 import type { DockTab, ProposedChange, ToolCall } from "./tools";
 
-/** hx:dock listens for this on window and switches to `detail.tab`. */
+/** The dock listens for this on window and switches to `detail.tab`. */
 export const DOCK_TAB_EVENT = "iynk:dock-tab";
 
 export function openDockTab(tab: DockTab) {

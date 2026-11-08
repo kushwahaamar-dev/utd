@@ -2,7 +2,7 @@ import "server-only";
 import { clientIp, fail } from "./http";
 
 /**
- * In-memory sliding-window limiter (HX-CONTRACT H2). It is per instance: a
+ * In-memory sliding-window limiter. It is per instance: a
  * serverless deployment with several warm instances lets through up to
  * `limit` per instance, which is fine for abuse protection and quota guards.
  */

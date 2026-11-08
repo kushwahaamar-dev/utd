@@ -245,7 +245,7 @@
       { id: 'gps', label: 'GPS lock (outdoors)', onClick: gpsTest },
       { id: 'failsafe', label: 'Failsafe test (props off)', onClick: failsafeTest },
     ],
-    // extra state for the host (docs/requests/item-longrange.md: the engine merges it as state.extra)
+    // extra state for the host (the engine merges it as state.extra)
     report: st => {
       const s = own(st), c = s.compass, fs = s.fs, fix = gpsFix(st);
       const compassDone = finished(st, c) && seated(st, c, ['GPS', 'FC']);

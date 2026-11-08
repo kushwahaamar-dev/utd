@@ -81,8 +81,8 @@ test.describe("the / redirect", () => {
   test.describe("from a German browser", () => {
     test.use({ locale: "de-DE" });
     test("goes to the browser language and keeps the query", async ({ page }) => {
-      await page.goto("/?ref=hacktx");
-      await expect(page).toHaveURL("/de?ref=hacktx");
+      await page.goto("/?ref=demo");
+      await expect(page).toHaveURL("/de?ref=demo");
     });
     test("a saved language beats the browser language", async ({ page, context, baseURL }) => {
       await context.addCookies([{ name: LANG_COOKIE, value: "hi", url: baseURL! }]);

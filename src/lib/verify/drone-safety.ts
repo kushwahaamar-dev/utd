@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { RunInput } from "./runlog";
 
-// The bench safety procedure as a pure function of the run (D14c), following
+// The bench safety procedure as a pure function of the run, following
 // the drone engine's rules in docs/FIGURES-DRONE.md §6 and §8. The recorder
 // turns the figure's state reports into the effective bench events below, so
 // the figure has already applied its build order, exploded view and busy

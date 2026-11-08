@@ -86,7 +86,7 @@ test("tip memos carry the room id", () => {
   expect(roomOfTip("hello")).toBeNull();
 });
 
-// The exported IDL (hx:solana-program) is the program's own description; the codec must agree with it.
+// The exported IDL is the program's own description; the codec must agree with it.
 const idlPath = join(process.cwd(), "src/lib/solana/idl/iynk_passport.json");
 
 describe.runIf(existsSync(idlPath))("agrees with the exported IDL", () => {

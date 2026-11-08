@@ -1,4 +1,4 @@
-// The /api/search/* response shapes (HX-CONTRACT H5), shared by the server
+// The /api/search/* response shapes, shared by the server
 // normalisers, the route handlers and the panels. Types only: nothing here
 // ships to the browser.
 

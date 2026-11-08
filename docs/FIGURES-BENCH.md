@@ -344,7 +344,7 @@ part's local frame (centre origin, its own x along `size[0]`, rotation applied),
 ### 5.3 Adding a kind
 
 Only if the library lacks it. Register it at the top of your item file, name it `<board>-<thing>` (`pico-bootsel`),
-and draw with `ctx` only. Tell engine:bench in `docs/requests/<label>.md` if it should move into the library.
+and draw with `ctx` only. Open an issue if it should move into the library.
 
 ## 6. Power, run, upload, faults
 

@@ -1,7 +1,7 @@
 import type { RunKind } from "./runlog";
 import { sha256 } from "./hash";
 
-// Skill ids are the on-chain names of what a credential proves (H6). The
+// Skill ids are the on-chain names of what a credential proves. The
 // program caps them at 64 bytes and hashes them as sha256(utf8(skill_id)).
 
 export const MAX_SKILL_ID_BYTES = 64;

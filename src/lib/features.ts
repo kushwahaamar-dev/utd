@@ -6,7 +6,7 @@ import type { Features as ServerFeatures } from "@/lib/server/env";
 export type Features = ServerFeatures & { hw: boolean };
 
 /**
- * Which hackathon features this deployment has (GET /api/status, HX-CONTRACT H2).
+ * Which optional features this deployment has (GET /api/status).
  * The server render and the first client render see "loading" with every
  * feature off; the answer is fetched once per page load and shared by every
  * caller. "error" means the server could not be reached, which is a different

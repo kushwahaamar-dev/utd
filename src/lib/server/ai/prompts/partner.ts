@@ -5,7 +5,7 @@ import type { ChatPeer } from "../types";
 import { LANGUAGE_NAMES, quoted } from "./language";
 
 /**
- * The lab partner's system prompt (HX-CONTRACT H4). The rules never change,
+ * The lab partner's system prompt. The rules never change,
  * so they come first and stay byte-identical across requests (the upstream prefix
  * cache); everything about this learner follows in a second system message.
  */

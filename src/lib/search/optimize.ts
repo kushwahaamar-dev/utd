@@ -5,7 +5,7 @@ import { lineCost, sumMoney } from "./cost";
 import { SLOTS, type BomLine, type Slot } from "./bom";
 import type { PartOffers } from "./types";
 
-// The budget optimiser (HX-CONTRACT H5). Pure: given what every battery,
+// The budget optimiser. Pure: given what every battery,
 // motor and prop option costs right now, it runs the drone calculator on
 // every combination (27 at most) and returns the build that clears the
 // constraints with the most headroom under the budget, plus what it trades.

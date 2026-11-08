@@ -2,7 +2,7 @@ import { z } from "zod";
 import { LOCALES } from "@/i18n/config";
 import { NEARBY_KINDS, OFFER_SOURCES } from "./types";
 
-// Request bodies of the /api/search/* routes (HX-CONTRACT H5). The routes
+// Request bodies of the /api/search/* routes. The routes
 // validate with these; callers import the inferred types.
 
 const query = (max: number) => z.string().trim().min(2).max(max);

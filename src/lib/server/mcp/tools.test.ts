@@ -183,7 +183,7 @@ describe("price_parts", () => {
     expect(data).toMatchObject({ total: 78, currency: "USD", partial: null, url: "https://iynk.test/en/drones/quad5" });
   });
 
-  it("prices a bench's own parts list from hx:search's bill of materials", async () => {
+  it("prices a bench's own parts list from its bill of materials", async () => {
     offers.mockResolvedValue({ parts: [] });
     const out = await runTool(priceParts, { lab: "robotics", id: "tb6612fng" }, ctx);
     const keys = (offers.mock.calls[0][0] as { key: string }[]).map((p) => p.key);

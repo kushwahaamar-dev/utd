@@ -1,8 +1,7 @@
 import "server-only";
 import type { MakerEvent, Offer, OfferSource, PageExtract, Place, Video, WebResult } from "@/lib/search/types";
 
-// Pure mappers from SerpApi's JSON (docs/hacktx/SEARCH.md lists the fields
-// each one reads) to the H5 shapes. Upstream JSON is untrusted: every field
+// Pure mappers from SerpApi's JSON to the shapes in @/lib/search/types. Upstream JSON is untrusted: every field
 // is checked, and a result without the fields we need is dropped.
 
 type Json = Record<string, unknown>;

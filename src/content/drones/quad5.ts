@@ -473,7 +473,7 @@ const quad5: DroneContent = {
       },
       commands: ['help', 'set', 'get', 'diff', 'dump', 'save', 'defaults', 'exit', 'status', 'version', 'resource', 'mixer', 'serial', 'aux', 'feature', 'vtxtable', 'beeper'],
       // Settings that change how the bench build flies. Numbers use the range's FlightCraft names (src/lib/flight/types.ts);
-      // boardYaw and yawReversed combine with the bench state (docs/requests/content-quad5.md §3).
+      // boardYaw and yawReversed combine with the bench state.
       effects: [
         { setting: 'yaw_motors_reversed', equals: 'ON', set: { yawReversed: true } },
         { setting: 'yaw_motors_reversed', equals: 'OFF', set: { yawReversed: false } },

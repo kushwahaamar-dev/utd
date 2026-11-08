@@ -1,5 +1,5 @@
 // describeBench(): what is on the learner's bench, as compact text for the
-// partner's prompt (H4: at most 12 KB). Each lab adapter reads its store's
+// partner's prompt (at most 12 KB). Each lab adapter reads its store's
 // state into BenchFacts; this module renders them most-important first and
 // cuts whatever does not fit.
 
