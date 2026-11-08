@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useId, useMemo, useState, type FormEvent } from "react";
 import type { LabKind } from "@/components/dock/types";
 import { useTogetherT, type TogetherT } from "@/components/realtime/messages";
-import { Action, Note, eyebrow, quietField, sectionTitle } from "@/components/editorial/Editorial";
+import { Action, eyebrow, quietField, sectionTitle } from "@/components/editorial/Editorial";
 import { Callout, SegmentedControl, Select, TextInput } from "@/components/ui";
 import { cx } from "@/components/ui/cx";
 import { useLocale } from "@/i18n/client";
