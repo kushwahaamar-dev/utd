@@ -16,6 +16,7 @@ import {
   issueCredentialIx,
   parseEvents,
 } from "./passport";
+import { RACE_DISCRIMINATORS } from "./race";
 
 const programId = Keypair.generate().publicKey;
 const anchor = (prefix: string) => [...createHash("sha256").update(prefix).digest().subarray(0, 8)];
@@ -107,8 +108,9 @@ describe.runIf(existsSync(idlPath))("agrees with the exported IDL", () => {
     expect(ix("issue_credential").discriminator).toEqual(DISCRIMINATORS.issueCredential);
     expect(ix("create_bounty").discriminator).toEqual(DISCRIMINATORS.createBounty);
     expect(ix("cancel_bounty").discriminator).toEqual(DISCRIMINATORS.cancelBounty);
-    for (const a of idl.accounts) expect(a.discriminator).toEqual(DISCRIMINATORS[a.name as "Config"]);
-    for (const e of idl.events) expect(e.discriminator).toEqual(DISCRIMINATORS[e.name as "BountyPaid"]);
+    const known: Record<string, readonly number[]> = { ...DISCRIMINATORS, ...RACE_DISCRIMINATORS };
+    for (const a of idl.accounts) expect(a.discriminator).toEqual(known[a.name]);
+    for (const e of idl.events) expect(e.discriminator).toEqual(known[e.name]);
   });
 
   test("account order, signers and writability", () => {

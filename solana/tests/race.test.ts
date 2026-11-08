@@ -132,6 +132,14 @@ describe("create_race", () => {
     assert.equal(info.lamports, (await connection.getMinimumBalanceForRentExemption(info.data.length)) + 50_000_000);
     const events = await eventsOf(signature);
     assert.deepEqual(events.map((e) => e.name), ["raceCreated"]);
+
+    // The hand-written client codec (src/lib/solana/race.ts) depends on this layout.
+    const raw = info.data;
+    assert.equal(raw.length, 362);
+    assert.equal(raw.readBigUInt64LE(8), BigInt(state.raceId.toString()));
+    assert.equal(raw.readBigInt64LE(8 + 120), BigInt(closesAt));
+    assert.equal(raw[8 + 128], 0);
+    assert.equal(raw.readBigUInt64LE(8 + 337), 50_000_000n);
   });
 
   it("refuses a past close time and a dust entry fee", async () => {
@@ -282,7 +290,7 @@ describe("settle", () => {
 
     const [ev] = await eventsOf(sig);
     assert.equal(ev.name, "raceSettled");
-    const data = ev.data as { pot: BN; payouts: { player: PublicKey; amount: BN }[] };
+    const data = ev.data as { pot: { toNumber(): number }; payouts: { player: PublicKey; amount: { toNumber(): number } }[] };
     assert.equal(data.pot.toNumber(), pot);
     assert.deepEqual(data.payouts.map((p) => p.amount.toNumber()), [pot * 0.5, pot * 0.3, pot * 0.2]);
 

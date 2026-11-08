@@ -72,11 +72,24 @@ export function bountyAddress(programId: PublicKey, sponsor: PublicKey, skillHas
 
 /* ---------- Borsh ---------- */
 
-class Writer {
+export class Writer {
   private parts: Buffer[] = [];
   bytes(value: Uint8Array | readonly number[]) {
     this.parts.push(Buffer.from(value as Uint8Array));
     return this;
+  }
+  u8(value: number) {
+    return this.bytes([value]);
+  }
+  u32(value: number) {
+    const b = Buffer.alloc(4);
+    b.writeUInt32LE(value);
+    return this.bytes(b);
+  }
+  i64(value: number) {
+    const b = Buffer.alloc(8);
+    b.writeBigInt64LE(BigInt(value));
+    return this.bytes(b);
   }
   u16(value: number) {
     const b = Buffer.alloc(2);
@@ -100,7 +113,7 @@ class Writer {
   }
 }
 
-class Reader {
+export class Reader {
   private at = 0;
   constructor(private readonly data: Buffer) {}
   take(n: number): Buffer {
@@ -111,6 +124,8 @@ class Reader {
   }
   u8 = () => this.take(1)[0];
   u16 = () => this.take(2).readUInt16LE();
+  u32 = () => this.take(4).readUInt32LE();
+  bool = () => this.take(1)[0] === 1;
   u64 = () => this.take(8).readBigUInt64LE();
   i64 = () => Number(this.take(8).readBigInt64LE());
   pubkey = () => new PublicKey(this.take(32)).toBase58();
@@ -119,7 +134,7 @@ class Reader {
   optionPubkey = () => (this.u8() === 1 ? this.pubkey() : null);
 }
 
-function body(data: Uint8Array, discriminator: readonly number[]): Reader | null {
+export function body(data: Uint8Array, discriminator: readonly number[]): Reader | null {
   const buf = Buffer.from(data);
   if (buf.length < 8 || discriminator.some((byte, i) => buf[i] !== byte)) return null;
   return new Reader(buf.subarray(8));

@@ -39,7 +39,7 @@ function memoIx(text: string, signer: PublicKey): TransactionInstruction {
   });
 }
 
-async function sendAndConfirm(connection: Connection, wallet: Signer, ...ixs: TransactionInstruction[]): Promise<string> {
+export async function sendAndConfirm(connection: Connection, wallet: Signer, ...ixs: TransactionInstruction[]): Promise<string> {
   if (!wallet.publicKey) throw new WalletRequiredError();
   const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
   const tx = new Transaction({ feePayer: wallet.publicKey, blockhash, lastValidBlockHeight }).add(...ixs);

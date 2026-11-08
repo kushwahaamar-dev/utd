@@ -38,3 +38,11 @@ export function isAddress(value: string): boolean {
 export function shortAddress(value: string): string {
   return value.length > 12 ? `${value.slice(0, 4)}…${value.slice(-4)}` : value;
 }
+
+export function txUrl(signature: string): string {
+  return explorerUrl("tx", signature);
+}
+
+export function addressUrl(address: string): string {
+  return explorerUrl("address", address);
+}
