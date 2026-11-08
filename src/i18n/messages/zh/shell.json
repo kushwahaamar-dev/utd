@@ -125,16 +125,8 @@
     },
     "live": {
       "title": "正在进行",
-      "rooms": "房间",
-      "leaderboard": "排行榜",
       "lobby": "打开大厅",
-      "points": "分",
-      "players": "房间内 {count} 人",
-      "sample": {
-        "r1": "Blink 竞速，Uno",
-        "r2": "循线小车，TB6612",
-        "r3": "微型机绕桩"
-      }
+      "course": "5 英寸四轴的过门竞速"
     },
     "solana": {
       "title": "Solana 上的凭证",

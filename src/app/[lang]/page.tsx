@@ -16,6 +16,7 @@ import {
   Timeline,
   riseIndex,
 } from "@/components/editorial";
+import { getDataMessages } from "@/components/data";
 import { ArrowLink } from "@/components/marketing";
 import { BOARD_IDS, DRONE_IDS, ROBOTICS_IDS } from "@/content/ids";
 import { isLocale } from "@/i18n/config";
@@ -26,12 +27,6 @@ type Props = PageProps<"/[lang]">;
 
 const counts = { boards: BOARD_IDS.length, benches: ROBOTICS_IDS.length, drones: DRONE_IDS.length };
 const REPO = "https://github.com/kushwahaamar-dev/utd";
-
-const LEADERS = [
-  { name: "kira_m", points: 2480 },
-  { name: "ada.volt", points: 2215 },
-  { name: "nibble", points: 1960 },
-];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
@@ -56,7 +51,7 @@ export default function LandingPage({ params }: Props) {
 async function Landing({ params }: Pick<Props, "params">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  const t = await getT(lang, "shell");
+  const [t, data] = await Promise.all([getT(lang, "shell"), getDataMessages(lang)]);
   const [lead, focus, tail] = t("landing.title").split("*");
 
   return (
@@ -139,20 +134,10 @@ async function Landing({ params }: Pick<Props, "params">) {
         <Section id={`live-${lang}`} n="03" motif="scope" tone="green" tilt={-3} title={t("landing.live.title")}>
           <LiveNow
             locale={lang}
+            messages={data}
+            course="quad5-race"
             lobbyHref={`/${lang}/together`}
-            rooms={[
-              { id: "blink", title: t("landing.live.sample.r1"), players: 3 },
-              { id: "line", title: t("landing.live.sample.r2"), players: 2 },
-              { id: "slalom", title: t("landing.live.sample.r3"), players: 4 },
-            ]}
-            leaders={LEADERS}
-            labels={{
-              rooms: t("landing.live.rooms"),
-              leaderboard: t("landing.live.leaderboard"),
-              lobby: t("landing.live.lobby"),
-              points: t("landing.live.points"),
-              players: (count) => t("landing.live.players", { count }),
-            }}
+            labels={{ course: t("landing.live.course"), lobby: t("landing.live.lobby") }}
           />
         </Section>
 

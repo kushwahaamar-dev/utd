@@ -125,16 +125,8 @@
     },
     "live": {
       "title": "En vivo ahora",
-      "rooms": "Salas",
-      "leaderboard": "Clasificación",
       "lobby": "Abrir el vestíbulo",
-      "points": "pts",
-      "players": "{count} en la sala",
-      "sample": {
-        "r1": "Carrera de Blink, Uno",
-        "r2": "Seguidor de línea, TB6612",
-        "r3": "Eslalon de whoops"
-      }
+      "course": "la carrera de puertas del quad de 5 pulgadas"
     },
     "solana": {
       "title": "Pruebas en Solana",

@@ -125,16 +125,8 @@
     },
     "live": {
       "title": "Live now",
-      "rooms": "Rooms",
-      "leaderboard": "Leaderboard",
       "lobby": "Open the lobby",
-      "points": "pts",
-      "players": "{count} in the room",
-      "sample": {
-        "r1": "Blink race, Uno",
-        "r2": "Line follower, TB6612",
-        "r3": "Whoop slalom"
-      }
+      "course": "the 5-inch gate race"
     },
     "solana": {
       "title": "Proof on Solana",

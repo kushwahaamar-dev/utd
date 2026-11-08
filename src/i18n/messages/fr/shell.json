@@ -125,16 +125,8 @@
     },
     "live": {
       "title": "En direct",
-      "rooms": "Salons",
-      "leaderboard": "Classement",
       "lobby": "Ouvrir le salon d'accueil",
-      "points": "pts",
-      "players": "{count} dans le salon",
-      "sample": {
-        "r1": "Course Blink, Uno",
-        "r2": "Suiveur de ligne, TB6612",
-        "r3": "Slalom de whoops"
-      }
+      "course": "la course de portes du quad 5 pouces"
     },
     "solana": {
       "title": "Preuves sur Solana",

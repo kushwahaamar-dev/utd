@@ -125,16 +125,8 @@
     },
     "live": {
       "title": "Gerade live",
-      "rooms": "Räume",
-      "leaderboard": "Bestenliste",
       "lobby": "Lobby öffnen",
-      "points": "Pkt.",
-      "players": "{count} im Raum",
-      "sample": {
-        "r1": "Blink-Rennen, Uno",
-        "r2": "Linienfolger, TB6612",
-        "r3": "Whoop-Slalom"
-      }
+      "course": "das Torrennen des 5-Zoll-Quads"
     },
     "solana": {
       "title": "Nachweise auf Solana",

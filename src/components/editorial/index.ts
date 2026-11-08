@@ -3,7 +3,7 @@ export { Column, Section, riseIndex } from "./Column";
 export { FloatingControls, type FloatingControlsLabels } from "./FloatingControls";
 export { GlyphScene, type GlyphSceneLabels } from "./GlyphScene";
 export { KeyValueFooter, type KeyValueRow } from "./KeyValueFooter";
-export { LiveNow, type LiveLeader, type LiveNowLabels, type LiveRoom } from "./LiveNow";
+export { LiveNow, type LiveNowLabels } from "./LiveNow";
 export { PcbTraces } from "./PcbTraces";
 export { SelectionBox } from "./SelectionBox";
 export { STAMP_MOTIFS, Stamp, type StampMotif, type StampTone } from "./Stamp";
