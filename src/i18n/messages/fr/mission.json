@@ -118,7 +118,8 @@
     "race": "Courir",
     "credential": "Obtenir un certificat",
     "labNote": "Ouvre la page du labo pour cet engin. Les pièces exactes sont listées ci-dessus.",
-    "none": "Les agents ont terminé sans résultat écrit."
+    "none": "Les agents ont terminé sans résultat écrit.",
+    "pending": "Le résultat et les propositions apparaissent ici quand les agents ont fini."
   },
   "proposals": {
     "title": "Propositions",

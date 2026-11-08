@@ -15,7 +15,7 @@ export function Trace({ job, steps }: { job: Job; steps: Step[] }) {
   const planDone = donePlanItems(steps);
 
   return (
-    <Section id="trace-title" n="01" motif="scope" tone="cobalt" tilt={-3} title={t("trace.title")} className="mt-0">
+    <Section id="trace-title" n="01" motif="scope" tone="cobalt" tilt={-3} title={t("trace.title")} flush>
       {steps.length === 0 ? (
         <p className="flex items-center gap-3 text-muted">
           {active ? <Diamond tone="idle" live /> : null}

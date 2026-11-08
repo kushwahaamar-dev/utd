@@ -58,14 +58,14 @@ export function JobHeader({ job, steps, watchers, onCancel, demo }: { job: Job; 
 
       <p className="mt-4 text-xl font-medium leading-snug text-balance sm:text-2xl">{job.goal}</p>
 
-      <dl className="mt-6 grid grid-cols-3 gap-x-4 gap-y-4 border-t border-rule pt-5 sm:grid-cols-[repeat(3,auto)_1fr] sm:gap-x-10">
+      <dl className="mt-6 grid grid-cols-3 gap-x-4 gap-y-4 border-t border-rule pt-5 sm:grid-cols-[repeat(3,auto)_1fr] sm:gap-x-10 lg:grid-cols-3 lg:gap-x-4">
         {stats.map(([label, value]) => (
           <div key={label} className="min-w-0">
             <dt className="text-xs text-muted">{label}</dt>
             <dd className="tabular mt-1 font-ui text-2xl font-medium leading-none">{value}</dd>
           </div>
         ))}
-        <div className="col-span-3 min-w-0 sm:col-span-1">
+        <div className="col-span-3 min-w-0 sm:col-span-1 lg:col-span-3">
           <dt className="text-xs text-muted">{t("job.models")}</dt>
           <dd className="mt-1.5 flex flex-wrap gap-1.5">
             {models.length ? (

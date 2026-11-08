@@ -118,7 +118,8 @@
     "race": "Rennen fliegen",
     "credential": "Nachweis erwerben",
     "labNote": "Öffnet die Laborseite für dieses Fluggerät. Die genauen Teile stehen oben in der Liste.",
-    "none": "Die Agenten sind ohne schriftliches Ergebnis fertig geworden."
+    "none": "Die Agenten sind ohne schriftliches Ergebnis fertig geworden.",
+    "pending": "Ergebnis und Vorschläge erscheinen hier, sobald die Agenten fertig sind."
   },
   "proposals": {
     "title": "Vorschläge",

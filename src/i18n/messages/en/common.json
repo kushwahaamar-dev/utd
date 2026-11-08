@@ -57,6 +57,11 @@
       "label": "Anonymous usage counts",
       "body": "iynk counts what happens in the labs (a lesson passed, a step built, a fault tried) for the live counters and leaderboards. Each event carries a random id for this browser, never your name or your code.",
       "toggle": "Share anonymous usage counts"
+    },
+    "labshell": {
+      "resize": "Resize {panel}",
+      "collapse": "Collapse {panel}",
+      "expand": "Expand {panel}"
     }
   }
 }

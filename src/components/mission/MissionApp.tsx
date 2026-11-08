@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, type ReactNode } from "react";
-import { Container } from "@/components/editorial";
+import { Cell, Container, Grid } from "@/components/editorial";
 import { ActionLink, Note, eyebrow } from "@/components/editorial/Editorial";
 import { cx } from "@/components/ui/cx";
 import type { Locale } from "@/i18n/config";
@@ -89,13 +89,11 @@ function Home({ lang, roomCode, head }: { lang: Locale; roomCode?: string; head?
   }
 
   return (
-    <div>
-      {head}
-      <div className="mt-10 sm:mt-12">
-      {online ? null : <OfflineNote lang={lang} />}
-      <Composer roomCode={roomCode} disabled={!online} onStart={onStart} />
-      {missions.length ? (
-        <section aria-labelledby="recent-title" className="mt-12">
+    <Grid className="gap-y-10">
+      <Cell span={5}>
+        {head}
+        {missions.length ? (
+        <section aria-labelledby="recent-title" className="mt-10 lg:mt-14">
           <h2 id="recent-title" className={eyebrow}>
             {t("recent.title")}
           </h2>
@@ -110,9 +108,13 @@ function Home({ lang, roomCode, head }: { lang: Locale; roomCode?: string; head?
             ))}
           </ul>
         </section>
-      ) : null}
-      </div>
-    </div>
+        ) : null}
+      </Cell>
+      <Cell span={7} className="lg:pt-[clamp(40px,6vw,96px)]">
+        {online ? null : <OfflineNote lang={lang} />}
+        <Composer roomCode={roomCode} disabled={!online} onStart={onStart} />
+      </Cell>
+    </Grid>
   );
 }
 
@@ -124,38 +126,60 @@ function JobView({ lang, jobId }: { lang: Locale; jobId: string }) {
   const { job, steps, proposals, watchers } = mission;
   const home = `/${lang}/mission${demoQuery(search, ["demo", "room"])}`;
 
-  return (
-    <div className="pt-[clamp(32px,6vw,72px)]">
-      <Link href={home} className="inline-flex min-h-10 items-center text-sm text-muted no-underline hover:text-ink">
-        {`← ${t("job.newMission")}`}
-      </Link>
+  const rail = "lg:sticky lg:top-[4.75rem] lg:max-h-[calc(100svh-5.5rem)] lg:self-start lg:overflow-y-auto lg:pb-2";
+  const loaded = mission.state === "ready" && job;
+  const done = job?.status === "done";
 
-      {mission.state === "loading" ? (
-        <p className="mt-6 text-muted" role="status">
-          {t("state.loading")}
-        </p>
-      ) : mission.state === "missing" ? (
-        <Note title={t("state.missing.title")} action={<ActionLink kind="primary" href={home}>{t("state.missing.back")}</ActionLink>}>
-          {t("state.missing.body")}
-        </Note>
-      ) : mission.state === "error" || mission.state === "offline" || !job ? (
-        <Note title={t(mission.state === "offline" ? "state.offline.title" : "state.error.title")}>
-          {t(mission.state === "offline" ? "state.offline.body" : "state.error.body")}
-        </Note>
-      ) : (
-        <div className="mt-4 flex flex-col gap-10">
-          <JobHeader job={job} steps={steps} watchers={watchers} onCancel={mission.cancel} demo={mode === "demo"} />
-          <Announcer status={job.status} steps={steps} />
-          <Trace job={job} steps={steps} />
-          {job.status === "cancelled" ? (
-            <Note title={t("state.cancelled.title")}>{t("state.cancelled.body")}</Note>
-          ) : job.status === "failed" ? (
-            <Note title={t("state.failed.title")}>{job.error ?? t("state.failed.body")}</Note>
-          ) : null}
-          {job.status === "done" ? <ResultPanel result={job.result} lang={lang} planBudget={planBudget(steps)} /> : null}
-          {job.status === "done" ? <Proposals proposals={proposals} onResolve={mission.resolve} /> : null}
-        </div>
-      )}
+  return (
+    <div className="pt-[clamp(24px,4vw,56px)]">
+      <Grid className="gap-y-8">
+        <Cell span={3} className={rail}>
+          <Link href={home} className="inline-flex min-h-10 items-center text-sm text-muted no-underline hover:text-ink">
+            {`← ${t("job.newMission")}`}
+          </Link>
+          {mission.state === "loading" ? (
+            <p className="mt-6 text-muted" role="status">
+              {t("state.loading")}
+            </p>
+          ) : mission.state === "missing" ? (
+            <Note title={t("state.missing.title")} action={<ActionLink kind="primary" href={home}>{t("state.missing.back")}</ActionLink>}>
+              {t("state.missing.body")}
+            </Note>
+          ) : !loaded ? (
+            <Note title={t(mission.state === "offline" ? "state.offline.title" : "state.error.title")}>
+              {t(mission.state === "offline" ? "state.offline.body" : "state.error.body")}
+            </Note>
+          ) : (
+            <div className="mt-3 flex flex-col gap-6">
+              <JobHeader job={job} steps={steps} watchers={watchers} onCancel={mission.cancel} demo={mode === "demo"} />
+              <Announcer status={job.status} steps={steps} />
+              {job.status === "cancelled" ? (
+                <Note title={t("state.cancelled.title")}>{t("state.cancelled.body")}</Note>
+              ) : job.status === "failed" ? (
+                <Note title={t("state.failed.title")}>{job.error ?? t("state.failed.body")}</Note>
+              ) : null}
+            </div>
+          )}
+        </Cell>
+
+        {loaded ? (
+          <>
+            <Cell span={5}>
+              <Trace job={job} steps={steps} />
+            </Cell>
+            <Cell span={4} className={rail}>
+              {done ? (
+                <div className="flex flex-col gap-12">
+                  <ResultPanel result={job.result} lang={lang} planBudget={planBudget(steps)} />
+                  <Proposals proposals={proposals} onResolve={mission.resolve} />
+                </div>
+              ) : (
+                <p className="hidden border-s-2 border-line ps-4 text-sm text-muted lg:block">{t("result.pending")}</p>
+              )}
+            </Cell>
+          </>
+        ) : null}
+      </Grid>
     </div>
   );
 }

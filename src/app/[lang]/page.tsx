@@ -170,7 +170,7 @@ async function Landing({ params }: Pick<Props, "params">) {
           />
         </Section>
 
-        <footer className="mt-[clamp(88px,11vw,144px)]">
+        <footer className="mt-[clamp(64px,8vw,112px)]">
           <Grid className="items-end">
             <Cell span={4}>
               <div aria-hidden="true" className="flex gap-1">

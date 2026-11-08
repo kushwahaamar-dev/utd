@@ -33,7 +33,7 @@ async function Mission({ params }: Props) {
 
   return (
     <MissionApp lang={lang} messages={messages} head={
-        <header className="pt-[clamp(72px,11vw,136px)]">
+        <header className="pt-[clamp(40px,6vw,96px)]">
           <div className="flex items-center gap-3.5">
             <Stamp motif="arm" tone="plum" value="MC" size={46} tilt={-3} />
             <p className={eyebrow}>{t("head.kicker")}</p>

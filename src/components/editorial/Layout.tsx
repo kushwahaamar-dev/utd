@@ -62,12 +62,14 @@ type SectionProps = {
   lede?: ReactNode;
   /** Header left, content right on desktop. */
   split?: boolean;
+  /** No space above, for a section that opens its column. */
+  flush?: boolean;
   children: ReactNode;
   className?: string;
 };
 
 /** A titled section: a postage stamp, a small heading, then the content a little way below. */
-export function Section({ id, title, n, motif, tone, tilt, aside, lede, split, children, className }: SectionProps) {
+export function Section({ id, title, n, motif, tone, tilt, aside, lede, split, flush, children, className }: SectionProps) {
   const header = (
     <>
       <header className="flex items-center gap-3.5">
@@ -81,7 +83,7 @@ export function Section({ id, title, n, motif, tone, tilt, aside, lede, split, c
     </>
   );
   return (
-    <section aria-labelledby={id} className={cx("mt-[clamp(64px,8vw,120px)]", className)}>
+    <section aria-labelledby={id} className={cx(!flush && "mt-[clamp(56px,7vw,104px)]", className)}>
       {split ? (
         <Grid className="gap-y-6">
           <Cell span={4} className="lg:sticky lg:top-24 lg:self-start">

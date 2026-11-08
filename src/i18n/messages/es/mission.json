@@ -118,7 +118,8 @@
     "race": "Competir",
     "credential": "Obtener credencial",
     "labNote": "Abre la página del laboratorio de este aparato. Las piezas exactas están en la lista de arriba.",
-    "none": "Los agentes terminaron sin un resultado escrito."
+    "none": "Los agentes terminaron sin un resultado escrito.",
+    "pending": "El resultado y las propuestas aparecen aquí cuando los agentes terminan."
   },
   "proposals": {
     "title": "Propuestas",

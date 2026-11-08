@@ -20,7 +20,7 @@ export function ResultPanel({ result: raw, lang, planBudget }: { result: unknown
   const result = readResult(raw);
   if (!result) {
     return (
-      <Section id="result-title" n="02" motif="chip" tone="green" tilt={3} title={t("result.title")}>
+      <Section id="result-title" n="02" motif="chip" tone="green" tilt={3} title={t("result.title")} flush className="@container">
         <p className="text-muted">{t("result.none")}</p>
       </Section>
     );
@@ -31,7 +31,7 @@ export function ResultPanel({ result: raw, lang, planBudget }: { result: unknown
   const paths = labPath(result);
 
   return (
-    <Section id="result-title" n="02" motif="chip" tone="green" tilt={3} title={t("result.title")} className="motion-safe:animate-ink-rise">
+    <Section id="result-title" n="02" motif="chip" tone="green" tilt={3} title={t("result.title")} flush className="@container motion-safe:animate-ink-rise">
       {result.summary ? <p className="max-w-[62ch] text-[17px] leading-[1.55] text-balance">{result.summary}</p> : null}
 
       {result.verification.length ? (
@@ -58,7 +58,7 @@ export function ResultPanel({ result: raw, lang, planBudget }: { result: unknown
         <div className="mt-9">
           <h3 className="text-xs font-medium text-muted">{t("result.bom")}</h3>
           <table className="mt-3 w-full border-collapse text-[15px]">
-            <thead className="max-sm:sr-only">
+            <thead className="@max-md:sr-only">
               <tr className="border-b border-rule text-start text-xs text-muted">
                 <th scope="col" className="py-2 pe-3 text-start font-medium">{t("result.part")}</th>
                 <th scope="col" className="px-3 py-2 text-start font-medium">{t("result.store")}</th>
@@ -69,19 +69,19 @@ export function ResultPanel({ result: raw, lang, planBudget }: { result: unknown
             </thead>
             <tbody>
               {result.bom.map((line) => (
-                <tr key={`${line.part}-${line.store ?? ""}`} className="border-b border-rule/70 align-top max-sm:grid max-sm:grid-cols-[1fr_auto] max-sm:gap-x-3 max-sm:py-3">
-                  <td className="py-3 pe-3 max-sm:col-span-2 max-sm:p-0 max-sm:font-medium">{line.part}</td>
-                  <td className="px-3 py-3 text-muted max-sm:p-0">{line.store ?? ""}</td>
-                  <td className="tabular px-3 py-3 text-end text-muted max-sm:hidden">{line.qty}</td>
-                  <td className="tabular px-3 py-3 text-end font-ui max-sm:p-0">
-                    {line.qty > 1 ? <span className="text-muted sm:hidden">{`${line.qty} × `}</span> : null}
+                <tr key={`${line.part}-${line.store ?? ""}`} className="border-b border-rule/70 align-top @max-md:grid @max-md:grid-cols-[1fr_auto] @max-md:gap-x-3 @max-md:py-3">
+                  <td className="py-3 pe-3 @max-md:col-span-2 @max-md:p-0 @max-md:font-medium">{line.part}</td>
+                  <td className="px-3 py-3 text-muted @max-md:p-0">{line.store ?? ""}</td>
+                  <td className="tabular px-3 py-3 text-end text-muted @max-md:hidden">{line.qty}</td>
+                  <td className="tabular px-3 py-3 text-end font-ui @max-md:p-0">
+                    {line.qty > 1 ? <span className="text-muted @md:hidden">{`${line.qty} × `}</span> : null}
                     {line.price === undefined ? "–" : money(line.price * line.qty)}
                   </td>
-                  <td className="py-3 ps-3 text-end max-sm:col-span-2 max-sm:p-0 max-sm:pt-1 max-sm:text-start">
+                  <td className="py-3 ps-3 text-end @max-md:col-span-2 @max-md:p-0 @max-md:pt-1 @max-md:text-start">
                     {line.url ? (
                       <a href={line.url} target="_blank" rel="noopener noreferrer" aria-label={`${t("result.buy")}: ${line.part}`} className="text-muted underline decoration-muted/50 underline-offset-4 hover:text-ink">
-                        <span aria-hidden="true" className="max-sm:hidden">↗</span>
-                        <span aria-hidden="true" className="sm:hidden">{`${t("result.buy")} ↗`}</span>
+                        <span aria-hidden="true" className="@max-md:hidden">↗</span>
+                        <span aria-hidden="true" className="@md:hidden">{`${t("result.buy")} ↗`}</span>
                       </a>
                     ) : null}
                   </td>
@@ -152,9 +152,9 @@ export function Proposals({ proposals, onResolve }: { proposals: Proposal[]; onR
   const { t } = useMissionText();
   if (proposals.length === 0) return null;
   return (
-    <Section id="proposals-title" n="03" motif="gear" tone="copper" tilt={-2} title={t("proposals.title")}>
+    <Section id="proposals-title" n="03" motif="gear" tone="copper" tilt={-2} title={t("proposals.title")} flush className="@container">
       <p className="max-w-[52ch] text-muted">{t("proposals.lede")}</p>
-      <ul className="mt-5 grid list-none gap-4 p-0 sm:grid-cols-2">
+      <ul className="mt-5 grid list-none gap-4 p-0 @lg:grid-cols-2">
         {proposals.map((p) => {
           const view = readProposal(p.kind, p.payload);
           return (

@@ -118,7 +118,8 @@
     "race": "Race it",
     "credential": "Earn credential",
     "labNote": "Opens the lab page for this craft. The exact part choices are listed above.",
-    "none": "The agents finished without a written result."
+    "none": "The agents finished without a written result.",
+    "pending": "The result and any proposals appear here when the agents finish."
   },
   "proposals": {
     "title": "Proposals",
