@@ -34,11 +34,16 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    ".next-mission/types/**/*.ts",
+    ".next-mission/dev/types/**/*.ts",
+    ".next-design/types/**/*.ts",
+    ".next-design/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     ".next-*",
-    "docs/MASTER_PLAN"
+    "docs/MASTER_PLAN",
+    "worker"
   ]
 }
