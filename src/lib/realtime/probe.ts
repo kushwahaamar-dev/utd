@@ -1,7 +1,9 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import type { LabKind } from "@/components/dock/types";
-import { DEFAULT_LOCALE, type Locale } from "@/i18n/config";
-import { createTransport } from "./config";
-import { newId, PROBE_STATUS, welcomeItem } from "./protocol";
+import { useRoom, useRoomMembers, useStdb } from "@/lib/stdb";
+import { MAX_PEERS } from "./protocol";
 
 export type ProbeResult =
   | { kind: "found"; lab: LabKind; itemId: string; peers: number }
@@ -11,34 +13,32 @@ export type ProbeResult =
   | { kind: "unavailable" }
   | { kind: "timeout" };
 
+const LABS: readonly string[] = ["board", "robotics", "drone"];
+const TIMEOUT_MS = 6000;
+
 /**
  * Looks up which lab item a room code belongs to, for "join by code" in the
- * lobby: joins for a moment as an invisible peer, reads the welcome, leaves.
+ * lobby. `null` while there is no code to look up or the answer isn't in yet.
  */
-export function probeRoom(roomId: string, lang: Locale = DEFAULT_LOCALE, timeoutMs = 6000): Promise<ProbeResult> {
-  const transport = createTransport(roomId);
-  if (!transport) return Promise.resolve({ kind: "unavailable" });
-  return new Promise((resolve) => {
-    const finish = (result: ProbeResult) => {
-      clearTimeout(timer);
-      off();
-      transport.close();
-      resolve(result);
-    };
-    const timer = setTimeout(() => finish({ kind: "timeout" }), timeoutMs);
-    const off = transport.onMessage((msg) => {
-      if (msg.t === "error") return finish({ kind: msg.code === "room_full" || msg.code === "full" ? "full" : "timeout" });
-      if (msg.t !== "welcome") return;
-      const others = msg.peers.filter((peer) => peer.status !== PROBE_STATUS);
-      if (others.length === 0) return finish({ kind: "empty" });
-      const { lab, itemId } = welcomeItem(msg);
-      if (!lab || !itemId) return finish({ kind: "unknown-item" });
-      finish({ kind: "found", lab, itemId, peers: others.length });
-    });
-    transport.start(() => ({
-      t: "join",
-      room: roomId,
-      peer: { id: newId(), name: "lobby", color: "#857d6e", lang, status: PROBE_STATUS, role: "watcher" },
-    }));
-  });
+export function useRoomProbe(code: string | null): ProbeResult | null {
+  const { status } = useStdb();
+  const { room, ready: roomReady } = useRoom(code);
+  const { members, ready: membersReady } = useRoomMembers(code);
+  const [timedOut, setTimedOut] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!code) return;
+    const timer = setTimeout(() => setTimedOut(code), TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [code]);
+
+  if (!code) return null;
+  if (roomReady && membersReady) {
+    if (!room || members.length === 0) return { kind: "empty" };
+    if (members.length >= MAX_PEERS) return { kind: "full" };
+    if (!LABS.includes(room.lab)) return { kind: "unknown-item" };
+    return { kind: "found", lab: room.lab as LabKind, itemId: room.itemId, peers: members.length };
+  }
+  if (status === "offline") return { kind: "unavailable" };
+  return timedOut === code ? { kind: "timeout" } : null;
 }

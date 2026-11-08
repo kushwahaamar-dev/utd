@@ -1,22 +1,38 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useTable } from "spacetimedb/react";
 import type { LabKind, LabStore } from "@/components/dock/types";
+import type { Locale } from "@/i18n/config";
 import { useLocale } from "@/i18n/client";
-import { useFeatures } from "@/lib/features";
 import { progressPrefix, useSaved } from "@/lib/progress";
+import {
+  tables,
+  useChat,
+  useCursorEvents,
+  usePlayers,
+  usePoseEvents,
+  useRoom as useRoomRow,
+  useRoomActions,
+  useRoomMembers,
+  useRoomSnapshot,
+  useStdb,
+  useStdbActions,
+  useTranslations,
+  type StdbActions,
+  type StdbStatus,
+} from "@/lib/stdb";
 import { setTelemetryContext, track } from "@/lib/telemetry";
-import { createTransport, pageLink, pageScope, ROOM_PARAM, transportKind } from "./config";
+import { pageLink, pageScope, ROOM_PARAM } from "./config";
 import { getIdentity, getServerIdentity, subscribeIdentity, type Identity } from "./identity";
-import { isRoomId, newId, newRoomId, normalizeRoomId } from "./protocol";
-import { RoomClient, type RoomState } from "./room";
+import { NEW_ROOM, parseRoomParam } from "./protocol";
+import { RoomClient, type RoomBackend, type RoomState } from "./room";
 import { attachStore } from "./store-sync";
-import { translateMessages } from "./translate";
-import type { TransportKind } from "./transport";
 import type { RoomApi, RoomEnd } from "./types";
 
 // ?room= in the address bar is the only room state that outlives a page: the
-// room starts when it appears and ends when it goes. Pages stay static (D14e).
+// room starts when it appears and ends when it goes. Pages stay static.
+// ?room=new means "open a fresh room here"; the page swaps in the code the module picks.
 
 const locationListeners = new Set<() => void>();
 
@@ -30,9 +46,7 @@ function subscribeLocation(listener: () => void) {
 }
 
 function getRoomParam(): string | null {
-  const raw = new URLSearchParams(window.location.search).get(ROOM_PARAM);
-  const id = raw ? normalizeRoomId(raw) : "";
-  return isRoomId(id) ? id : null;
+  return parseRoomParam(new URLSearchParams(window.location.search).get(ROOM_PARAM));
 }
 
 const getServerRoomParam = () => null;
@@ -51,8 +65,8 @@ export type Together = {
   /** The room in the address bar, joined or not. */
   roomId: string | null;
   identity: Identity | null;
-  /** null when this browser has no way to reach a room. */
-  transport: TransportKind | null;
+  /** The connection to the realtime database; rooms need it to be online. */
+  connection: StdbStatus;
   room: RoomApi | null;
   /** Why the last room ended, until you start or join another. */
   ended: RoomEnd | null;
@@ -64,7 +78,7 @@ export type Together = {
 
 const TogetherContext = createContext<Together | null>(null);
 
-/** H7.1: null when the page isn't in a room. */
+/** The room this page is in, or null. */
 export function useRoom(): RoomApi | null {
   return useContext(TogetherContext)?.room ?? null;
 }
@@ -79,10 +93,6 @@ export function useTogether(): Together | null {
   return useContext(TogetherContext);
 }
 
-function useClientValue<T>(subscribe: (listener: () => void) => () => void, get: () => T, server: () => T): T {
-  return useSyncExternalStore(subscribe, get, server);
-}
-
 const noopSubscribe = () => () => {};
 
 function toApi(client: RoomClient, state: RoomState): RoomApi {
@@ -93,7 +103,6 @@ function toApi(client: RoomClient, state: RoomState): RoomApi {
     peers: state.peers,
     hostId: state.hostId,
     connected: state.status === "live",
-    transport: state.transport,
     messages: state.messages,
     status: state.status,
     ended: state.ended,
@@ -113,8 +122,92 @@ function toApi(client: RoomClient, state: RoomState): RoomApi {
   };
 }
 
+/** A fixed backend that always calls the connection's current actions, so a client outlives a reconnect. */
+function useStableBackend(): RoomBackend {
+  const actions = useStdbActions();
+  const latest = useRef<StdbActions>(actions);
+  useEffect(() => {
+    latest.current = actions;
+  });
+  return useMemo(
+    () =>
+      new Proxy({} as RoomBackend, {
+        get: (_, name: string) => (...args: unknown[]) => (latest.current as unknown as Record<string, (...a: unknown[]) => unknown>)[name](...args),
+      }),
+    [],
+  );
+}
+
+const NONE = "\u0000none";
+
+/** Makes a room on the module and reports the code it picked, which it reads back from our new membership. */
+function RoomCreator({
+  lab,
+  itemId,
+  identity,
+  lang,
+  onCode,
+  onError,
+}: {
+  lab: LabKind;
+  itemId: string;
+  identity: Identity;
+  lang: string;
+  onCode: (code: string) => void;
+  onError: (error: unknown) => void;
+}) {
+  const stdb = useStdb();
+  const actions = useStdbActions();
+  const [rows, ready] = useTable(tables.roomMember.where((m) => m.identity.eq(stdb.identity ?? (NONE as never))), { enabled: !!stdb.identity });
+  const before = useRef<Set<string> | null>(null);
+  const online = stdb.status === "online" && ready;
+
+  useEffect(() => {
+    if (!online || before.current) return;
+    before.current = new Set(rows.map((row) => row.roomCode));
+    actions
+      .setProfile({ name: identity.name, color: identity.color, lang })
+      .then(() => actions.createRoom(lab, itemId))
+      .catch(onError);
+  }, [online, rows, actions, identity, lang, lab, itemId, onError]);
+
+  useEffect(() => {
+    if (!before.current) return;
+    const fresh = rows.find((row) => !before.current!.has(row.roomCode));
+    if (fresh) onCode(fresh.roomCode);
+  }, [rows, onCode]);
+
+  return null;
+}
+
+/** Feeds one room's rows, cursor frames and pose frames to its client. Mounted only while a room is open. */
+function RoomFeed({ client, code, locale }: { client: RoomClient; code: string; locale: Locale }) {
+  const { status } = useStdb();
+  const { room, ready: roomReady } = useRoomRow(code);
+  const { members, ready: membersReady } = useRoomMembers(code);
+  const { actions, ready: actionsReady } = useRoomActions(code);
+  const { snapshot, ready: snapshotReady } = useRoomSnapshot(code);
+  const { messages, ready: chatReady } = useChat(code);
+  const { byMessage } = useTranslations(code);
+  const { rows: players } = usePlayers();
+  const langs = useMemo(() => new Map(players.map((player) => [player.identity.toHexString(), player.lang])), [players]);
+  const ready = roomReady && membersReady && actionsReady && snapshotReady && chatReady;
+
+  useEffect(() => {
+    client.ingest({ online: status === "online", ready, room, members, actions, snapshot, chat: messages, translations: byMessage, langs });
+  }, [client, status, ready, room, members, actions, snapshot, messages, byMessage, langs]);
+
+  useEffect(() => {
+    client.translateFor(locale);
+  }, [client, locale]);
+
+  useCursorEvents(code, (event) => client.cursorEvent(event.from.toHexString(), event.x, event.y));
+  usePoseEvents(code, (event) => client.poseEvent(event.from.toHexString(), event));
+  return null;
+}
+
 /**
- * H7.1: joins the room named by ?room= and keeps `store` in step with it.
+ * Joins the room named by ?room= and keeps `store` in step with it.
  * Wrap a lab page (figure, controls and LabDock) in one RoomProvider.
  */
 export function RoomProvider<S, A extends { type: string }>({
@@ -129,54 +222,47 @@ export function RoomProvider<S, A extends { type: string }>({
   children: ReactNode;
 }) {
   const locale = useLocale();
-  const roomId = useClientValue(subscribeLocation, getRoomParam, getServerRoomParam);
+  const param = useSyncExternalStore(subscribeLocation, getRoomParam, getServerRoomParam);
   const identity = useIdentity();
-  const kind = useClientValue(noopSubscribe, transportKind, () => null);
   const saved = useSaved();
-  const { features } = useFeatures();
+  const stdb = useStdb();
+  const backend = useStableBackend();
   const [client, setClient] = useState<RoomClient | null>(null);
   const [lastEnded, setLastEnded] = useState<RoomEnd | null>(null);
+
+  const code = param && param !== NEW_ROOM ? param : null;
+  const selfId = stdb.identityHex;
 
   const prefix = progressPrefix.item(lab, itemId);
   const doneKeys = useMemo(() => Object.keys(saved.done).filter((key) => key.startsWith(prefix)).sort(), [saved, prefix]);
   const doneSignature = doneKeys.join("|");
 
   // The join reads these when it happens; later changes go out as presence.
-  const latest = useRef({ identity, doneKeys });
+  const latest = useRef({ identity, doneKeys, locale });
   useEffect(() => {
-    latest.current = { identity, doneKeys };
+    latest.current = { identity, doneKeys, locale };
   });
 
-  // Join the room in the address bar once you have a name.
+  // Join the room in the address bar once you have a name and the connection knows who you are.
   const named = identity !== null;
   useEffect(() => {
-    const me = latest.current.identity;
-    if (!roomId || !me) return;
-    const transport = createTransport(roomId);
-    if (!transport) return;
-    const next = new RoomClient({
-      id: roomId,
-      link: pageLink(roomId),
-      me: { id: newId(), name: me.name, color: me.color, lang: locale, done: latest.current.doneKeys },
-      lab,
-      itemId,
-      transport,
-    });
+    const { identity: me, doneKeys: done, locale: lang } = latest.current;
+    if (!code || !me || !selfId) return;
+    const next = new RoomClient({ id: code, link: pageLink(code), selfId, me: { name: me.name, color: me.color, lang, done }, lab, itemId, backend });
     const detach = attachStore(store, lab, next, { scope: pageScope(window.location.pathname) });
     let joined = false;
     const offStatus = next.subscribe(() => {
       const { ended, status, peers } = next.getState();
       if (status === "live" && !joined) {
         joined = true;
-        setTelemetryContext({ room: roomId });
+        setTelemetryContext({ room: code });
         track("room.join", { peers: peers.length + 1 });
       }
-      // The room ended without us leaving (removed, full, wrong item): drop ?room= so a reload doesn't rejoin.
+      // The room ended without us leaving (removed, full, gone): drop ?room= so a reload doesn't rejoin.
       if (!ended || ended === "left") return;
       setLastEnded(ended);
       setRoomParam(null);
     });
-    next.start();
     setClient(next);
     return () => {
       offStatus();
@@ -185,12 +271,15 @@ export function RoomProvider<S, A extends { type: string }>({
       setTelemetryContext({ room: undefined });
       setClient((current) => (current === next ? null : current));
     };
-  }, [roomId, named, lab, itemId, store, locale]);
+  }, [code, named, selfId, lab, itemId, store, backend]);
 
   const name = identity?.name;
+  const color = identity?.color;
   useEffect(() => {
-    if (client && name && client.getState().you.name !== name) client.rename(name);
-  }, [client, name]);
+    if (!client || !name || !color) return;
+    if (client.getState().you.name !== name) client.rename(name);
+    void backend.setProfile({ name, color, lang: locale }).catch(() => {});
+  }, [client, name, color, locale, backend]);
 
   useEffect(() => {
     if (client && client.getState().you.done.join("|") !== doneSignature) client.shareDone(doneSignature ? doneSignature.split("|") : []);
@@ -202,46 +291,24 @@ export function RoomProvider<S, A extends { type: string }>({
     () => null,
   );
 
-
-  // Translate every line into this reader's language as it arrives.
-  useEffect(() => {
-    if (!client || !features.ai) return;
-    const controller = new AbortController();
-    const run = () => {
-      void translateMessages(
-        client.getState().messages,
-        locale,
-        (id, text) => client.setTranslation(id, locale, text),
-        (id) => client.failTranslation(id, locale),
-        controller.signal,
-      );
-    };
-    run();
-    const off = client.subscribe(run);
-    return () => {
-      off();
-      controller.abort();
-    };
-  }, [client, locale, features.ai]);
-
   const room = useMemo(() => (client && state ? toApi(client, state) : null), [client, state]);
 
   const value = useMemo<Together>(
     () => ({
       lab,
       itemId,
-      roomId,
+      roomId: param,
       identity,
-      transport: kind,
+      connection: stdb.status,
       room,
       ended: lastEnded,
       start: () => {
         setLastEnded(null);
-        setRoomParam(newRoomId());
+        setRoomParam(NEW_ROOM);
       },
       join: (id) => {
-        const clean = normalizeRoomId(id);
-        if (!isRoomId(clean)) return;
+        const clean = parseRoomParam(id);
+        if (!clean || clean === NEW_ROOM) return;
         setLastEnded(null);
         setRoomParam(clean);
       },
@@ -250,8 +317,21 @@ export function RoomProvider<S, A extends { type: string }>({
         setRoomParam(null);
       },
     }),
-    [lab, itemId, roomId, identity, kind, room, lastEnded, client],
+    [lab, itemId, param, identity, stdb.status, room, lastEnded, client],
   );
 
-  return <TogetherContext.Provider value={value}>{children}</TogetherContext.Provider>;
+  const failCreate = useCallback(() => {
+    setLastEnded("error");
+    setRoomParam(null);
+  }, []);
+
+  return (
+    <TogetherContext.Provider value={value}>
+      {param === NEW_ROOM && identity ? (
+        <RoomCreator lab={lab} itemId={itemId} identity={identity} lang={locale} onCode={setRoomParam} onError={failCreate} />
+      ) : null}
+      {client && code ? <RoomFeed client={client} code={code} locale={locale} /> : null}
+      {children}
+    </TogetherContext.Provider>
+  );
 }

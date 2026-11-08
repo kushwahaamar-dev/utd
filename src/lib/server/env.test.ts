@@ -39,13 +39,13 @@ describe("readEnv", () => {
       NEMOTRON_BASE_URL: "ftp://nope",
       SERPAPI_MONTHLY_BUDGET: "lots",
       SOLANA_ISSUER_KEYPAIR: "[1,2,3]",
-      NEXT_PUBLIC_REALTIME_URL: "https://not-a-socket.example",
+      NEXT_PUBLIC_STDB_URI: "https://not-a-socket.example",
       NEXT_PUBLIC_SOLANA_CLUSTER: "mainnet-beta",
     });
     expect(issues.sort()).toEqual(
       [
         "NEMOTRON_BASE_URL",
-        "NEXT_PUBLIC_REALTIME_URL",
+        "NEXT_PUBLIC_STDB_URI",
         "NEXT_PUBLIC_SOLANA_CLUSTER",
         "SERPAPI_MONTHLY_BUDGET",
         "SOLANA_ISSUER_KEYPAIR",
@@ -65,7 +65,7 @@ describe("readEnv", () => {
       SERPAPI_MONTHLY_BUDGET: "50",
       SOLANA_ISSUER_KEYPAIR: keypair,
       NEXT_PUBLIC_SOLANA_PROGRAM_ID: programId,
-      NEXT_PUBLIC_REALTIME_URL: "wss://rt.example/ws",
+      NEXT_PUBLIC_STDB_URI: "wss://rt.example/ws",
     });
     expect(issues).toEqual([]);
     expect(env.NEMOTRON_BASE_URL).toBe("https://proxy.example/v1");

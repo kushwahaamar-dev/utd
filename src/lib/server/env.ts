@@ -40,7 +40,7 @@ const schema = {
   NEXT_PUBLIC_SOLANA_CLUSTER: z.literal("devnet").default("devnet"),
   NEXT_PUBLIC_SOLANA_RPC_URL: url.default("https://api.devnet.solana.com"),
   NEXT_PUBLIC_SOLANA_PROGRAM_ID: base58.optional(),
-  NEXT_PUBLIC_REALTIME_URL: wsUrl.optional(),
+  NEXT_PUBLIC_STDB_URI: wsUrl.optional(),
   NEXT_PUBLIC_SITE_URL: url.default("http://localhost:3000"),
 } as const;
 
@@ -87,7 +87,7 @@ export function featuresOf(e: Env): Features {
     voice: false,
     search: Boolean(e.SERPAPI_KEY),
     solana: Boolean(e.SOLANA_ISSUER_KEYPAIR && e.NEXT_PUBLIC_SOLANA_PROGRAM_ID),
-    realtime: Boolean(e.NEXT_PUBLIC_REALTIME_URL),
+    realtime: Boolean(e.NEXT_PUBLIC_STDB_URI),
   };
 }
 

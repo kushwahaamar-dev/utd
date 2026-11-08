@@ -43,8 +43,8 @@ export function RoomBar({ room, t, onLeave, onRename }: { room: RoomApi; t: Toge
         <h3 id={`${id}-title`} className="font-head text-base font-bold">
           {t("bar.label", { code: room.id })}
         </h3>
-        <Chip tone={room.status === "live" ? (room.transport === "ws" ? "mint" : "cobalt") : "mustard"} dot>
-          {t(`bar.status.${room.status === "live" ? room.transport : room.status}`)}
+        <Chip tone={room.status === "live" ? "mint" : "mustard"} dot>
+          {t(`bar.status.${room.status === "live" ? "live" : room.status}`)}
         </Chip>
         <div className="flex basis-full flex-wrap gap-1.5">
           <Button size="sm" variant="primary" onClick={() => setInviting(true)}>

@@ -8,8 +8,8 @@
     "joinPlaceholder": "p. ex. k7m2qx",
     "join": "Rejoindre",
     "badCode": "Ce n'est pas un code de salon. Les codes comptent 6 lettres et chiffres.",
-    "unavailable": "Ce navigateur ne peut pas ouvrir de salon. Essayez une version récente de Chrome, Firefox, Safari ou Edge.",
-    "localOnly": "Ce déploiement n'a pas de serveur relais : les salons ne fonctionnent qu'entre les onglets de ce navigateur.",
+    "unavailable": "Les salons ont besoin d'une connexion au serveur iynk, qui est injoignable pour l'instant. Les labos fonctionnent quand même seuls ; réessayez dans un instant.",
+    "starting": "Ouverture d'un salon…",
     "connecting": "Connexion au salon {code}…",
     "syncing": "Réception de l'établi de l'hôte…",
     "reconnecting": "Connexion perdue. Reconnexion… Vos modifications seront synchronisées à votre retour.",
@@ -18,6 +18,7 @@
       "removed": "L'hôte vous a retiré du salon.",
       "full": "Ce salon est complet. Un salon accueille 8 personnes.",
       "wrong-item": "Ce salon construit autre chose. Ouvrez son lien d'invitation pour le rejoindre.",
+      "not-found": "Ce salon est fermé, ou le code est faux. Les salons se ferment 30 minutes après le départ de la dernière personne.",
       "error": "Le salon s'est fermé."
     },
     "again": "Ouvrir un nouveau salon"
@@ -80,8 +81,7 @@
     "removeConfirm": "Retirer {name} du salon ?",
     "removeYes": "Retirer",
     "status": {
-      "ws": "En direct",
-      "broadcast": "Ce navigateur seulement",
+      "live": "En direct",
       "connecting": "Connexion",
       "syncing": "Synchronisation",
       "reconnecting": "Reconnexion",
@@ -175,7 +175,7 @@
       "full": "Le salon {code} est complet.",
       "timeout": "Impossible de joindre le salon {code}. Vérifiez le code et votre connexion.",
       "unknown": "Le salon {code} est ouvert, mais il n'a pas dit ce qu'il construit. Demandez le lien d'invitation.",
-      "unavailable": "Ce navigateur ne peut pas ouvrir de salon.",
+      "unavailable": "Les salons ont besoin d'une connexion au serveur pour l'instant.",
       "found": "Trouvé. Ouverture du salon…"
     },
     "buddies": {

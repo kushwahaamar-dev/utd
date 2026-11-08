@@ -8,8 +8,8 @@
     "joinPlaceholder": "p. ej. k7m2qx",
     "join": "Unirse",
     "badCode": "Eso no es un código de sala. Los códigos tienen 6 letras y números.",
-    "unavailable": "Este navegador no puede abrir salas. Prueba una versión actual de Chrome, Firefox, Safari o Edge.",
-    "localOnly": "Esta instalación no tiene servidor de retransmisión, así que las salas solo funcionan entre pestañas de este navegador.",
+    "unavailable": "Las salas necesitan conexión con el servidor de iynk y ahora no responde. Los laboratorios siguen funcionando solos; inténtalo de nuevo en un momento.",
+    "starting": "Abriendo una sala…",
     "connecting": "Entrando en la sala {code}…",
     "syncing": "Recibiendo el banco de trabajo del anfitrión…",
     "reconnecting": "Se perdió la conexión. Reconectando… Tus cambios se sincronizarán cuando vuelvas.",
@@ -18,6 +18,7 @@
       "removed": "El anfitrión te sacó de la sala.",
       "full": "Esa sala está llena. Caben 8 personas.",
       "wrong-item": "Esa sala está construyendo otra cosa. Abre su enlace de invitación para unirte.",
+      "not-found": "Esa sala se cerró o el código no es correcto. Las salas se cierran 30 minutos después de que salga la última persona.",
       "error": "La sala se cerró."
     },
     "again": "Abrir una sala nueva"
@@ -80,8 +81,7 @@
     "removeConfirm": "¿Sacar a {name} de la sala?",
     "removeYes": "Sacar",
     "status": {
-      "ws": "En vivo",
-      "broadcast": "Solo este navegador",
+      "live": "En vivo",
       "connecting": "Conectando",
       "syncing": "Sincronizando",
       "reconnecting": "Reconectando",
@@ -175,7 +175,7 @@
       "full": "La sala {code} está llena.",
       "timeout": "No se pudo llegar a la sala {code}. Revisa el código y tu conexión.",
       "unknown": "La sala {code} está abierta, pero no dijo qué está construyendo. Pide el enlace de invitación.",
-      "unavailable": "Este navegador no puede abrir salas.",
+      "unavailable": "Las salas necesitan conexión con el servidor ahora mismo.",
       "found": "La encontramos. Abriendo la sala…"
     },
     "buddies": {

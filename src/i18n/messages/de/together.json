@@ -8,8 +8,8 @@
     "joinPlaceholder": "z. B. k7m2qx",
     "join": "Beitreten",
     "badCode": "Das ist kein Raumcode. Codes haben 6 Buchstaben und Ziffern.",
-    "unavailable": "Dieser Browser kann keine Räume öffnen. Versuch es mit einer aktuellen Version von Chrome, Firefox, Safari oder Edge.",
-    "localOnly": "Diese Installation hat keinen Relay-Server, deshalb funktionieren Räume nur zwischen Tabs dieses Browsers.",
+    "unavailable": "Räume brauchen eine Verbindung zum iynk-Server, der gerade nicht erreichbar ist. Die Labore laufen auch allein; versuch es gleich noch einmal.",
+    "starting": "Raum wird geöffnet…",
     "connecting": "Raum {code} wird betreten …",
     "syncing": "Die Werkbank wird vom Gastgeber geholt …",
     "reconnecting": "Verbindung verloren. Sie wird neu aufgebaut … Deine Änderungen werden synchronisiert, sobald du wieder da bist.",
@@ -18,6 +18,7 @@
       "removed": "Der Gastgeber hat dich aus dem Raum entfernt.",
       "full": "Dieser Raum ist voll. In einen Raum passen 8 Personen.",
       "wrong-item": "In diesem Raum wird etwas anderes gebaut. Öffne seinen Einladungslink, um beizutreten.",
+      "not-found": "Dieser Raum ist geschlossen oder der Code stimmt nicht. Räume schließen 30 Minuten nach dem Weggang der letzten Person.",
       "error": "Der Raum wurde geschlossen."
     },
     "again": "Neuen Raum öffnen"
@@ -80,8 +81,7 @@
     "removeConfirm": "{name} aus dem Raum entfernen?",
     "removeYes": "Entfernen",
     "status": {
-      "ws": "Live",
-      "broadcast": "Nur dieser Browser",
+      "live": "Live",
       "connecting": "Verbindet",
       "syncing": "Synchronisiert",
       "reconnecting": "Verbindet neu",
@@ -175,7 +175,7 @@
       "full": "Raum {code} ist voll.",
       "timeout": "Raum {code} war nicht erreichbar. Prüf den Code und deine Verbindung.",
       "unknown": "Raum {code} ist offen, hat aber nicht gesagt, was dort gebaut wird. Frag nach dem Einladungslink.",
-      "unavailable": "Dieser Browser kann keine Räume öffnen.",
+      "unavailable": "Räume brauchen gerade eine Verbindung zum Server.",
       "found": "Gefunden. Der Raum wird geöffnet …"
     },
     "buddies": {

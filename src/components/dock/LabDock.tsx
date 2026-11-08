@@ -16,7 +16,7 @@ import { DOCK_TABS, type DockTab } from "@/lib/ai/tools";
 import { useFeatures, type Features } from "@/lib/features";
 import { useTogether } from "@/lib/realtime";
 import { ROOM_PARAM } from "@/lib/realtime/config";
-import { isRoomId, normalizeRoomId } from "@/lib/realtime/protocol";
+import { parseRoomParam } from "@/lib/realtime/protocol";
 import { useRegisterLabStore } from "./LabRoom";
 
 // Phones, including 390×844. Matches the header's md breakpoint.
@@ -60,8 +60,7 @@ function tabFromEvent(event: Event): DockTab | null {
 }
 
 function roomInAddress() {
-  const raw = new URLSearchParams(window.location.search).get(ROOM_PARAM);
-  return isRoomId(raw ? normalizeRoomId(raw) : "");
+  return parseRoomParam(new URLSearchParams(window.location.search).get(ROOM_PARAM)) !== null;
 }
 
 function RealTab(lab: LabDockProps) {

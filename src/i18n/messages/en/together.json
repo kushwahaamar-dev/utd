@@ -8,8 +8,8 @@
     "joinPlaceholder": "e.g. k7m2qx",
     "join": "Join",
     "badCode": "That isn't a room code. Codes have 6 letters and numbers.",
-    "unavailable": "This browser can't open rooms. Try a current version of Chrome, Firefox, Safari or Edge.",
-    "localOnly": "This deployment has no relay server, so rooms work between tabs of this browser only.",
+    "unavailable": "Rooms need a connection to the iynk server and it can't be reached right now. The labs still work on their own; try again in a moment.",
+    "starting": "Opening a room…",
     "connecting": "Joining room {code}…",
     "syncing": "Getting the bench from the host…",
     "reconnecting": "Connection lost. Reconnecting… Your changes will sync when you're back.",
@@ -18,6 +18,7 @@
       "removed": "The host removed you from the room.",
       "full": "That room is full. Rooms hold 8 people.",
       "wrong-item": "That room is building something else. Open its invite link to join it.",
+      "not-found": "That room has closed, or the code is wrong. Rooms close 30 minutes after the last person leaves.",
       "error": "The room closed."
     },
     "again": "Start a new room"
@@ -80,8 +81,7 @@
     "removeConfirm": "Remove {name} from the room?",
     "removeYes": "Remove",
     "status": {
-      "ws": "Live",
-      "broadcast": "This browser only",
+      "live": "Live",
       "connecting": "Connecting",
       "syncing": "Syncing",
       "reconnecting": "Reconnecting",
@@ -175,7 +175,7 @@
       "full": "Room {code} is full.",
       "timeout": "Couldn't reach room {code}. Check the code and your connection.",
       "unknown": "Room {code} is open, but it didn't say what it's building. Ask for the invite link.",
-      "unavailable": "This browser can't open rooms.",
+      "unavailable": "Rooms need a connection to the server right now.",
       "found": "Found it. Opening the room…"
     },
     "buddies": {

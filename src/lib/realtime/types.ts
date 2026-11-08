@@ -1,9 +1,8 @@
-// The client API of iynk Together (HX-CONTRACT H7.1). Fields marked
-// "additive" go beyond H7.1 without changing anything it defines.
+// The client API of iynk Together. Fields marked "additive" go beyond
+// the original contract without changing anything it defines.
 
 import type { Locale } from "@/i18n/config";
 import type { ChatKind, Role } from "./protocol";
-import type { TransportKind } from "./transport";
 
 export type { Role } from "./protocol";
 
@@ -37,7 +36,7 @@ export type ChatMsg = {
   translations: Partial<Record<Locale, string>>;
   /** Additive: set on kind 'system'; `text` then holds the English line. */
   system?: SystemEvent;
-  /** Additive: true until the relay has echoed our own message. */
+  /** Additive: true until the module has stored our own message. */
   pending?: boolean;
   /** Additive: languages the translation service couldn't produce for this line. */
   untranslated?: Locale[];
@@ -49,7 +48,7 @@ export type ChatMsg = {
 export type RoomStatus = "connecting" | "syncing" | "live" | "reconnecting" | "ended";
 
 /** Additive: why a room ended. */
-export type RoomEnd = "left" | "removed" | "full" | "wrong-item" | "error";
+export type RoomEnd = "left" | "removed" | "full" | "wrong-item" | "not-found" | "error";
 
 export type CursorPoint = { x: number; y: number };
 
@@ -61,7 +60,6 @@ export type RoomApi = {
   peers: Peer[];
   hostId: string;
   connected: boolean;
-  transport: TransportKind;
   messages: ChatMsg[];
   chat(text: string, kind?: ChatMsg["kind"], options?: { lang?: Locale }): void;
   setPresence(p: { role?: Role; status?: string; baton?: boolean }): void;

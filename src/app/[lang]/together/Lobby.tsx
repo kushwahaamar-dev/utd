@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
 import type { LabKind } from "@/components/dock/types";
 import { useTogetherT, type TogetherT } from "@/components/realtime/messages";
 import { Action, eyebrow, quietField, sectionTitle } from "@/components/editorial/Editorial";
@@ -9,7 +9,7 @@ import { Callout, SegmentedControl, Select, TextInput } from "@/components/ui";
 import { cx } from "@/components/ui/cx";
 import { useLocale } from "@/i18n/client";
 import { useFeatures } from "@/lib/features";
-import { createRoom, parseRoomInput, probeRoom, roomLink, type ProbeResult } from "@/lib/realtime";
+import { createRoom, parseRoomInput, roomLink, useRoomProbe } from "@/lib/realtime";
 import { roomPath } from "./api";
 import { Buddies } from "./Buddies";
 import { Planner } from "./Planner";
@@ -64,30 +64,30 @@ function StartRoom({ items, t }: { items: LobbyItem[]; t: TogetherT }) {
   );
 }
 
-type JoinState = { kind: "idle" } | { kind: "bad" } | { kind: "looking"; code: string } | { kind: "result"; code: string; result: ProbeResult };
-
 function JoinRoom({ t }: { t: TogetherT }) {
   const id = useId();
   const router = useRouter();
   const locale = useLocale();
   const [value, setValue] = useState("");
-  const [state, setState] = useState<JoinState>({ kind: "idle" });
+  const [bad, setBad] = useState(false);
+  const [code, setCode] = useState<string | null>(null);
+  const result = useRoomProbe(code);
 
-  const submit = async (event: FormEvent) => {
+  useEffect(() => {
+    if (code && result?.kind === "found") router.push(roomPath(roomLink(code, result.lab, result.itemId, locale)));
+  }, [code, result, router, locale]);
+
+  const submit = (event: FormEvent) => {
     event.preventDefault();
-    const code = parseRoomInput(value);
-    if (!code) return setState({ kind: "bad" });
-    setState({ kind: "looking", code });
-    const result = await probeRoom(code, locale);
-    setState({ kind: "result", code, result });
-    if (result.kind === "found") router.push(roomPath(roomLink(code, result.lab, result.itemId, locale)));
+    const parsed = parseRoomInput(value);
+    setBad(!parsed);
+    setCode(parsed);
   };
 
   const message = (() => {
-    if (state.kind === "bad") return { tone: "warn" as const, text: t("panel.badCode") };
-    if (state.kind === "looking") return { tone: "note" as const, text: t("lobby.join.looking", { code: state.code }) };
-    if (state.kind !== "result") return null;
-    const { code, result } = state;
+    if (bad) return { tone: "warn" as const, text: t("panel.badCode") };
+    if (!code) return null;
+    if (!result) return { tone: "note" as const, text: t("lobby.join.looking", { code }) };
     switch (result.kind) {
       case "found":
         return { tone: "success" as const, text: t("lobby.join.found") };
@@ -115,13 +115,13 @@ function JoinRoom({ t }: { t: TogetherT }) {
         autoComplete="off"
         autoCapitalize="none"
         spellCheck={false}
-        aria-invalid={state.kind === "bad"}
+        aria-invalid={bad}
         className={cx(quietField, "font-ui aria-invalid:border-bad")}
       />
       <div aria-live="polite" className="empty:hidden">
         {message ? <Callout tone={message.tone}>{message.text}</Callout> : null}
       </div>
-      <Action type="submit" size="lg" className="mt-auto self-start" disabled={state.kind === "looking"}>
+      <Action type="submit" size="lg" className="mt-auto self-start" disabled={code !== null && result === null}>
         {t("lobby.join.go")}
       </Action>
     </form>

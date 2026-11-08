@@ -1,29 +1,10 @@
 import type { LabKind } from "@/components/dock/types";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/config";
-import { broadcastSupported, createBroadcastTransport } from "./broadcast-transport";
-import { isRoomId, newRoomId, normalizeRoomId } from "./protocol";
-import type { Transport, TransportKind } from "./transport";
-import { createWsTransport } from "./ws-transport";
-
-/** Inlined at build time; unset means "tabs of one browser" over BroadcastChannel. */
-const REALTIME_URL = process.env.NEXT_PUBLIC_REALTIME_URL ?? "";
+import { isRoomId, NEW_ROOM, normalizeRoomId } from "./protocol";
 
 export const ROOM_PARAM = "room";
 
 const LAB_PATHS: Record<LabKind, string> = { board: "boards", robotics: "robotics", drone: "drones" };
-
-/** Which transport this deployment uses, or null when neither works in this browser. */
-export function transportKind(): TransportKind | null {
-  if (REALTIME_URL) return typeof WebSocket === "undefined" ? null : "ws";
-  return broadcastSupported() ? "broadcast" : null;
-}
-
-export function createTransport(roomId: string): Transport | null {
-  const kind = transportKind();
-  if (kind === "ws") return createWsTransport(REALTIME_URL);
-  if (kind === "broadcast") return createBroadcastTransport(roomId);
-  return null;
-}
 
 function siteOrigin(): string {
   if (typeof window !== "undefined") return window.location.origin;
@@ -66,9 +47,9 @@ export function withRoom(path: string, roomId: string | null | undefined): strin
   return roomId ? `${path}?${ROOM_PARAM}=${encodeURIComponent(roomId)}` : path;
 }
 
-/** H7.1: a link to a fresh room on one lab item. */
+/** A link that opens a fresh room on one lab item: the page makes the room and swaps in its code. */
 export function createRoom(lab: LabKind, itemId: string, locale?: Locale): string {
-  return roomLink(newRoomId(), lab, itemId, locale);
+  return roomLink(NEW_ROOM, lab, itemId, locale);
 }
 
 /** The room id in a pasted link or a typed code, if there is one. */

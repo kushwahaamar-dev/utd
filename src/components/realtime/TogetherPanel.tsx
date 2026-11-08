@@ -6,6 +6,7 @@ import { Button, Callout } from "@/components/ui";
 import { useLocale } from "@/i18n/client";
 import { useFeatures } from "@/lib/features";
 import { parseRoomInput, RoomProvider, useTogether, type Together } from "@/lib/realtime";
+import { NEW_ROOM } from "@/lib/realtime/protocol";
 import { ChatPanel } from "./ChatPanel";
 import { IdentityForm } from "./IdentityForm";
 import { useTogetherT, type TogetherT } from "./messages";
@@ -56,12 +57,12 @@ function JoinForm({ t, onJoin }: { t: TogetherT; onJoin: (id: string) => void })
 function PanelBody({ together, t }: { together: Together; t: TogetherT }) {
   const locale = useLocale();
   const [renaming, setRenaming] = useState(false);
-  const { room, roomId, identity, transport } = together;
+  const { room, roomId, identity, connection } = together;
   const { status, features } = useFeatures();
   // Chat translation runs on the AI service; without it the intro doesn't promise it.
   const translates = status !== "ready" || features.ai;
 
-  if (transport === null) return <Callout tone="warn">{t("panel.unavailable")}</Callout>;
+  if (connection === "offline") return <Callout tone="warn">{t("panel.unavailable")}</Callout>;
 
   if (roomId && !identity) {
     return <IdentityForm t={t} initial={null} submitLabel={t("identity.save")} />;
@@ -88,6 +89,14 @@ function PanelBody({ together, t }: { together: Together; t: TogetherT }) {
     );
   }
 
+  if (roomId && identity && !together.ended) {
+    return (
+      <p role="status" className="text-sm text-muted">
+        {roomId === NEW_ROOM ? t("panel.starting") : t("panel.connecting", { code: roomId })}
+      </p>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {together.ended ? (
@@ -100,7 +109,6 @@ function PanelBody({ together, t }: { together: Together; t: TogetherT }) {
         {together.ended ? t("panel.again") : t("panel.start")}
       </Button>
       <JoinForm t={t} onJoin={together.join} />
-      {transport === "broadcast" ? <p className="text-xs text-muted">{t("panel.localOnly")}</p> : null}
     </div>
   );
 }

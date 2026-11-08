@@ -32,15 +32,14 @@ export function isHydrating(): boolean {
 
 /**
  * Puts a lab store in a room. While attached, the store's dispatch sends
- * shared actions to the relay instead of applying them, and the room applies
+ * shared actions to the module instead of applying them, and the room applies
  * them back in seq order through the original dispatch. Lab pages keep
  * calling store.dispatch as before; detaching restores it.
  *
- * The keyboard baton is enforced here, not in the UI: a build action from
- * anyone but its holder is refused (and `batonDenied` bumped so the page can
- * say why), and on apply only the holder at that point in the order counts.
- * Code edits are applied at once by the holder (so typing never waits for the
- * network) and everyone else follows the full text, sent debounced.
+ * The module decides who may build (the keyboard baton) and refuses the rest.
+ * Here the baton is only read, to skip a send that would be refused and to say
+ * why (`batonDenied`), and to apply a holder's code edits at once so typing
+ * never waits for the network; everyone else follows the full text, sent debounced.
  */
 export function attachStore<S, A extends { type: string }>(
   store: LabStore<S, A>,
@@ -113,7 +112,7 @@ export function attachStore<S, A extends { type: string }>(
   room.bind({
     snapshot: (): Snapshot => ({ scope, state: store.getState() }),
     hydrate: (snapshot) => {
-      if (!isSnapshot(snapshot) || snapshot.scope !== scope) return;
+      if (!isSnapshot(snapshot) || snapshot.scope !== scope) return false;
       hydrating += 1;
       try {
         run({ type: HYDRATE, state: snapshot.state });
@@ -122,13 +121,20 @@ export function attachStore<S, A extends { type: string }>(
         hydrating -= 1;
       }
       sentKey = sync.codeKey(store.getState());
+      return true;
+    },
+    catchUp: (fn) => {
+      hydrating += 1;
+      try {
+        fn();
+      } finally {
+        hydrating -= 1;
+      }
     },
     apply: (action, from) => {
       if (typeof action.scope === "string" && action.scope !== scope) return;
       const self = from === room.getState().you.id;
       if (self && typeof action.n === "string" && ownCode.delete(action.n)) return;
-      // A build action only counts from whoever held the keyboard at this point in the order.
-      if (!sync.isFree(action.type) && from !== room.getState().batonHolder) return;
       const code = sync.isCodeEdit(action.type);
       const before = sync.codeKey(store.getState());
       run(action);

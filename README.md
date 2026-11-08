@@ -74,7 +74,7 @@ Every item is a hand-inked 3D figure you can turn all the way round, see through
 ```mermaid
 flowchart LR
   B["Browser<br/>Next.js app, figures,<br/>interpreters, flight sim"] -->|"/api/ai, /api/search,<br/>/api/solana, /api/mcp"| V["Vercel functions"]
-  B <-->|WebSocket| R["Room relay<br/>Node + ws, Docker, Caddy"]
+  B <-->|WebSocket| R["SpacetimeDB<br/>rooms, scores, agents"]
   V --> M["Meta Model API<br/>Muse Spark, Image, Voice"]
   V --> G["Gemini<br/>fallback"]
   V --> S["SerpApi"]
@@ -89,7 +89,7 @@ flowchart LR
   a drone calculator; a flight model. All in the browser.
 - **Server:** Vercel functions for AI, search, data and Solana. API keys stay on the server, every call is
   rate-limited, and Gemini takes over when Meta is busy.
-- **Realtime:** a small Node WebSocket relay (`server/realtime`), run in Docker behind Caddy.
+- **Realtime:** rooms (shared bench, chat, presence, flight ghosts) run on a SpacetimeDB module (`spacetime/`); the browser keeps one WebSocket to it.
 - **Data:** Postgres with TimescaleDB (`db/migrations`): an events hypertable, continuous aggregates and opt-in buddy
   profiles.
 - **Chain:** an Anchor program (`solana/programs/iynk_passport`), tested on a local validator.
@@ -112,14 +112,14 @@ The labs, the figures, the interpreters and the flight sim work with no keys at 
 | `META_API_KEY` | the lab partner, translation, voice, story covers, Build Night and Build Buddies matching |
 | `GEMINI_API_KEY` | the fallback model when Meta is busy |
 | `SERPAPI_KEY` | live prices, places, events, videos and datasheet answers |
-| `NEXT_PUBLIC_REALTIME_URL` | rooms across devices (without it, rooms work between tabs of one browser) |
+| `NEXT_PUBLIC_STDB_URI`, `NEXT_PUBLIC_STDB_DB` | where rooms connect (default `ws://127.0.0.1:3100`, database `iynk`); the server only reports rooms as set up when the URI is given |
 | `SOLANA_ISSUER_KEYPAIR`, `NEXT_PUBLIC_SOLANA_PROGRAM_ID` | Proof of Build on devnet |
 
-Rooms across devices need the relay:
+Rooms need the SpacetimeDB module running; the labs work without it:
 
 ```bash
-cd server/realtime && npm ci && node server.js --port 43117
-# then NEXT_PUBLIC_REALTIME_URL=ws://127.0.0.1:43117/ws in .env.local
+npm run stdb:start     # leave running (127.0.0.1:3100)
+npm run stdb:publish   # build and publish the module as database "iynk"
 ```
 
 ## Tests
@@ -141,7 +141,7 @@ src/content        boards, benches and drones: lessons, steps, faults, checks
 src/lib            interpreters, circuit solver, drone calculator, flight model, realtime, AI, search, Solana
 src/i18n           messages and lesson prose in six languages
 figures            figure sources and engines (built into public/figures)
-server/realtime    the room relay
+spacetime          the SpacetimeDB module: rooms, scores, agents, races
 solana             the Anchor program, its tests and deploy scripts
 db/migrations      the TimescaleDB schema
 e2e                Playwright tests
