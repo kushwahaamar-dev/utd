@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "title": "Missionszentrale",
+    "description": "Gib den Nemotron-Agenten ein Ziel und sieh zu, wie sie planen, die echten Simulatoren und Live-Preise nutzen, ihre eigene Arbeit prüfen und einen verifizierten Aufbau mit Preis abliefern."
+  },
+  "head": {
+    "kicker": "Missionszentrale",
+    "title": "Gib den Agenten ein Ziel. Sieh zu, wie sie es lösen.",
+    "lede": "Nemotron plant die Aufgabe, nutzt die echten Simulatoren und Live-Teilepreise, widerspricht der eigenen Antwort und hört erst auf, wenn der Aufbau geprüft und bepreist ist."
+  },
+  "composer": {
+    "label": "Was sollen die Agenten tun?",
+    "placeholder": "Eine 5-Zoll-Drohne, die 8 Minuten fliegt, unter 180 $",
+    "kind": "Modus",
+    "kinds": {
+      "build": "Bauen",
+      "diagnose": "Diagnose",
+      "plan": "Planen"
+    },
+    "presets": "Oder starte mit einem davon",
+    "start": "Mission starten",
+    "starting": "Wird gestartet…",
+    "tooShort": "Sag noch etwas mehr zum Ziel.",
+    "room": "Raum {code}: alle darin können zusehen",
+    "failed": "Die Mission konnte nicht gestartet werden. Versuch es noch einmal."
+  },
+  "presets": {
+    "drone": {
+      "label": "5-Zoll-Drohne, 8 Minuten",
+      "goal": "5-Zoll-Drohne, die 8 Minuten fliegt, unter 180 $"
+    },
+    "parking": {
+      "label": "ESP32-Parksensor",
+      "goal": "ESP32-Parksensor, der unter 20 cm piept"
+    },
+    "robot": {
+      "label": "Linienfolger-Roboter",
+      "goal": "Linienfolger-Roboter mit einem QTR-8RC unter 60 $"
+    },
+    "led": {
+      "label": "Warum brennt meine LED durch?",
+      "goal": "Warum brennt meine LED durch?"
+    }
+  },
+  "recent": {
+    "title": "Deine Missionen",
+    "open": "Mission öffnen"
+  },
+  "status": {
+    "queued": "In der Warteschlange",
+    "planning": "Planung",
+    "running": "Läuft",
+    "reviewing": "Prüfung",
+    "done": "Fertig",
+    "failed": "Fehlgeschlagen",
+    "cancelled": "Abgebrochen"
+  },
+  "role": {
+    "planner": "Planer",
+    "executor": "Ausführer",
+    "critic": "Kritiker",
+    "tool": "Werkzeug",
+    "system": "System"
+  },
+  "job": {
+    "newMission": "Neue Mission",
+    "elapsed": "Dauer",
+    "toolCalls": "Werkzeugaufrufe",
+    "revisions": "Überarbeitungen",
+    "models": "Modelle",
+    "watching": {
+      "one": "{count} Zuschauer",
+      "other": "{count} Zuschauer"
+    },
+    "room": "Raum {code}",
+    "cancel": "Mission abbrechen",
+    "demo": "Aufgezeichneter Demolauf. Nichts hier ist live."
+  },
+  "trace": {
+    "title": "Agentenverlauf",
+    "waiting": "Warte auf den ersten Agenten…",
+    "plan": "Plan",
+    "criteria": "Erfolgskriterien",
+    "input": "Eingabe",
+    "output": "Ausgabe",
+    "showRaw": "Rohes JSON anzeigen",
+    "hideRaw": "Rohes JSON ausblenden",
+    "running": "Läuft",
+    "stepFailed": "Schritt fehlgeschlagen",
+    "revision": "Überarbeitung {n}",
+    "approve": "Freigegeben",
+    "revise": "Überarbeiten",
+    "reject": "Abgelehnt",
+    "reasons": "Warum",
+    "noOutput": "Noch keine Ausgabe",
+    "to": "auf"
+  },
+  "announce": {
+    "step": "{role}: {title}",
+    "status": "Mission {status}"
+  },
+  "result": {
+    "title": "Ergebnis",
+    "verified": "Verifiziert",
+    "bom": "Stückliste",
+    "part": "Teil",
+    "store": "Shop",
+    "qty": "Anz.",
+    "price": "Preis",
+    "link": "Link",
+    "buy": "Shop-Seite öffnen",
+    "total": "Summe",
+    "budget": "Budget {amount}",
+    "under": "{amount} unter dem Budget",
+    "over": "{amount} über dem Budget",
+    "loadLab": "In das Labor laden",
+    "race": "Rennen fliegen",
+    "credential": "Nachweis erwerben",
+    "labNote": "Öffnet die Laborseite für dieses Fluggerät. Die genauen Teile stehen oben in der Liste.",
+    "none": "Die Agenten sind ohne schriftliches Ergebnis fertig geworden."
+  },
+  "proposals": {
+    "title": "Vorschläge",
+    "lede": "Änderungen, die die Agenten vorschlagen. Es passiert nichts, bis du zustimmst.",
+    "accept": "Annehmen",
+    "reject": "Ablehnen",
+    "accepted": "Angenommen",
+    "rejected": "Abgelehnt"
+  },
+  "state": {
+    "loading": "Verbinde mit den Agenten…",
+    "missing": {
+      "title": "Mission nicht gefunden",
+      "body": "Zu diesem Link gibt es keine Mission. Sie gehört vielleicht zu einem anderen Konto oder wurde nie gestartet.",
+      "back": "Neue Mission starten"
+    },
+    "error": {
+      "title": "Diese Mission ließ sich nicht laden",
+      "body": "Die Verbindung zum Backend ist abgebrochen. Deine Mission ist sicher; versuch es noch einmal.",
+      "retry": "Erneut versuchen"
+    },
+    "offline": {
+      "title": "Die Agenten sind offline",
+      "body": "Diese Installation erreicht gerade das Backend nicht, auf dem Nemotron läuft. Du kannst dir trotzdem einen aufgezeichneten Lauf ansehen, um zu sehen, wie eine Mission abläuft.",
+      "demo": "Aufgezeichneten Lauf ansehen"
+    },
+    "cancelled": {
+      "title": "Mission abgebrochen",
+      "body": "Du hast diese Mission vor dem Ende gestoppt. Die Schritte oben zeigen, was die Agenten bis dahin geschafft hatten."
+    },
+    "failed": {
+      "title": "Die Mission ist fehlgeschlagen",
+      "body": "Die Agenten konnten diese Mission nicht abschließen."
+    }
+  }
+}

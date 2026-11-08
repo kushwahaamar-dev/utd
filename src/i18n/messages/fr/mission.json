@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "title": "Centre de mission",
+    "description": "Donnez un objectif aux agents Nemotron et regardez-les planifier, utiliser les vrais simulateurs et les prix en direct, vérifier leur propre travail et rendre un montage vérifié et chiffré."
+  },
+  "head": {
+    "kicker": "Centre de mission",
+    "title": "Donnez un objectif aux agents. Regardez-les le résoudre.",
+    "lede": "Nemotron planifie le travail, lance les vrais simulateurs et les prix de pièces en direct, conteste sa propre réponse et ne s'arrête que lorsque le montage est vérifié et chiffré."
+  },
+  "composer": {
+    "label": "Que doivent faire les agents ?",
+    "placeholder": "Un drone de 5 pouces qui vole 8 minutes, pour moins de 180 $",
+    "kind": "Mode",
+    "kinds": {
+      "build": "Construire",
+      "diagnose": "Diagnostiquer",
+      "plan": "Planifier"
+    },
+    "presets": "Ou partez de l'un de ceux-ci",
+    "start": "Lancer la mission",
+    "starting": "Lancement…",
+    "tooShort": "Précisez un peu plus l'objectif.",
+    "room": "Salle {code} : tous ses membres peuvent regarder",
+    "failed": "Impossible de lancer la mission. Réessayez."
+  },
+  "presets": {
+    "drone": {
+      "label": "Drone de 5 pouces, 8 minutes",
+      "goal": "Drone de 5 pouces qui vole 8 minutes, pour moins de 180 $"
+    },
+    "parking": {
+      "label": "Capteur de stationnement ESP32",
+      "goal": "Capteur de stationnement ESP32 qui bipe sous 20 cm"
+    },
+    "robot": {
+      "label": "Robot suiveur de ligne",
+      "goal": "Robot suiveur de ligne avec un QTR-8RC pour moins de 60 $"
+    },
+    "led": {
+      "label": "Pourquoi ma LED grille-t-elle ?",
+      "goal": "Pourquoi ma LED grille-t-elle ?"
+    }
+  },
+  "recent": {
+    "title": "Vos missions",
+    "open": "Ouvrir la mission"
+  },
+  "status": {
+    "queued": "En attente",
+    "planning": "Planification",
+    "running": "En cours",
+    "reviewing": "Vérification",
+    "done": "Terminée",
+    "failed": "Échouée",
+    "cancelled": "Annulée"
+  },
+  "role": {
+    "planner": "Planificateur",
+    "executor": "Exécuteur",
+    "critic": "Critique",
+    "tool": "Outil",
+    "system": "Système"
+  },
+  "job": {
+    "newMission": "Nouvelle mission",
+    "elapsed": "Durée",
+    "toolCalls": "Appels d'outils",
+    "revisions": "Révisions",
+    "models": "Modèles",
+    "watching": {
+      "one": "{count} spectateur",
+      "other": "{count} spectateurs"
+    },
+    "room": "Salle {code}",
+    "cancel": "Annuler la mission",
+    "demo": "Exécution enregistrée de démonstration. Rien ici n'est en direct."
+  },
+  "trace": {
+    "title": "Trace des agents",
+    "waiting": "En attente du premier agent…",
+    "plan": "Plan",
+    "criteria": "Critères de réussite",
+    "input": "Entrée",
+    "output": "Sortie",
+    "showRaw": "Afficher le JSON brut",
+    "hideRaw": "Masquer le JSON brut",
+    "running": "En cours",
+    "stepFailed": "L'étape a échoué",
+    "revision": "Révision {n}",
+    "approve": "Approuvé",
+    "revise": "À revoir",
+    "reject": "Rejeté",
+    "reasons": "Pourquoi",
+    "noOutput": "Pas encore de sortie",
+    "to": "à"
+  },
+  "announce": {
+    "step": "{role} : {title}",
+    "status": "Mission {status}"
+  },
+  "result": {
+    "title": "Résultat",
+    "verified": "Vérifié",
+    "bom": "Nomenclature",
+    "part": "Pièce",
+    "store": "Boutique",
+    "qty": "Qté",
+    "price": "Prix",
+    "link": "Lien",
+    "buy": "Ouvrir la page de la boutique",
+    "total": "Total",
+    "budget": "Budget {amount}",
+    "under": "{amount} sous le budget",
+    "over": "{amount} au-dessus du budget",
+    "loadLab": "Charger dans le labo",
+    "race": "Courir",
+    "credential": "Obtenir un certificat",
+    "labNote": "Ouvre la page du labo pour cet engin. Les pièces exactes sont listées ci-dessus.",
+    "none": "Les agents ont terminé sans résultat écrit."
+  },
+  "proposals": {
+    "title": "Propositions",
+    "lede": "Des changements suggérés par les agents. Rien ne se passe tant que vous n'acceptez pas.",
+    "accept": "Accepter",
+    "reject": "Refuser",
+    "accepted": "Acceptée",
+    "rejected": "Refusée"
+  },
+  "state": {
+    "loading": "Connexion aux agents…",
+    "missing": {
+      "title": "Mission introuvable",
+      "body": "Aucune mission ne correspond à ce lien. Elle appartient peut-être à un autre compte, ou n'a jamais été lancée.",
+      "back": "Lancer une nouvelle mission"
+    },
+    "error": {
+      "title": "Impossible de charger cette mission",
+      "body": "La connexion au serveur a été coupée. Votre mission est en sécurité ; réessayez.",
+      "retry": "Réessayer"
+    },
+    "offline": {
+      "title": "Les agents sont hors ligne",
+      "body": "Ce déploiement ne peut pas joindre pour l'instant le serveur qui fait tourner Nemotron. Vous pouvez quand même regarder une exécution enregistrée pour voir comment se déroule une mission.",
+      "demo": "Regarder une exécution enregistrée"
+    },
+    "cancelled": {
+      "title": "Mission annulée",
+      "body": "Vous avez arrêté cette mission avant la fin. Les étapes ci-dessus sont ce que les agents avaient fait à ce moment-là."
+    },
+    "failed": {
+      "title": "La mission a échoué",
+      "body": "Les agents n'ont pas pu terminer celle-ci."
+    }
+  }
+}

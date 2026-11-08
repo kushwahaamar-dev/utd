@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "title": "Mission Control",
+    "description": "Give Nemotron agents a goal and watch them plan, run the real simulators and live parts prices, check their own work and hand back a verified, priced build."
+  },
+  "head": {
+    "kicker": "Mission Control",
+    "title": "Give the agents a goal. Watch them work it out.",
+    "lede": "Nemotron plans the job, runs the real simulators and live parts prices, argues with its own answer, and stops only when the build is checked and priced."
+  },
+  "composer": {
+    "label": "What should the agents do?",
+    "placeholder": "A 5-inch drone that flies 8 minutes, under $180",
+    "kind": "Mode",
+    "kinds": {
+      "build": "Build",
+      "diagnose": "Diagnose",
+      "plan": "Plan"
+    },
+    "presets": "Or start from one of these",
+    "start": "Start mission",
+    "starting": "Starting…",
+    "tooShort": "Say a little more about the goal.",
+    "room": "Room {code}: everyone in it can watch",
+    "failed": "Couldn't start the mission. Try again."
+  },
+  "presets": {
+    "drone": {
+      "label": "5-inch drone, 8 minutes",
+      "goal": "5-inch drone that flies 8 minutes, under $180"
+    },
+    "parking": {
+      "label": "ESP32 parking sensor",
+      "goal": "ESP32 parking sensor that beeps under 20 cm"
+    },
+    "robot": {
+      "label": "Line-following robot",
+      "goal": "Line-following robot with a QTR-8RC under $60"
+    },
+    "led": {
+      "label": "Why does my LED burn out?",
+      "goal": "Why does my LED burn out?"
+    }
+  },
+  "recent": {
+    "title": "Your missions",
+    "open": "Open mission"
+  },
+  "status": {
+    "queued": "Queued",
+    "planning": "Planning",
+    "running": "Running",
+    "reviewing": "Reviewing",
+    "done": "Done",
+    "failed": "Failed",
+    "cancelled": "Cancelled"
+  },
+  "role": {
+    "planner": "Planner",
+    "executor": "Executor",
+    "critic": "Critic",
+    "tool": "Tool",
+    "system": "System"
+  },
+  "job": {
+    "newMission": "New mission",
+    "elapsed": "Elapsed",
+    "toolCalls": "Tool calls",
+    "revisions": "Revisions",
+    "models": "Models",
+    "watching": {
+      "one": "{count} watching",
+      "other": "{count} watching"
+    },
+    "room": "Room {code}",
+    "cancel": "Cancel mission",
+    "demo": "Recorded demo run. Nothing here is live."
+  },
+  "trace": {
+    "title": "Agent trace",
+    "waiting": "Waiting for the first agent to pick this up…",
+    "plan": "Plan",
+    "criteria": "Success criteria",
+    "input": "Input",
+    "output": "Output",
+    "showRaw": "Show raw JSON",
+    "hideRaw": "Hide raw JSON",
+    "running": "Running",
+    "stepFailed": "Step failed",
+    "revision": "Revision {n}",
+    "approve": "Approved",
+    "revise": "Revise",
+    "reject": "Rejected",
+    "reasons": "Why",
+    "noOutput": "No output yet",
+    "to": "to"
+  },
+  "announce": {
+    "step": "{role}: {title}",
+    "status": "Mission {status}"
+  },
+  "result": {
+    "title": "Result",
+    "verified": "Verified",
+    "bom": "Bill of materials",
+    "part": "Part",
+    "store": "Store",
+    "qty": "Qty",
+    "price": "Price",
+    "link": "Link",
+    "buy": "Open store page",
+    "total": "Total",
+    "budget": "Budget {amount}",
+    "under": "{amount} under budget",
+    "over": "{amount} over budget",
+    "loadLab": "Load into lab",
+    "race": "Race it",
+    "credential": "Earn credential",
+    "labNote": "Opens the lab page for this craft. The exact part choices are listed above.",
+    "none": "The agents finished without a written result."
+  },
+  "proposals": {
+    "title": "Proposals",
+    "lede": "Changes the agents suggest. Nothing happens until you accept.",
+    "accept": "Accept",
+    "reject": "Reject",
+    "accepted": "Accepted",
+    "rejected": "Rejected"
+  },
+  "state": {
+    "loading": "Connecting to the agents…",
+    "missing": {
+      "title": "Mission not found",
+      "body": "There is no mission with this link. It may belong to another account, or it was never started.",
+      "back": "Start a new mission"
+    },
+    "error": {
+      "title": "Couldn't load this mission",
+      "body": "The connection to the backend broke. Your mission is safe; try again.",
+      "retry": "Try again"
+    },
+    "offline": {
+      "title": "The agents are offline",
+      "body": "This deployment can't reach the backend that runs Nemotron right now. You can still watch a recorded run to see how a mission unfolds.",
+      "demo": "Watch a recorded run"
+    },
+    "cancelled": {
+      "title": "Mission cancelled",
+      "body": "You stopped this mission before it finished. The steps above are what the agents had done by then."
+    },
+    "failed": {
+      "title": "The mission failed",
+      "body": "The agents could not finish this one."
+    }
+  }
+}
