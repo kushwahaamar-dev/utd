@@ -61,4 +61,47 @@ pub mod iynk_passport {
     pub fn cancel_bounty(ctx: Context<CancelBounty>) -> Result<()> {
         instructions::cancel_bounty::cancel_bounty(ctx)
     }
+
+    /// Opens a prize race. The creator may seed the pot with `seed_lamports`.
+    pub fn create_race(
+        ctx: Context<CreateRace>,
+        race_id: u64,
+        entry_lamports: u64,
+        track_hash: [u8; 32],
+        closes_at: i64,
+        seed_lamports: u64,
+    ) -> Result<()> {
+        instructions::race::create_race(ctx, race_id, entry_lamports, track_hash, closes_at, seed_lamports)
+    }
+
+    /// Pays the entry fee into the pot and registers the signer as an entrant.
+    pub fn enter_race(ctx: Context<EnterRace>) -> Result<()> {
+        instructions::race::enter_race(ctx)
+    }
+
+    /// Oracle only: records a verified lap for an entrant and updates the podium.
+    pub fn submit_result(ctx: Context<SubmitResult>, lap_ms: u32, run_hash: [u8; 32]) -> Result<()> {
+        instructions::race::submit_result(ctx, lap_ms, run_hash)
+    }
+
+    /// Oracle only: stops new entries now.
+    pub fn close_race(ctx: Context<CloseRace>) -> Result<()> {
+        instructions::race::close_race(ctx)
+    }
+
+    /// Pays the pot to the podium (50/30/20, renormalised for fewer finishers)
+    /// in one transaction. `remaining_accounts`: a (wallet, entry) pair per winner.
+    pub fn settle<'info>(ctx: Context<'_, '_, 'info, 'info, Settle<'info>>) -> Result<()> {
+        instructions::race::settle(ctx)
+    }
+
+    /// Cancels an unfinished race and returns the seed to its creator.
+    pub fn cancel_race(ctx: Context<CancelRace>) -> Result<()> {
+        instructions::race::cancel_race(ctx)
+    }
+
+    /// Returns an entrant's fee after the race was cancelled.
+    pub fn refund_entry(ctx: Context<RefundEntry>) -> Result<()> {
+        instructions::race::refund_entry(ctx)
+    }
 }

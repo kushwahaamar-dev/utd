@@ -69,6 +69,103 @@
       "args": []
     },
     {
+      "name": "cancel_race",
+      "docs": [
+        "Cancels an unfinished race and returns the seed to its creator."
+      ],
+      "discriminator": [
+        223,
+        214,
+        232,
+        232,
+        43,
+        15,
+        165,
+        234
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "Race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_race",
+      "docs": [
+        "Oracle only: stops new entries now."
+      ],
+      "discriminator": [
+        43,
+        141,
+        231,
+        200,
+        195,
+        209,
+        100,
+        140
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "Race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "race"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "create_bounty",
       "docs": [
         "Escrows `amount` lamports for whoever next earns `skill_id`",
@@ -155,6 +252,175 @@
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "create_race",
+      "docs": [
+        "Opens a prize race. The creator may seed the pot with `seed_lamports`."
+      ],
+      "discriminator": [
+        233,
+        107,
+        148,
+        159,
+        241,
+        155,
+        226,
+        54
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "race_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "race_id",
+          "type": "u64"
+        },
+        {
+          "name": "entry_lamports",
+          "type": "u64"
+        },
+        {
+          "name": "track_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "closes_at",
+          "type": "i64"
+        },
+        {
+          "name": "seed_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "enter_race",
+      "docs": [
+        "Pays the entry fee into the pot and registers the signer as an entrant."
+      ],
+      "discriminator": [
+        242,
+        118,
+        55,
+        253,
+        83,
+        235,
+        115,
+        31
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "Race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "initialize",
@@ -404,6 +670,78 @@
       ]
     },
     {
+      "name": "refund_entry",
+      "docs": [
+        "Returns an entrant's fee after the race was cancelled."
+      ],
+      "discriminator": [
+        214,
+        5,
+        136,
+        23,
+        253,
+        7,
+        230,
+        81
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "Race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "set_issuer",
       "docs": [
         "Rotates the key allowed to issue credentials."
@@ -452,6 +790,143 @@
           "type": "pubkey"
         }
       ]
+    },
+    {
+      "name": "settle",
+      "docs": [
+        "Pays the pot to the podium (50/30/20, renormalised for fewer finishers)",
+        "in one transaction. `remaining_accounts`: a (wallet, entry) pair per winner."
+      ],
+      "discriminator": [
+        175,
+        42,
+        185,
+        87,
+        144,
+        131,
+        102,
+        212
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "Race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "settler",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "submit_result",
+      "docs": [
+        "Oracle only: records a verified lap for an entrant and updates the podium."
+      ],
+      "discriminator": [
+        240,
+        42,
+        89,
+        180,
+        10,
+        239,
+        9,
+        214
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "Race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player"
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "race"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "lap_ms",
+          "type": "u32"
+        },
+        {
+          "name": "run_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -493,6 +968,32 @@
         100,
         135
       ]
+    },
+    {
+      "name": "Entry",
+      "discriminator": [
+        63,
+        18,
+        152,
+        113,
+        215,
+        246,
+        221,
+        250
+      ]
+    },
+    {
+      "name": "Race",
+      "discriminator": [
+        114,
+        93,
+        186,
+        119,
+        99,
+        123,
+        162,
+        192
+      ]
     }
   ],
   "events": [
@@ -520,6 +1021,97 @@
         29,
         72,
         177
+      ]
+    },
+    {
+      "name": "EntryRefunded",
+      "discriminator": [
+        34,
+        82,
+        130,
+        116,
+        93,
+        139,
+        188,
+        234
+      ]
+    },
+    {
+      "name": "RaceCancelled",
+      "discriminator": [
+        211,
+        217,
+        124,
+        48,
+        45,
+        246,
+        250,
+        44
+      ]
+    },
+    {
+      "name": "RaceCreated",
+      "discriminator": [
+        92,
+        229,
+        121,
+        9,
+        205,
+        210,
+        225,
+        9
+      ]
+    },
+    {
+      "name": "RaceEntered",
+      "discriminator": [
+        225,
+        152,
+        64,
+        182,
+        188,
+        220,
+        210,
+        240
+      ]
+    },
+    {
+      "name": "RacePayout",
+      "discriminator": [
+        79,
+        103,
+        209,
+        68,
+        254,
+        249,
+        217,
+        178
+      ]
+    },
+    {
+      "name": "RaceSettled",
+      "discriminator": [
+        182,
+        88,
+        145,
+        67,
+        233,
+        56,
+        43,
+        181
+      ]
+    },
+    {
+      "name": "ResultSubmitted",
+      "discriminator": [
+        156,
+        153,
+        163,
+        89,
+        245,
+        144,
+        63,
+        94
       ]
     }
   ],
@@ -588,6 +1180,86 @@
       "code": 6012,
       "name": "BountyAlreadyClaimed",
       "msg": "The bounty has already been claimed"
+    },
+    {
+      "code": 6013,
+      "name": "NotOracle",
+      "msg": "Only the race's oracle can do this"
+    },
+    {
+      "code": 6014,
+      "name": "RaceNotOpen",
+      "msg": "The race is not open for entries"
+    },
+    {
+      "code": 6015,
+      "name": "RaceClosed",
+      "msg": "The race has closed"
+    },
+    {
+      "code": 6016,
+      "name": "RaceNotClosed",
+      "msg": "The race has not closed yet"
+    },
+    {
+      "code": 6017,
+      "name": "RaceFinished",
+      "msg": "The race is already settled or cancelled"
+    },
+    {
+      "code": 6018,
+      "name": "RaceNotCancelled",
+      "msg": "The race is not cancelled"
+    },
+    {
+      "code": 6019,
+      "name": "ClosesInPast",
+      "msg": "closes_at must be in the future"
+    },
+    {
+      "code": 6020,
+      "name": "EntryTooSmall",
+      "msg": "The entry fee is below the minimum for a race"
+    },
+    {
+      "code": 6021,
+      "name": "InvalidLap",
+      "msg": "lap_ms must be greater than zero"
+    },
+    {
+      "code": 6022,
+      "name": "NoFinishers",
+      "msg": "Nobody has a verified result yet"
+    },
+    {
+      "code": 6023,
+      "name": "SettleTooEarly",
+      "msg": "Only the oracle can settle until the grace period after closing has passed"
+    },
+    {
+      "code": 6024,
+      "name": "BadPayoutAccounts",
+      "msg": "settle needs one (wallet, entry) pair of writable accounts per podium place"
+    },
+    {
+      "code": 6025,
+      "name": "PayoutMismatch",
+      "msg": "A payout account does not match the podium"
+    },
+    {
+      "code": 6026,
+      "name": "EntryAlreadyPaid",
+      "msg": "This entry was already paid or refunded"
+    },
+    {
+      "code": 6027,
+      "name": "NotCreator",
+      "msg": "Only the creator can cancel a race, and only before anyone enters"
+    },
+    {
+      "code": 6028,
+      "name": "Overflow",
+      "msg": "Arithmetic overflow"
     }
   ],
   "types": [
@@ -772,6 +1444,375 @@
           }
         ]
       }
+    },
+    {
+      "name": "Entry",
+      "docs": [
+        "PDA [\"entry\", race, player]. One per player and race."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "lap_ms",
+            "docs": [
+              "Best verified lap in milliseconds, 0 until a result is submitted."
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "run_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "paid",
+            "docs": [
+              "Set once the player has been paid a prize or refunded."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EntryRefunded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Placing",
+      "docs": [
+        "One slot of the podium. `lap_ms == 0` means the slot is empty."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "lap_ms",
+            "type": "u32"
+          },
+          {
+            "name": "run_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Race",
+      "docs": [
+        "PDA [\"race\", race_id as u64 little-endian].",
+        "Holds its rent plus `pot` lamports (seed plus entry fees) until it settles or cancels."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race_id",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "docs": [
+              "The oracle (the config issuer when the race was created) that submits results."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "entry_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "seed_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "track_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "closes_at",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "RaceStatus"
+              }
+            }
+          },
+          {
+            "name": "entry_count",
+            "type": "u32"
+          },
+          {
+            "name": "top3",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "Placing"
+                  }
+                },
+                3
+              ]
+            }
+          },
+          {
+            "name": "pot",
+            "type": "u64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RaceCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "refundable",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RaceCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "race_id",
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "entry_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "seed_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "track_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "closes_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RaceEntered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "entry_count",
+            "type": "u32"
+          },
+          {
+            "name": "pot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RacePayout",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RaceSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "pot",
+            "type": "u64"
+          },
+          {
+            "name": "payouts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "RacePayout"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RaceStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "Closed"
+          },
+          {
+            "name": "Settled"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ResultSubmitted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "lap_ms",
+            "type": "u32"
+          },
+          {
+            "name": "run_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "improved",
+            "docs": [
+              "False when the player already had a faster verified lap."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "rank",
+            "docs": [
+              "Zero-based podium rank after this result, or 255 when outside the top three."
+            ],
+            "type": "u8"
+          }
+        ]
+      }
     }
   ],
   "constants": [
@@ -789,6 +1830,16 @@
       "name": "CREDENTIAL_SEED",
       "type": "bytes",
       "value": "[99, 114, 101, 100]"
+    },
+    {
+      "name": "ENTRY_SEED",
+      "type": "bytes",
+      "value": "[101, 110, 116, 114, 121]"
+    },
+    {
+      "name": "RACE_SEED",
+      "type": "bytes",
+      "value": "[114, 97, 99, 101]"
     }
   ]
 }

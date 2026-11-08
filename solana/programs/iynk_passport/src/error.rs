@@ -28,4 +28,37 @@ pub enum PassportError {
     BountyLearnerMismatch,
     #[msg("The bounty has already been claimed")]
     BountyAlreadyClaimed,
+
+    #[msg("Only the race's oracle can do this")]
+    NotOracle,
+    #[msg("The race is not open for entries")]
+    RaceNotOpen,
+    #[msg("The race has closed")]
+    RaceClosed,
+    #[msg("The race has not closed yet")]
+    RaceNotClosed,
+    #[msg("The race is already settled or cancelled")]
+    RaceFinished,
+    #[msg("The race is not cancelled")]
+    RaceNotCancelled,
+    #[msg("closes_at must be in the future")]
+    ClosesInPast,
+    #[msg("The entry fee is below the minimum for a race")]
+    EntryTooSmall,
+    #[msg("lap_ms must be greater than zero")]
+    InvalidLap,
+    #[msg("Nobody has a verified result yet")]
+    NoFinishers,
+    #[msg("Only the oracle can settle until the grace period after closing has passed")]
+    SettleTooEarly,
+    #[msg("settle needs one (wallet, entry) pair of writable accounts per podium place")]
+    BadPayoutAccounts,
+    #[msg("A payout account does not match the podium")]
+    PayoutMismatch,
+    #[msg("This entry was already paid or refunded")]
+    EntryAlreadyPaid,
+    #[msg("Only the creator can cancel a race, and only before anyone enters")]
+    NotCreator,
+    #[msg("Arithmetic overflow")]
+    Overflow,
 }

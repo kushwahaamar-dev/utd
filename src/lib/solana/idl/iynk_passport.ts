@@ -75,6 +75,103 @@ export type IynkPassport = {
       "args": []
     },
     {
+      "name": "cancelRace",
+      "docs": [
+        "Cancels an unfinished race and returns the seed to its creator."
+      ],
+      "discriminator": [
+        223,
+        214,
+        232,
+        232,
+        43,
+        15,
+        165,
+        234
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "closeRace",
+      "docs": [
+        "Oracle only: stops new entries now."
+      ],
+      "discriminator": [
+        43,
+        141,
+        231,
+        200,
+        195,
+        209,
+        100,
+        140
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "race"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "createBounty",
       "docs": [
         "Escrows `amount` lamports for whoever next earns `skill_id`",
@@ -161,6 +258,175 @@ export type IynkPassport = {
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "createRace",
+      "docs": [
+        "Opens a prize race. The creator may seed the pot with `seed_lamports`."
+      ],
+      "discriminator": [
+        233,
+        107,
+        148,
+        159,
+        241,
+        155,
+        226,
+        54
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "raceId"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "raceId",
+          "type": "u64"
+        },
+        {
+          "name": "entryLamports",
+          "type": "u64"
+        },
+        {
+          "name": "trackHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "closesAt",
+          "type": "i64"
+        },
+        {
+          "name": "seedLamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "enterRace",
+      "docs": [
+        "Pays the entry fee into the pot and registers the signer as an entrant."
+      ],
+      "discriminator": [
+        242,
+        118,
+        55,
+        253,
+        83,
+        235,
+        115,
+        31
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "initialize",
@@ -410,6 +676,78 @@ export type IynkPassport = {
       ]
     },
     {
+      "name": "refundEntry",
+      "docs": [
+        "Returns an entrant's fee after the race was cancelled."
+      ],
+      "discriminator": [
+        214,
+        5,
+        136,
+        23,
+        253,
+        7,
+        230,
+        81
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "setIssuer",
       "docs": [
         "Rotates the key allowed to issue credentials."
@@ -458,6 +796,143 @@ export type IynkPassport = {
           "type": "pubkey"
         }
       ]
+    },
+    {
+      "name": "settle",
+      "docs": [
+        "Pays the pot to the podium (50/30/20, renormalised for fewer finishers)",
+        "in one transaction. `remaining_accounts`: a (wallet, entry) pair per winner."
+      ],
+      "discriminator": [
+        175,
+        42,
+        185,
+        87,
+        144,
+        131,
+        102,
+        212
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "settler",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "submitResult",
+      "docs": [
+        "Oracle only: records a verified lap for an entrant and updates the podium."
+      ],
+      "discriminator": [
+        240,
+        42,
+        89,
+        180,
+        10,
+        239,
+        9,
+        214
+      ],
+      "accounts": [
+        {
+          "name": "race",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  97,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race.race_id",
+                "account": "race"
+              }
+            ]
+          }
+        },
+        {
+          "name": "entry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  116,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "race"
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player"
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "race"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "lapMs",
+          "type": "u32"
+        },
+        {
+          "name": "runHash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -499,6 +974,32 @@ export type IynkPassport = {
         100,
         135
       ]
+    },
+    {
+      "name": "entry",
+      "discriminator": [
+        63,
+        18,
+        152,
+        113,
+        215,
+        246,
+        221,
+        250
+      ]
+    },
+    {
+      "name": "race",
+      "discriminator": [
+        114,
+        93,
+        186,
+        119,
+        99,
+        123,
+        162,
+        192
+      ]
     }
   ],
   "events": [
@@ -526,6 +1027,97 @@ export type IynkPassport = {
         29,
         72,
         177
+      ]
+    },
+    {
+      "name": "entryRefunded",
+      "discriminator": [
+        34,
+        82,
+        130,
+        116,
+        93,
+        139,
+        188,
+        234
+      ]
+    },
+    {
+      "name": "raceCancelled",
+      "discriminator": [
+        211,
+        217,
+        124,
+        48,
+        45,
+        246,
+        250,
+        44
+      ]
+    },
+    {
+      "name": "raceCreated",
+      "discriminator": [
+        92,
+        229,
+        121,
+        9,
+        205,
+        210,
+        225,
+        9
+      ]
+    },
+    {
+      "name": "raceEntered",
+      "discriminator": [
+        225,
+        152,
+        64,
+        182,
+        188,
+        220,
+        210,
+        240
+      ]
+    },
+    {
+      "name": "racePayout",
+      "discriminator": [
+        79,
+        103,
+        209,
+        68,
+        254,
+        249,
+        217,
+        178
+      ]
+    },
+    {
+      "name": "raceSettled",
+      "discriminator": [
+        182,
+        88,
+        145,
+        67,
+        233,
+        56,
+        43,
+        181
+      ]
+    },
+    {
+      "name": "resultSubmitted",
+      "discriminator": [
+        156,
+        153,
+        163,
+        89,
+        245,
+        144,
+        63,
+        94
       ]
     }
   ],
@@ -594,6 +1186,86 @@ export type IynkPassport = {
       "code": 6012,
       "name": "bountyAlreadyClaimed",
       "msg": "The bounty has already been claimed"
+    },
+    {
+      "code": 6013,
+      "name": "notOracle",
+      "msg": "Only the race's oracle can do this"
+    },
+    {
+      "code": 6014,
+      "name": "raceNotOpen",
+      "msg": "The race is not open for entries"
+    },
+    {
+      "code": 6015,
+      "name": "raceClosed",
+      "msg": "The race has closed"
+    },
+    {
+      "code": 6016,
+      "name": "raceNotClosed",
+      "msg": "The race has not closed yet"
+    },
+    {
+      "code": 6017,
+      "name": "raceFinished",
+      "msg": "The race is already settled or cancelled"
+    },
+    {
+      "code": 6018,
+      "name": "raceNotCancelled",
+      "msg": "The race is not cancelled"
+    },
+    {
+      "code": 6019,
+      "name": "closesInPast",
+      "msg": "closes_at must be in the future"
+    },
+    {
+      "code": 6020,
+      "name": "entryTooSmall",
+      "msg": "The entry fee is below the minimum for a race"
+    },
+    {
+      "code": 6021,
+      "name": "invalidLap",
+      "msg": "lap_ms must be greater than zero"
+    },
+    {
+      "code": 6022,
+      "name": "noFinishers",
+      "msg": "Nobody has a verified result yet"
+    },
+    {
+      "code": 6023,
+      "name": "settleTooEarly",
+      "msg": "Only the oracle can settle until the grace period after closing has passed"
+    },
+    {
+      "code": 6024,
+      "name": "badPayoutAccounts",
+      "msg": "settle needs one (wallet, entry) pair of writable accounts per podium place"
+    },
+    {
+      "code": 6025,
+      "name": "payoutMismatch",
+      "msg": "A payout account does not match the podium"
+    },
+    {
+      "code": 6026,
+      "name": "entryAlreadyPaid",
+      "msg": "This entry was already paid or refunded"
+    },
+    {
+      "code": 6027,
+      "name": "notCreator",
+      "msg": "Only the creator can cancel a race, and only before anyone enters"
+    },
+    {
+      "code": 6028,
+      "name": "overflow",
+      "msg": "Arithmetic overflow"
     }
   ],
   "types": [
@@ -778,6 +1450,375 @@ export type IynkPassport = {
           }
         ]
       }
+    },
+    {
+      "name": "entry",
+      "docs": [
+        "PDA [\"entry\", race, player]. One per player and race."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "lapMs",
+            "docs": [
+              "Best verified lap in milliseconds, 0 until a result is submitted."
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "runHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "verified",
+            "type": "bool"
+          },
+          {
+            "name": "paid",
+            "docs": [
+              "Set once the player has been paid a prize or refunded."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "entryRefunded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "placing",
+      "docs": [
+        "One slot of the podium. `lap_ms == 0` means the slot is empty."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "lapMs",
+            "type": "u32"
+          },
+          {
+            "name": "runHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "race",
+      "docs": [
+        "PDA [\"race\", race_id as u64 little-endian].",
+        "Holds its rent plus `pot` lamports (seed plus entry fees) until it settles or cancels."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "raceId",
+            "type": "u64"
+          },
+          {
+            "name": "authority",
+            "docs": [
+              "The oracle (the config issuer when the race was created) that submits results."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "entryLamports",
+            "type": "u64"
+          },
+          {
+            "name": "seedLamports",
+            "type": "u64"
+          },
+          {
+            "name": "trackHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "closesAt",
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "raceStatus"
+              }
+            }
+          },
+          {
+            "name": "entryCount",
+            "type": "u32"
+          },
+          {
+            "name": "top3",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "placing"
+                  }
+                },
+                3
+              ]
+            }
+          },
+          {
+            "name": "pot",
+            "type": "u64"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "raceCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "refundable",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "raceCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "raceId",
+            "type": "u64"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "entryLamports",
+            "type": "u64"
+          },
+          {
+            "name": "seedLamports",
+            "type": "u64"
+          },
+          {
+            "name": "trackHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "closesAt",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "raceEntered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "entryCount",
+            "type": "u32"
+          },
+          {
+            "name": "pot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "racePayout",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "raceSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "pot",
+            "type": "u64"
+          },
+          {
+            "name": "payouts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "racePayout"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "raceStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "open"
+          },
+          {
+            "name": "closed"
+          },
+          {
+            "name": "settled"
+          },
+          {
+            "name": "cancelled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "resultSubmitted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "race",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "lapMs",
+            "type": "u32"
+          },
+          {
+            "name": "runHash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "improved",
+            "docs": [
+              "False when the player already had a faster verified lap."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "rank",
+            "docs": [
+              "Zero-based podium rank after this result, or 255 when outside the top three."
+            ],
+            "type": "u8"
+          }
+        ]
+      }
     }
   ],
   "constants": [
@@ -795,6 +1836,16 @@ export type IynkPassport = {
       "name": "credentialSeed",
       "type": "bytes",
       "value": "[99, 114, 101, 100]"
+    },
+    {
+      "name": "entrySeed",
+      "type": "bytes",
+      "value": "[101, 110, 116, 114, 121]"
+    },
+    {
+      "name": "raceSeed",
+      "type": "bytes",
+      "value": "[114, 97, 99, 101]"
     }
   ]
 };

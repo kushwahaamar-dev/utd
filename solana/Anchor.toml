@@ -20,7 +20,7 @@ wallet = "~/.config/solana/iynk/deployer.json"
 # Run the suite with `npm test` (anchor test --provider.cluster localnet).
 # A bare `anchor test` would deploy to devnet, and the suite refuses to run there.
 [scripts]
-test = "node scripts/export-idl.mjs && node --test --test-concurrency=1 tests/iynk_passport.test.ts"
+test = "node scripts/export-idl.mjs && node --test --test-concurrency=1 tests/iynk_passport.test.ts tests/race.test.ts"
 
 [test]
 upgradeable = true
