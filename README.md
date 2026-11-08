@@ -73,7 +73,7 @@ bench arrive as proposals you accept or reject.
 
 ```mermaid
 flowchart LR
-  B["Browser<br/>Next.js app, figures,<br/>interpreters, flight sim"] <-->|"one WebSocket<br/>(spacetimedb/react)"| S["SpacetimeDB module<br/>tables, reducers, views,<br/>schedules, procedures"]
+  B["Browser<br/>Next.js app, figures,<br/>interpreters, flight sim"] <-->|"one WebSocket<br/>(spacetimedb/react)"| S["SpacetimeDB module on Maincloud<br/>tables, reducers, views,<br/>schedules, procedures"]
   S -->|"procedures: ctx.http.fetch"| N["Nemotron<br/>(NVIDIA API or vLLM on Vultr GPU)"]
   S -->|procedures| P["SerpApi"]
   W["Agent worker<br/>Nemotron loop, Solana signer"] <-->|"subscribes to agent_job, chain_job<br/>writes via worker-only reducers"| S
@@ -98,9 +98,9 @@ flowchart LR
   a drone calculator and a flight model, all in the browser.
 - **Chain:** an Anchor program (`solana/programs/iynk_passport`) with credentials and race pools, tested on a local
   validator.
-- **Hosting:** everything runs on Vultr. One VM runs SpacetimeDB, the worker, the web app and Caddy in Docker
-  Compose, and an optional GPU instance serves Nemotron through vLLM. See [docs/DEPLOY.md](docs/DEPLOY.md). A
-  Maincloud copy of the module is the backup.
+- **Hosting:** the SpacetimeDB module runs on Maincloud. A Vultr VM runs the worker, the web app and Caddy in
+  Docker Compose, and an optional Vultr GPU serves Nemotron through vLLM. The module can also be self-hosted on
+  the VM. See [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Run it locally
 

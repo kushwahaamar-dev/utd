@@ -2,8 +2,8 @@
 
 iynk is a hardware lab in the browser. The labs, figures, interpreters and flight sim run on the client.
 Everything shared, persistent or trusted runs on **SpacetimeDB**. **Nemotron** agents do multi-step work through
-tools that run the real simulators. **Solana** holds credentials and race prize pools. All of it is deployed on
-**Vultr**.
+tools that run the real simulators. **Solana** holds credentials and race prize pools. The module runs on
+SpacetimeDB **Maincloud**; the worker, the site and an optional Nemotron GPU run on **Vultr**.
 
 ```
 Browser (Next.js 16) ── one WebSocket ──► SpacetimeDB module (spacetime/)
@@ -27,7 +27,7 @@ Browser (Next.js 16) ── one WebSocket ──► SpacetimeDB module (spacetim
 | `solana/`, `src/lib/solana/` | Solana | Anchor program `iynk_passport` v2 |
 | `src/app/[lang]/page.tsx`, `src/components/shell/`, `src/components/editorial/`, `src/app/globals.css` | design | kshv-style editorial design system |
 | `src/app/[lang]/mission/`, `src/components/mission/` | design | Mission Control (agent) UI |
-| `deploy/`, `scripts/deploy-*` | deploy | Vultr compose: SpacetimeDB standalone, worker, web, Caddy |
+| `deploy/`, `scripts/deploy-*`, `scripts/publish-maincloud.sh` | deploy | Maincloud publish; Vultr compose: worker, web, Caddy (SpacetimeDB standalone optional) |
 
 ## SpacetimeDB schema (contract)
 

@@ -26,7 +26,7 @@
     "stdb:publish": "WORKER_SECRET=${WORKER_SECRET:-dev-worker-secret} spacetime publish iynk --server http://127.0.0.1:3100 -p spacetime --yes",
     "stdb:reset": "WORKER_SECRET=${WORKER_SECRET:-dev-worker-secret} spacetime publish iynk --server http://127.0.0.1:3100 -p spacetime --delete-data=always --yes",
     "stdb:generate": "spacetime generate --lang typescript --out-dir src/lib/stdb/bindings -p spacetime --yes",
-    "stdb:publish:maincloud": "spacetime publish iynk-hackutd --server maincloud -p spacetime --yes",
+    "stdb:publish:maincloud": "bash scripts/publish-maincloud.sh",
     "stdb:logs": "spacetime logs iynk --server http://127.0.0.1:3100 -f",
     "stdb:test": "vitest run --root spacetime"
   },

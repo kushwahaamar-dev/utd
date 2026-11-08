@@ -1,6 +1,7 @@
-# One domain for everything. Browsers reach SpacetimeDB only through the subscribe socket, identity,
-# reducer/procedure calls and HTTP routes; publishing and SQL stay inside the VM (scripts/deploy-vultr.sh
-# publishes with `docker compose exec`). Everything else is the Next.js app.
+# One domain for the site. With the database on Maincloud, browsers connect to maincloud.spacetimedb.com
+# directly and the /v1 routes here answer 404. With STDB_TARGET=vultr, browsers reach the VM's SpacetimeDB
+# only through the subscribe socket, identity, reducer/procedure calls and HTTP routes; publishing and SQL
+# stay inside the VM (scripts/deploy-vultr.sh publishes over an SSH tunnel). Everything else is Next.js.
 {$DOMAIN} {
 	encode zstd gzip
 

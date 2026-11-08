@@ -1,10 +1,12 @@
-# The whole iynk backend on one Vultr VM: SpacetimeDB (the backend), the agent worker (Nemotron + Solana
-# signer), the Next.js web app and Caddy for TLS. scripts/deploy-vultr.sh copies the repo here, writes
+# iynk on one Vultr VM: the agent worker (Nemotron + Solana signer), the Next.js web app and Caddy for TLS.
+# The database is the SpacetimeDB module on Maincloud by default. With STDB_TARGET=vultr the deploy script
+# runs SpacetimeDB here too (`--profile selfhost`). scripts/deploy-vultr.sh copies the repo here, writes
 # deploy/core/.env and runs `docker compose up -d --build`.
 name: iynk-core
 
 services:
   spacetimedb:
+    profiles: [selfhost]
     image: clockworklabs/spacetime:v2.14.1
     restart: unless-stopped
     command: ["start", "--listen-addr", "0.0.0.0:3000"]
@@ -30,10 +32,11 @@ services:
     depends_on:
       spacetimedb:
         condition: service_healthy
+        required: false
     env_file: .env
     environment:
-      STDB_URI: ws://spacetimedb:3000
-      STDB_DB: ${STDB_DB:-iynk}
+      STDB_URI: ${STDB_URI:-wss://maincloud.spacetimedb.com}
+      STDB_DB: ${STDB_DB:-iynk-hackutd}
     read_only: true
     tmpfs: [/tmp]
     cap_drop: [ALL]
@@ -49,8 +52,8 @@ services:
       dockerfile: deploy/core/Dockerfile.web
       args:
         NEXT_PUBLIC_SITE_URL: https://${DOMAIN:?set DOMAIN in deploy/core/.env}
-        NEXT_PUBLIC_STDB_URI: wss://${DOMAIN}
-        NEXT_PUBLIC_STDB_DB: ${STDB_DB:-iynk}
+        NEXT_PUBLIC_STDB_URI: ${STDB_PUBLIC_URI:-wss://maincloud.spacetimedb.com}
+        NEXT_PUBLIC_STDB_DB: ${STDB_DB:-iynk-hackutd}
         NEXT_PUBLIC_SOLANA_PROGRAM_ID: ${NEXT_PUBLIC_SOLANA_PROGRAM_ID:-}
         NEXT_PUBLIC_SOLANA_CLUSTER: devnet
     restart: unless-stopped
@@ -69,7 +72,12 @@ services:
   caddy:
     image: caddy:2.11.7-alpine
     restart: unless-stopped
-    depends_on: [spacetimedb, web]
+    depends_on:
+      web:
+        condition: service_started
+      spacetimedb:
+        condition: service_started
+        required: false
     environment:
       DOMAIN: ${DOMAIN}
     ports:
