@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Deploys the whole iynk backend to the Vultr VM made by scripts/deploy-vultr-create.sh:
-#   1. builds the SpacetimeDB module bundle here,
-#   2. copies the repo to /opt/iynk on the VM and writes deploy/core/.env from .env.local,
-#   3. `docker compose up -d --build` (SpacetimeDB, agent worker, web, Caddy),
-#   4. publishes the module into the VM's SpacetimeDB from inside its container,
-#   5. waits for https://<domain>.
+#   1. copies the repo to /opt/iynk on the VM and writes deploy/core/.env from .env.local,
+#   2. starts SpacetimeDB there and publishes the module from this machine over an SSH tunnel
+#      (module secrets WORKER_SECRET, NVIDIA_API_KEY, SERPAPI_KEY go with the publish and stay on the database),
+#   3. `docker compose up -d --build` for the agent worker, web and Caddy,
+#   4. waits for https://<domain>.
 # Safe to re-run: rsync skips unchanged files, compose recreates only what changed, and a publish
 # migrates the database in place.
 #
@@ -48,11 +48,6 @@ TARGET="root@$VULTR_HOST"
 SSH_OPTS=(-i "$SSH_KEY" -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15)
 remote() { ssh "${SSH_OPTS[@]}" "$TARGET" "$@"; }
 
-echo "==> Building the SpacetimeDB module"
-(cd "$ROOT/spacetime" && "${SPACETIME:-spacetime}" build >/dev/null)
-BUNDLE="$(cd "$ROOT/spacetime" && find dist target -maxdepth 3 -name '*.js' -newer package.json 2>/dev/null | head -n 1 || true)"
-[[ -n "$BUNDLE" ]] || die "spacetime build produced no .js bundle under spacetime/dist or spacetime/target."
-
 echo "==> Preparing $TARGET (Docker, compose, firewall)"
 remote "bash -s" <<'BOOTSTRAP'
 set -euo pipefail
@@ -90,9 +85,19 @@ rsync -az --delete -e "$RSH" \
 echo "==> Starting SpacetimeDB, worker, web and Caddy for $DOMAIN"
 remote "cd $REMOTE_DIR/deploy/core && docker compose up -d --build --remove-orphans spacetimedb"
 
-echo "==> Publishing the module to the VM's SpacetimeDB"
-remote "cd $REMOTE_DIR/deploy/core && docker compose exec -T spacetimedb \
-  spacetime publish -s local --yes --js-path /module/$BUNDLE $STDB_DB"
+echo "==> Publishing the module to the VM's SpacetimeDB (SSH tunnel)"
+TUNNEL_PORT="${TUNNEL_PORT:-3199}"
+ssh "${SSH_OPTS[@]}" -N -L "$TUNNEL_PORT:127.0.0.1:3000" "$TARGET" &
+TUNNEL_PID=$!
+trap 'kill $TUNNEL_PID 2>/dev/null || true' EXIT
+for _ in $(seq 1 30); do curl -fsS --max-time 2 "http://127.0.0.1:$TUNNEL_PORT/v1/ping" >/dev/null 2>&1 && break; sleep 2; done
+for name in WORKER_SECRET NVIDIA_API_KEY NEMOTRON_FAST_MODEL SERPAPI_KEY; do
+  value="${!name:-$(env_local "$name")}"
+  [[ -z "$value" ]] || export "$name=$value"
+done
+[[ -n "${WORKER_SECRET:-}" ]] || die "set WORKER_SECRET in .env.local (any long random string; the worker uses the same one)."
+"${SPACETIME:-spacetime}" publish "$STDB_DB" --server "http://127.0.0.1:$TUNNEL_PORT" -p "$ROOT/spacetime" --yes
+kill $TUNNEL_PID 2>/dev/null || true
 
 remote "cd $REMOTE_DIR/deploy/core && docker compose up -d --build --remove-orphans"
 

@@ -8,11 +8,11 @@ services:
     image: clockworklabs/spacetime:v2.14.1
     restart: unless-stopped
     command: ["start", "--listen-addr", "0.0.0.0:3000"]
-    expose:
-      - "3000"
+    # Reachable from the VM itself only, for publishing over an SSH tunnel; browsers come in through Caddy.
+    ports:
+      - "127.0.0.1:3000:3000"
     volumes:
       - stdb_data:/home/spacetime/.local/share/spacetime/data
-      - ../../spacetime:/module:ro
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/v1/ping >/dev/null || exit 1"]
       interval: 10s
