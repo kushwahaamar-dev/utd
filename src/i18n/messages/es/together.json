@@ -7,7 +7,7 @@
     "joinLabel": "Código de sala o enlace de invitación",
     "joinPlaceholder": "p. ej. k7m2qxhp",
     "join": "Unirse",
-    "badCode": "Eso no es un código de sala. Los códigos tienen 6 letras y números.",
+    "badCode": "Eso no es un código de sala. Los códigos tienen 8 letras y números.",
     "unavailable": "Las salas necesitan conexión con el servidor de iynk y ahora no responde. Los laboratorios siguen funcionando solos; inténtalo de nuevo en un momento.",
     "starting": "Abriendo una sala…",
     "connecting": "Entrando en la sala {code}…",
@@ -156,7 +156,6 @@
     "lede": "Abre una sala para cualquier placa, robot o dron y envía el enlace. Todos ven el mismo banco de trabajo, una persona escribe a la vez y el chat muestra cada mensaje en tu propio idioma.",
     "ledePlain": "Abre una sala para cualquier placa, robot o dron y envía el enlace. Todos ven el mismo banco de trabajo y una persona escribe a la vez.",
     "notSetUp": "No está configurado en esta instalación",
-    "aiOff": "Compañeros de construcción y el Planificador de noche de construcción necesitan el servicio de IA, que no está configurado en esta instalación.",
     "retry": "Reintentar",
     "create": {
       "title": "Abrir una sala",
@@ -168,7 +167,7 @@
     },
     "join": {
       "title": "Unirse a una sala",
-      "hint": "Escribe el código de 6 caracteres de la invitación o pega el enlace.",
+      "hint": "Escribe el código de 8 caracteres de la invitación o pega el enlace.",
       "go": "Unirse",
       "looking": "Buscando la sala {code}…",
       "empty": "Ahora no hay nadie en la sala {code}. Las salas se cierran 30 minutos después de que sale la última persona.",
