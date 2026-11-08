@@ -262,6 +262,40 @@
         "4": "PIQUÉ",
         "5": "ATTERRISSAGE"
       }
+    },
+    "downtown": {
+      "title": "Course de portes en ville",
+      "brief": "Douze portes éclairées dans une ville de 160 m : remontez la rue ouest, traversez le tunnel bas, passez sous le panneau publicitaire et la passerelle, longez un étage de parking, montez la ruelle et rentrez. La grue pivote au-dessus du chantier : restez en dessous."
+    },
+    "gauntlet": {
+      "title": "Parcours de précision en ville",
+      "brief": "Dix contrôles de précision dans la même ville : une fente de 2,2 m dans une façade de brique, un slalom de quatre poteaux, un piqué dans un atrium ouvert à côté d'un monte-charge en mouvement, sortie par sa porte, sous la charge de la grue, dans le tunnel bas puis atterrissage sur le pad.",
+      "goals": {
+        "1": "FENTE",
+        "2": "SLALOM 1",
+        "3": "SLALOM 2",
+        "4": "SLALOM 3",
+        "5": "SLALOM 4",
+        "6": "PIQUÉ ATRIUM",
+        "7": "PORTE DE SERVICE",
+        "8": "SOUS LA CHARGE",
+        "9": "TUNNEL BAS",
+        "10": "ATTERRIS"
+      }
+    },
+    "stress": {
+      "title": "Test de résistance",
+      "brief": "Huit points de passage dans la ville pendant que la journée tourne mal : un vent qui monte en tempête, la nuit qui tombe, une batterie qui s'affaisse, un courant descendant, du brouillard, puis un moteur qui perd de la poussée. Survivez, posez-vous et lisez le bulletin. Une config faible lâche la première.",
+      "goals": {
+        "1": "CANYON OUEST",
+        "2": "TRONÇON NORD",
+        "3": "AVENUE",
+        "4": "TUNNEL",
+        "5": "RUE EST",
+        "6": "TRONÇON SUD",
+        "7": "LIGNE DROITE",
+        "8": "ATTERRIS"
+      }
     }
   },
   "quizzes": {

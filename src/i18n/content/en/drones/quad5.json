@@ -262,6 +262,40 @@
         "4": "DIVE",
         "5": "LAND"
       }
+    },
+    "downtown": {
+      "title": "Downtown gate race",
+      "brief": "Twelve lit gates through a 160 m city: up the west street, through the low tunnel, under the billboard and the skybridge, along a parking-garage deck, up the alley and home. The crane swings over the building site: stay under it."
+    },
+    "gauntlet": {
+      "title": "Downtown gauntlet",
+      "brief": "Ten precision checks in the same city: a 2.2 m slot in a brick facade, a four-pole slalom, a dive into an open atrium past a moving service lift, out through its door, under the crane's swinging load, through the low tunnel and down on the pad.",
+      "goals": {
+        "1": "WINDOW SLOT",
+        "2": "SLALOM 1",
+        "3": "SLALOM 2",
+        "4": "SLALOM 3",
+        "5": "SLALOM 4",
+        "6": "ATRIUM DIVE",
+        "7": "SERVICE DOOR",
+        "8": "UNDER THE LOAD",
+        "9": "LOW TUNNEL",
+        "10": "LAND"
+      }
+    },
+    "stress": {
+      "title": "Stress test",
+      "brief": "Eight checkpoints across the city while the day goes wrong: wind that builds to a gale, night falling, a sagging pack, a downdraft, fog, then a motor losing thrust. Survive, land it, and read the report card. A weak build fails first.",
+      "goals": {
+        "1": "WEST CANYON",
+        "2": "NORTH LEG",
+        "3": "AVENUE",
+        "4": "TUNNEL",
+        "5": "EAST STREET",
+        "6": "SOUTH LEG",
+        "7": "HOME STRAIGHT",
+        "8": "LAND"
+      }
     }
   },
   "quizzes": {

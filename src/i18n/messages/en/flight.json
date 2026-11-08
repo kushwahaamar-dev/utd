@@ -199,11 +199,15 @@
     "pillar": "Hit a pillar",
     "tower": "Hit the tower",
     "barrel": "Hit a barrel",
-    "obstacle": "Hit an obstacle",
     "flipFc": "Flipped on take-off: the flight controller is mounted the wrong way round",
     "flipProps": "Flipped on take-off: the props are on the wrong motors",
     "flipMotor": "Flipped on take-off: motor direction was never checked (bench: Check motor direction)",
-    "flipServo": "Spun out on take-off: the tail servo is reversed"
+    "flipServo": "Spun out on take-off: the tail servo is reversed",
+    "crane": "Hit the crane",
+    "blade": "Hit a turbine blade",
+    "wire": "Flew into a power line",
+    "door": "Hit the service lift",
+    "obstacle": "Hit an obstacle"
   },
   "demoHint": "The autopilot flies this course's line with the same physics you fly. Watch it, then beat it: its times never count.",
   "medals": {
@@ -246,6 +250,10 @@
       "pillar": "a pillar",
       "tower": "the tower",
       "barrel": "a barrel",
+      "crane": "the crane",
+      "blade": "a turbine blade",
+      "wire": "a power line",
+      "door": "the service lift",
       "obstacle": "an obstacle"
     },
     "fix": {

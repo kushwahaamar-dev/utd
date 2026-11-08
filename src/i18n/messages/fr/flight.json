@@ -199,11 +199,15 @@
     "pillar": "A percuté un pilier",
     "tower": "A percuté la tour",
     "barrel": "A percuté un baril",
-    "obstacle": "A percuté un obstacle",
     "flipFc": "Retourné au décollage : le contrôleur de vol est monté à l'envers",
     "flipProps": "Retourné au décollage : les hélices sont sur les mauvais moteurs",
     "flipMotor": "Retourné au décollage : le sens des moteurs n'a jamais été vérifié (établi : Vérifier le sens des moteurs)",
-    "flipServo": "Parti en vrille au décollage : le servo de queue est inversé"
+    "flipServo": "Parti en vrille au décollage : le servo de queue est inversé",
+    "crane": "Collision avec la grue",
+    "blade": "Collision avec une pale d'éolienne",
+    "wire": "Collision avec un câble électrique",
+    "door": "Collision avec le monte-charge",
+    "obstacle": "A percuté un obstacle"
   },
   "demoHint": "Le pilote automatique suit la ligne de ce parcours avec la même physique que vous. Regardez-le, puis battez-le : ses temps ne comptent jamais.",
   "medals": {
@@ -246,6 +250,10 @@
       "pillar": "un pilier",
       "tower": "la tour",
       "barrel": "un baril",
+      "crane": "la grue",
+      "blade": "une pale d'éolienne",
+      "wire": "un câble électrique",
+      "door": "le monte-charge",
       "obstacle": "un obstacle"
     },
     "fix": {

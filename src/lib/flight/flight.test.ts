@@ -429,7 +429,7 @@ describe("the flight registry", () => {
     expect(quad5Craft.look.armLen).toBeCloseTo(0.1125, 3);
     expect(quad5Craft.modes.find((m) => m.id === "raceAcro")).toMatchObject({ attitude: "acro", throttle: "manual", task: "race", expo: 0.7 });
     expect(quad5Craft.modes.find((m) => m.id === "range")).toMatchObject({ attitude: "angle", throttle: "climb", task: "range" });
-    expect(quad5Flight.courses.map((c) => [c.id, c.kind])).toEqual([["race", "gates"], ["bando", "checkpoints"]]);
+    expect(quad5Flight.courses.map((c) => [c.id, c.kind])).toEqual([["race", "gates"], ["bando", "checkpoints"], ["downtown", "gates"], ["gauntlet", "checkpoints"], ["stress", "checkpoints"]]);
     expect(quad5Race.checkpoints).toEqual([]);
     expect(quad5Course.checkpoints.at(-1)).toMatchObject({ land: true, z: 0 });
   });
@@ -476,7 +476,8 @@ describe("the autopilot demo", () => {
   // the demo flies the course with the learner's physics: a route that crashes means the course cannot be flown
   for (const content of crafts) {
     const flight = flightOf(content);
-    for (const course of flight?.courses ?? []) {
+    // a stress test is flown in bad weather with a failing motor: the autopilot gets no line through it
+    for (const course of (flight?.courses ?? []).filter((c) => !c.stress)) {
       it(`flies ${content.id}/${course.id} to the end without a crash`, () => {
         expect(course.missions?.some((m) => m.id === DEMO_MISSION), "the planner found a route").toBe(true);
         expect(modesFor(flight!.craft, course).map((m) => m.id)).toContain("demo");

@@ -199,11 +199,15 @@
     "pillar": "Gegen eine Säule geflogen",
     "tower": "Gegen den Turm geflogen",
     "barrel": "Gegen ein Fass geflogen",
-    "obstacle": "Gegen ein Hindernis geflogen",
     "flipFc": "Beim Start überschlagen: Der Flugcontroller ist verkehrt herum montiert",
     "flipProps": "Beim Start überschlagen: Die Propeller sitzen auf den falschen Motoren",
     "flipMotor": "Beim Start überschlagen: Die Drehrichtung der Motoren wurde nie geprüft (Werkbank: Motordrehrichtung prüfen)",
-    "flipServo": "Beim Start ausgedreht: Das Heckservo arbeitet verkehrt herum"
+    "flipServo": "Beim Start ausgedreht: Das Heckservo arbeitet verkehrt herum",
+    "crane": "Den Kran getroffen",
+    "blade": "Ein Rotorblatt getroffen",
+    "wire": "In eine Stromleitung geflogen",
+    "door": "Den Lastenaufzug getroffen",
+    "obstacle": "Gegen ein Hindernis geflogen"
   },
   "demoHint": "Der Autopilot fliegt die Linie dieses Parcours mit derselben Physik, mit der du fliegst. Schau zu und schlag ihn dann: Seine Zeiten zählen nie.",
   "medals": {
@@ -246,6 +250,10 @@
       "pillar": "eine Säule",
       "tower": "den Turm",
       "barrel": "ein Fass",
+      "crane": "den Kran",
+      "blade": "ein Rotorblatt",
+      "wire": "eine Stromleitung",
+      "door": "den Lastenaufzug",
       "obstacle": "ein Hindernis"
     },
     "fix": {

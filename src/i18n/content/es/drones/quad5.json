@@ -262,6 +262,40 @@
         "4": "PICADO",
         "5": "ATERRIZAJE"
       }
+    },
+    "downtown": {
+      "title": "Carrera urbana de puertas",
+      "brief": "Doce puertas iluminadas en una ciudad de 160 m: sube por la calle oeste, cruza el túnel bajo, pasa bajo la valla publicitaria y la pasarela, recorre una planta del aparcamiento, sube por el callejón y vuelve. La grúa gira sobre la obra: mantente por debajo."
+    },
+    "gauntlet": {
+      "title": "Prueba de precisión urbana",
+      "brief": "Diez controles de precisión en la misma ciudad: una ranura de 2,2 m en una fachada de ladrillo, un eslalon de cuatro postes, una picada a un atrio abierto junto a un montacargas en movimiento, salida por su puerta, bajo la carga de la grúa, por el túnel bajo y aterrizaje en la base.",
+      "goals": {
+        "1": "VENTANA",
+        "2": "ESLALON 1",
+        "3": "ESLALON 2",
+        "4": "ESLALON 3",
+        "5": "ESLALON 4",
+        "6": "PICADA AL ATRIO",
+        "7": "PUERTA DE SERVICIO",
+        "8": "BAJO LA CARGA",
+        "9": "TÚNEL BAJO",
+        "10": "ATERRIZA"
+      }
+    },
+    "stress": {
+      "title": "Prueba de estrés",
+      "brief": "Ocho puntos de control por la ciudad mientras el día se tuerce: un viento que crece hasta temporal, la noche que cae, una batería que se hunde, una corriente descendente, niebla y por último un motor que pierde empuje. Sobrevive, aterriza y lee el informe. Un montaje débil falla primero.",
+      "goals": {
+        "1": "CAÑÓN OESTE",
+        "2": "TRAMO NORTE",
+        "3": "AVENIDA",
+        "4": "TÚNEL",
+        "5": "CALLE ESTE",
+        "6": "TRAMO SUR",
+        "7": "RECTA FINAL",
+        "8": "ATERRIZA"
+      }
     }
   },
   "quizzes": {

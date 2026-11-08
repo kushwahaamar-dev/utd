@@ -199,11 +199,15 @@
     "pillar": "Chocó con un pilar",
     "tower": "Chocó con la torre",
     "barrel": "Chocó con un barril",
-    "obstacle": "Chocó con un obstáculo",
     "flipFc": "Volcó al despegar: la controladora de vuelo está montada al revés",
     "flipProps": "Volcó al despegar: las hélices están en los motores equivocados",
     "flipMotor": "Volcó al despegar: nunca se comprobó el sentido de los motores (banco: Comprueba el sentido de los motores)",
-    "flipServo": "Giró sin control al despegar: el servo de cola está invertido"
+    "flipServo": "Giró sin control al despegar: el servo de cola está invertido",
+    "crane": "Chocaste con la grúa",
+    "blade": "Chocaste con un aspa de turbina",
+    "wire": "Volaste contra un cable eléctrico",
+    "door": "Chocaste con el montacargas",
+    "obstacle": "Chocó con un obstáculo"
   },
   "demoHint": "El piloto automático vuela la trazada de este circuito con la misma física que tú. Míralo y luego bátelo: sus tiempos nunca cuentan.",
   "medals": {
@@ -246,6 +250,10 @@
       "pillar": "un pilar",
       "tower": "la torre",
       "barrel": "un barril",
+      "crane": "la grúa",
+      "blade": "un aspa de turbina",
+      "wire": "un cable eléctrico",
+      "door": "el montacargas",
       "obstacle": "un obstáculo"
     },
     "fix": {

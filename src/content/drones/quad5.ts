@@ -4,6 +4,7 @@
 // (src/lib/flight/registry.ts), so the CLI snippets, the prose and the range share one copy.
 
 import type { Course, DroneContent } from '@/content/schema';
+import { cityCourses } from './_city';
 
 // The "Freestyle bando" field (x east, y north, metres). Both courses fly it: the gate race through the five gates,
 // the range run past the five checkpoints with the gates standing as solid obstacles. The height limit is 16 m, so
@@ -553,6 +554,8 @@ const quad5: DroneContent = {
         { x: 20, y: 6, z: 0, r: 1.5, land: true, label: 'courses.bando.goals.5' },
       ],
     },
+    // The downtown pack: one 160 m city, three ways to fly it (src/content/drones/_city.ts).
+    ...cityCourses(['downtown', 'gauntlet', 'stress']),
   ],
 
   // `answer` is the index into `options` (0-based); option text keys count from 1.

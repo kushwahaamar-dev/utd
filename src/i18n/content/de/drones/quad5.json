@@ -262,6 +262,40 @@
         "4": "STURZFLUG",
         "5": "LANDEN"
       }
+    },
+    "downtown": {
+      "title": "Torrennen in der Innenstadt",
+      "brief": "Zwölf beleuchtete Tore durch eine 160-m-Stadt: die Weststraße hinauf, durch den niedrigen Tunnel, unter Werbetafel und Skybridge hindurch, über ein Parkhausdeck, die Gasse hinauf und nach Hause. Der Kran schwenkt über der Baustelle: bleib darunter."
+    },
+    "gauntlet": {
+      "title": "Präzisionsparcours Innenstadt",
+      "brief": "Zehn Präzisionsaufgaben in derselben Stadt: ein 2,2-m-Schlitz in einer Backsteinfassade, ein Slalom um vier Stangen, ein Sturzflug in ein offenes Atrium an einem fahrenden Lastenaufzug vorbei, durch die Tür hinaus, unter der Last des Krans hindurch, durch den niedrigen Tunnel und zurück auf den Pad.",
+      "goals": {
+        "1": "FENSTERSCHLITZ",
+        "2": "SLALOM 1",
+        "3": "SLALOM 2",
+        "4": "SLALOM 3",
+        "5": "SLALOM 4",
+        "6": "ATRIUMSTURZ",
+        "7": "SERVICETÜR",
+        "8": "UNTER DER LAST",
+        "9": "NIEDRIGER TUNNEL",
+        "10": "LANDEN"
+      }
+    },
+    "stress": {
+      "title": "Stresstest",
+      "brief": "Acht Kontrollpunkte durch die Stadt, während der Tag schiefgeht: Wind, der zum Sturm anschwillt, einbrechende Nacht, ein einbrechender Akku, ein Fallwind, Nebel und dann ein Motor, der Schub verliert. Überlebe, lande und lies das Zeugnis. Ein schwacher Aufbau fällt zuerst aus.",
+      "goals": {
+        "1": "WESTSCHLUCHT",
+        "2": "NORDETAPPE",
+        "3": "AVENUE",
+        "4": "TUNNEL",
+        "5": "OSTSTRASSE",
+        "6": "SÜDETAPPE",
+        "7": "ZIELGERADE",
+        "8": "LANDEN"
+      }
     }
   },
   "quizzes": {
