@@ -69,7 +69,10 @@
     "recording": "正在从图示记录本次操作。",
     "restart": "重新开始",
     "stepsLabel": "台架安全测试",
-    "stepStatus": { "done": "已通过", "current": "下一步" },
+    "stepStatus": {
+      "done": "已通过",
+      "current": "下一步"
+    },
     "steps": {
       "smoke": "防烟测试",
       "smokeHint": "在电池出事之前发现短路。",
@@ -88,7 +91,10 @@
     "fault": "电池线上的电容爆浆了。拔下电池，把 XT60 按正确方向重新装好，然后重新做防烟测试。",
     "score": "安全得分",
     "scoreValue": "{score}/100",
-    "pops": { "one": "通电时爆了 {count} 次", "other": "通电时爆了 {count} 次" },
+    "pops": {
+      "one": "通电时爆了 {count} 次",
+      "other": "通电时爆了 {count} 次"
+    },
     "otherLab": "等服务器能够重新运行课程和台架测试后，就会推出相应凭证。目前你可以在任意一架无人机上获得台架安全凭证。",
     "openPassport": "打开你的护照",
     "mint": "铸造我的凭证",
@@ -96,19 +102,22 @@
     "needsPass": "通过上面的所有测试后即可铸造。",
     "progressLabel": "铸造中",
     "phases": {
-      "check": "在本设备上检查操作记录",
-      "server": "服务器重新运行并铸造",
-      "chain": "从链上读回结果"
+      "check": "在本设备上检查这次飞行",
+      "server": "模块重新回放并把凭证排入队列",
+      "chain": "Worker 在 Solana devnet 上签名"
     },
-    "phaseStatus": { "done": "完成", "current": "进行中" },
+    "phaseStatus": {
+      "done": "完成",
+      "current": "进行中"
+    },
     "successTitle": "凭证已铸造",
     "successBody": "{skill} 已带着你的重放哈希写入 Solana 开发网。任何人都可以验证。",
     "viewTx": "查看交易",
     "viewVerify": "打开公开验证页",
-    "paidTitle": "已发放的赏金",
-    "paidItem": "来自赏金 {address} 的 {amount} SOL",
     "already": "这个钱包已经持有该凭证。",
-    "seeIt": "查看"
+    "seeIt": "查看",
+    "offline": "正在等待实时服务器连接。",
+    "failed": "凭证无法写入 Solana：{reason}"
   },
   "bounties": {
     "openTitle": "这项技能的赞助赏金",
@@ -167,7 +176,9 @@
     "account": "凭证账户",
     "explorer": "在 Solana Explorer 中查看",
     "verifyLink": "公开验证链接",
-    "soulbound": "不可转让：它存放在与这个钱包和这项技能绑定的程序地址上。"
+    "soulbound": "不可转让：它存放在与这个钱包和这项技能绑定的程序地址上。",
+    "verifyOnChain": "链上验证",
+    "tx": "发行交易"
   },
   "passport": {
     "metaTitle": "你的护照",
@@ -180,7 +191,10 @@
     "goDrones": "前往无人机",
     "connectFirst": "连接钱包即可查看你的凭证。",
     "reading": "正在读取 Solana 开发网…",
-    "readError": "无法读取 Solana 开发网。"
+    "readError": "无法读取 Solana 开发网。",
+    "racesTitle": "奖金赛",
+    "racesBody": "报名穿门赛，飞出你的最佳圈速，奖池奖励前三名。",
+    "racesLink": "查看比赛"
   },
   "verify": {
     "metaTitle": "验证凭证",
@@ -198,5 +212,63 @@
     "program": "程序",
     "howTitle": "验证原理",
     "how": "实验室会记录你的输入。服务器用页面所用的同一套纯函数检查重新运行这些输入，然后才签署 issue_credential。这些输入的 sha256 作为重放哈希保存在链上。"
+  },
+  "races": {
+    "metaTitle": "奖金赛",
+    "metaDescription": "用 devnet SOL 报名无人机穿门赛，飞出最佳圈速，赢取奖池份额。",
+    "kicker": "比赛",
+    "title": "奖金赛",
+    "lede": "用钱包支付少量报名费，飞完赛道，你验证过的最佳圈速会记录上链。比赛结束后，奖池支付给前三名。",
+    "listTitle": "比赛",
+    "empty": "还没有比赛，下一场很快开放。",
+    "loading": "正在加载比赛…",
+    "offline": "无法连接实时服务器，比赛无法加载。",
+    "connect": "连接钱包后才能报名。",
+    "fly": "飞这场比赛",
+    "flyHint": "你在这条赛道上的圈速会计入比赛。",
+    "enterError": "报名失败：{reason}",
+    "recordError": "你的报名已上链（{sig}），但 iynk 未能记录：{reason}",
+    "payout": "奖金",
+    "card": {
+      "pot": "奖池",
+      "entryFee": "报名费",
+      "entrants": "参赛者",
+      "closesIn": "距截止",
+      "closed": "已截止",
+      "podium": "领奖台",
+      "noTimes": "暂无验证成绩",
+      "enter": "报名参赛",
+      "entering": "等待钱包",
+      "entered": "你已报名",
+      "connect": "连接钱包后报名",
+      "settled": "已结算",
+      "cancelled": "已取消",
+      "open": "进行中",
+      "closedStatus": "已截止",
+      "viewRace": "比赛账户",
+      "viewPayout": "奖金交易"
+    },
+    "result": {
+      "title": "奖金",
+      "place": "名次",
+      "winner": "获奖者",
+      "time": "圈速",
+      "prize": "奖金",
+      "share": "占比",
+      "total": "奖池",
+      "viewTx": "在 Solana Explorer 查看交易"
+    },
+    "banner": {
+      "title": "奖金赛",
+      "yourBest": "你的最佳圈速",
+      "rank": "第 {rank} 名，共 {count} 人",
+      "noLap": "还没有圈速，去飞赛道吧。",
+      "notIn": "你还没有报名这场比赛。",
+      "enterOn": "到比赛页面报名",
+      "allRaces": "所有比赛",
+      "otherDrone": "这场比赛使用 {drone} 飞行。",
+      "flyThere": "前往那架无人机",
+      "closedNote": "这场比赛已截止。"
+    }
   }
 }

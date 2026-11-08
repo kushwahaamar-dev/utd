@@ -11,6 +11,18 @@ vi.mock("@/lib/features", () => ({
 vi.mock("@/i18n/client", () => ({ useLocale: () => "en" }));
 vi.mock("next/link", () => ({ default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => <a href={href} {...rest}>{children}</a> }));
 
+const stdb = vi.hoisted(() => ({
+  submitRun: vi.fn(async (_run: unknown) => {}),
+  credentials: [] as { id: bigint; skill: string; pda: string; sig: string }[],
+  job: null as { status: string; job: { payload: string; error?: string } } | null,
+}));
+vi.mock("@/lib/stdb", () => ({
+  useStdb: () => ({ status: "online", identityHex: "me" }),
+  useStdbActions: () => ({ submitRun: stdb.submitRun }),
+  useCredentials: () => ({ credentials: stdb.credentials, ready: true }),
+}));
+vi.mock("./useModule", () => ({ useLinkedWallet: () => true, useCredentialJob: () => stdb.job }));
+
 const { PassportPanel } = await import("./PassportPanel");
 
 function fakeFigure() {
@@ -42,6 +54,9 @@ const store = { getState: () => ({}), subscribe: () => () => {}, dispatch: () =>
 
 beforeEach(() => {
   features.solana = true;
+  stdb.credentials = [];
+  stdb.job = null;
+  stdb.submitRun.mockClear();
 });
 
 afterEach(() => {
@@ -63,23 +78,11 @@ test("explains what other labs can earn", async () => {
   expect(await screen.findByText(/Today you can earn the bench safety credential/)).toBeTruthy();
 });
 
-test("follows the bench live, then mints through the server", async () => {
-  const fetchMock = vi.fn(async (_url: string, init: RequestInit) => {
-    const body = JSON.parse(String(init.body));
-    expect(body).toMatchObject({ kind: "drone-safety", itemId: "quad5", run: { v: 1, kind: "drone-safety", itemId: "quad5" } });
-    return Response.json({
-      signature: "5ig",
-      credential: "Cred1111111111111111111111111111111111111111",
-      skillId: "drone:quad5:safety",
-      replayHash: "ab".repeat(32),
-      score: 100,
-      paid: [{ bounty: "Bnty111111111111111111111111111111111111111", amount: 50_000_000 }],
-    });
-  });
-  vi.stubGlobal("fetch", fetchMock);
+test("follows the bench live, then submits the run to the module and follows the credential job", async () => {
   const { figure, report } = fakeFigure();
+  let view!: ReturnType<typeof render>;
   await act(async () => {
-    render(<PassportPanel lab="drone" itemId="quad5" store={store} figure={figure} />);
+    view = render(<PassportPanel lab="drone" itemId="quad5" store={store} figure={figure} />);
   });
 
   expect(await screen.findByText(/Waiting for the figure/)).toBeTruthy();
@@ -104,10 +107,18 @@ test("follows the bench live, then mints through the server", async () => {
   await waitFor(() => expect(mint().disabled).toBe(false));
   fireEvent.click(mint());
 
+  await waitFor(() => expect(stdb.submitRun).toHaveBeenCalledTimes(1));
+  expect(stdb.submitRun.mock.calls[0]?.[0]).toMatchObject({ kind: "drone-safety", itemId: "quad5", run: { v: 1, kind: "drone-safety", itemId: "quad5" } });
+
+  stdb.job = { status: "queued", job: { payload: "{}" } };
+  view.rerender(<PassportPanel lab="drone" itemId="quad5" store={store} figure={figure} />);
+  expect(await screen.findByText("The module re-runs it and queues the credential")).toBeTruthy();
+
+  stdb.job = { status: "confirmed", job: { payload: JSON.stringify({ score: 100, replayHash: "ab".repeat(32) }) } };
+  stdb.credentials = [{ id: 1n, skill: "drone:quad5:safety", pda: "Cred1111111111111111111111111111111111111111", sig: "5ig" }];
+  view.rerender(<PassportPanel lab="drone" itemId="quad5" store={store} figure={figure} />);
   expect(await screen.findByText("Credential minted")).toBeTruthy();
-  expect(screen.getByText("0.05 SOL from bounty Bnty…1111")).toBeTruthy();
   expect(screen.getByRole("link", { name: /View the transaction/ }).getAttribute("href")).toBe("https://explorer.solana.com/tx/5ig?cluster=devnet");
-  expect(fetchMock).toHaveBeenCalledWith("/api/solana/attest", expect.anything());
 });
 
 test("a broken safety rule blocks minting and says which", async () => {

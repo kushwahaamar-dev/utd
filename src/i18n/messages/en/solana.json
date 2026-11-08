@@ -69,7 +69,10 @@
     "recording": "Recording this run from the figure.",
     "restart": "Start over",
     "stepsLabel": "Bench safety checks",
-    "stepStatus": { "done": "passed", "current": "next" },
+    "stepStatus": {
+      "done": "passed",
+      "current": "next"
+    },
     "steps": {
       "smoke": "Smoke stopper test",
       "smokeHint": "Catch a short before the battery does.",
@@ -88,7 +91,10 @@
     "fault": "The battery cap is vented. Unplug, re-seat the XT60 the right way round and re-run the smoke test.",
     "score": "Safety score",
     "scoreValue": "{score}/100",
-    "pops": { "one": "{count} pop on power-up", "other": "{count} pops on power-up" },
+    "pops": {
+      "one": "{count} pop on power-up",
+      "other": "{count} pops on power-up"
+    },
     "otherLab": "Lesson and bench credentials arrive when the server can re-run those checks. Today you can earn the bench safety credential on any drone.",
     "openPassport": "Open your passport",
     "mint": "Mint my credential",
@@ -97,18 +103,21 @@
     "progressLabel": "Minting",
     "phases": {
       "check": "Checking the run on this device",
-      "server": "The server re-runs it and mints",
-      "chain": "Reading it back from the chain"
+      "server": "The module re-runs it and queues the credential",
+      "chain": "The worker signs it on Solana devnet"
     },
-    "phaseStatus": { "done": "done", "current": "in progress" },
+    "phaseStatus": {
+      "done": "done",
+      "current": "in progress"
+    },
     "successTitle": "Credential minted",
     "successBody": "{skill} is on Solana devnet with your replay hash. Anyone can verify it.",
     "viewTx": "View the transaction",
     "viewVerify": "Open the public verify page",
-    "paidTitle": "Bounties paid out",
-    "paidItem": "{amount} SOL from bounty {address}",
     "already": "This wallet already holds this credential.",
-    "seeIt": "See it"
+    "seeIt": "See it",
+    "offline": "Waiting for the realtime server to connect.",
+    "failed": "The credential could not be written to Solana: {reason}"
   },
   "bounties": {
     "openTitle": "Sponsor bounties for this skill",
@@ -167,7 +176,9 @@
     "account": "Credential account",
     "explorer": "View on Solana Explorer",
     "verifyLink": "Public verify link",
-    "soulbound": "Non-transferable: it lives at a program address tied to this wallet and skill."
+    "soulbound": "Non-transferable: it lives at a program address tied to this wallet and skill.",
+    "verifyOnChain": "Verify on chain",
+    "tx": "Issuing transaction"
   },
   "passport": {
     "metaTitle": "Your passport",
@@ -180,7 +191,10 @@
     "goDrones": "Go to the drones",
     "connectFirst": "Connect a wallet to see your credentials.",
     "reading": "Reading Solana devnet…",
-    "readError": "Couldn't read Solana devnet."
+    "readError": "Couldn't read Solana devnet.",
+    "racesTitle": "Prize races",
+    "racesBody": "Enter a gate race, fly your best lap and the pot pays the podium.",
+    "racesLink": "See the races"
   },
   "verify": {
     "metaTitle": "Verify a credential",
@@ -198,5 +212,63 @@
     "program": "Program",
     "howTitle": "How the check works",
     "how": "The lab records your inputs. The server replays them through the same pure check functions the page used, and only then signs issue_credential. The sha256 of those inputs is stored on-chain as the replay hash."
+  },
+  "races": {
+    "metaTitle": "Prize races",
+    "metaDescription": "Enter a drone gate race with devnet SOL, fly your best lap and win a share of the pot.",
+    "kicker": "Races",
+    "title": "Prize races",
+    "lede": "Pay a small entry fee from your wallet, fly the course and your best verified lap goes on chain. When the race closes the pot pays the top three.",
+    "listTitle": "Races",
+    "empty": "No races yet. The next one opens soon.",
+    "loading": "Loading races…",
+    "offline": "The realtime server is not reachable, so races can't load.",
+    "connect": "Connect a wallet to enter a race.",
+    "fly": "Fly this race",
+    "flyHint": "Your laps on this course count for the race.",
+    "enterError": "Couldn't enter the race: {reason}",
+    "recordError": "Your entry went through on chain ({sig}) but iynk couldn't record it: {reason}",
+    "payout": "Payout",
+    "card": {
+      "pot": "Prize pot",
+      "entryFee": "Entry",
+      "entrants": "Entrants",
+      "closesIn": "Closes in",
+      "closed": "Closed",
+      "podium": "Podium",
+      "noTimes": "No verified times yet",
+      "enter": "Enter race",
+      "entering": "Waiting for wallet",
+      "entered": "You are in",
+      "connect": "Connect a wallet to enter",
+      "settled": "Settled",
+      "cancelled": "Cancelled",
+      "open": "Open",
+      "closedStatus": "Closed",
+      "viewRace": "Race account",
+      "viewPayout": "Payout transaction"
+    },
+    "result": {
+      "title": "Payout",
+      "place": "Place",
+      "winner": "Winner",
+      "time": "Lap",
+      "prize": "Prize",
+      "share": "Share",
+      "total": "Pot",
+      "viewTx": "View transaction on Solana Explorer"
+    },
+    "banner": {
+      "title": "Prize race",
+      "yourBest": "Your best lap",
+      "rank": "Rank {rank} of {count}",
+      "noLap": "No lap yet. Fly the course.",
+      "notIn": "You are not in this race yet.",
+      "enterOn": "Enter on the races page",
+      "allRaces": "All races",
+      "otherDrone": "This race is flown with {drone}.",
+      "flyThere": "Go to that drone",
+      "closedNote": "This race has closed."
+    }
   }
 }

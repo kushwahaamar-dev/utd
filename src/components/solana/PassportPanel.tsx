@@ -1,7 +1,6 @@
 "use client";
 
-import { PublicKey } from "@solana/web3.js";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { Suspense, use, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { LabDockProps } from "@/components/dock/types";
@@ -10,10 +9,9 @@ import { Button, Callout, Chip, Icon, Stat, Stepper, type StepItem } from "@/com
 import { isDroneId, type DroneId } from "@/content/ids";
 import { useLocale } from "@/i18n/client";
 import { reloadFeatures, useFeatures } from "@/lib/features";
-import { PROGRAM_ID, explorerUrl, shortAddress } from "@/lib/solana/config";
-import type { Credential } from "@/lib/solana/passport";
+import { explorerUrl } from "@/lib/solana/config";
 import { SolanaProvider } from "@/lib/solana/provider";
-import { credentialAt } from "@/lib/solana/reads";
+import { useCredentials, useStdb, useStdbActions, type Credential } from "@/lib/stdb";
 import { droneTestsFor } from "@/lib/verify";
 import { droneRecorder, type DroneRecording } from "@/lib/verify/drone-recorder";
 import { DRONE_TESTS, replayDroneSafety, type DroneTestSet } from "@/lib/verify/drone-safety";
@@ -22,24 +20,9 @@ import { Confetti } from "./Confetti";
 import { SkillBounties } from "./SkillBounties";
 import { SolanaText, useSolanaT } from "./SolanaText";
 import { WalletBar, bumpBalances } from "./WalletBar";
-import { errorText, formatSol, postJson } from "./shared";
+import { useCredentialJob, useLinkedWallet, type CredentialJob } from "./useModule";
 
-type AttestOk = {
-  signature: string;
-  credential: string;
-  skillId: string;
-  replayHash: string;
-  score: number;
-  paid: { bounty: string; amount: number }[];
-};
-
-type Flow =
-  | { phase: "idle" }
-  | { phase: "server" }
-  | { phase: "chain"; result: AttestOk }
-  | { phase: "done"; result: AttestOk; onChain: Credential | null }
-  | { phase: "already" }
-  | { phase: "error"; code: string };
+type Flow = { phase: "idle" } | { phase: "submitting" } | { phase: "error"; message: string };
 
 const testsCache = new Map<DroneId, Promise<DroneTestSet>>();
 
@@ -65,9 +48,8 @@ function useRecording(figure: FigureHandle | null) {
   return { recorder, recording };
 }
 
-function MintProgress({ flow }: { flow: Flow }) {
+function MintProgress({ at }: { at: number }) {
   const t = useSolanaT();
-  const at = flow.phase === "server" ? 1 : flow.phase === "chain" ? 2 : 3;
   const steps: StepItem[] = (["check", "server", "chain"] as const).map((id, i) => ({
     id,
     label: t(`panel.phases.${id}`),
@@ -76,42 +58,49 @@ function MintProgress({ flow }: { flow: Flow }) {
   return <Stepper label={t("panel.progressLabel")} steps={steps} statusText={{ done: t("panel.phaseStatus.done"), current: t("panel.phaseStatus.current") }} />;
 }
 
-function Success({ result, onChain }: { result: AttestOk; onChain: Credential | null }) {
+function jobDetails(job: CredentialJob["job"]): { score?: number; replayHash?: string } {
+  try {
+    return JSON.parse(job.payload) as { score?: number; replayHash?: string };
+  } catch {
+    return {};
+  }
+}
+
+function Success({ credential, job }: { credential: Credential; job: CredentialJob | null }) {
   const t = useSolanaT();
   const locale = useLocale();
+  const details = job ? jobDetails(job.job) : {};
   return (
     <div className="relative">
       <Confetti />
       <Callout tone="success" title={t("panel.successTitle")} live>
-        <p>{t("panel.successBody", { skill: result.skillId })}</p>
-        <dl className="mt-3 grid gap-1 font-ui text-xs">
-          <div className="flex flex-wrap gap-x-2">
-            <dt className="text-muted">{t("credential.score")}</dt>
-            <dd className="tabular font-bold">{t("panel.scoreValue", { score: onChain?.score ?? result.score })}</dd>
-          </div>
-          <div className="flex flex-wrap gap-x-2">
-            <dt className="text-muted">{t("credential.replayHash")}</dt>
-            <dd className="break-all" translate="no">
-              {result.replayHash}
-            </dd>
-          </div>
-        </dl>
-        {result.paid.length ? (
-          <div className="mt-3">
-            <p className="font-ui text-sm font-bold">{t("panel.paidTitle")}</p>
-            <ul className="mt-1 grid gap-1 text-sm">
-              {result.paid.map((p) => (
-                <li key={p.bounty}>{t("panel.paidItem", { amount: formatSol(p.amount, locale), address: shortAddress(p.bounty) })}</li>
-              ))}
-            </ul>
-          </div>
+        <p>{t("panel.successBody", { skill: credential.skill })}</p>
+        {details.score != null || details.replayHash ? (
+          <dl className="mt-3 grid gap-1 font-ui text-xs">
+            {details.score != null ? (
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="text-muted">{t("credential.score")}</dt>
+                <dd className="tabular font-bold">{t("panel.scoreValue", { score: details.score })}</dd>
+              </div>
+            ) : null}
+            {details.replayHash ? (
+              <div className="flex flex-wrap gap-x-2">
+                <dt className="text-muted">{t("credential.replayHash")}</dt>
+                <dd className="break-all" translate="no">
+                  {details.replayHash}
+                </dd>
+              </div>
+            ) : null}
+          </dl>
         ) : null}
         <div className="mt-3 flex flex-wrap gap-3 font-ui text-sm font-bold">
-          <a href={explorerUrl("tx", result.signature)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1">
-            {t("panel.viewTx")}
-            <Icon name="external" size={16} />
-          </a>
-          <Link href={`/${locale}/verify?credential=${result.credential}`} className="inline-flex min-h-11 items-center gap-1">
+          {credential.sig ? (
+            <a href={explorerUrl("tx", credential.sig)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1">
+              {t("panel.viewTx")}
+              <Icon name="external" size={16} />
+            </a>
+          ) : null}
+          <Link href={`/${locale}/verify?credential=${credential.pda}`} className="inline-flex min-h-11 items-center gap-1">
             {t("panel.viewVerify")}
             <Icon name="chevron-right" size={16} />
           </Link>
@@ -125,13 +114,21 @@ function DroneMint({ itemId, figure }: { itemId: DroneId; figure: FigureHandle |
   const t = useSolanaT();
   const locale = useLocale();
   const tests = use(testsOf(itemId));
-  const { connection } = useConnection();
   const { publicKey } = useWallet();
+  const { status: link } = useStdb();
+  const { submitRun } = useStdbActions();
   const { recorder, recording } = useRecording(figure);
   const report = useMemo(() => (recording.started ? replayDroneSafety(recording.inputs, tests) : null), [recording, tests]);
   const [flow, setFlow] = useState<Flow>({ phase: "idle" });
   const skillId = skillIdFor("drone-safety", itemId) as string;
-  const busy = flow.phase === "server" || flow.phase === "chain";
+  const wallet = publicKey?.toBase58() ?? null;
+  const walletLinked = useLinkedWallet(wallet);
+  const { credentials } = useCredentials(wallet);
+  const credential = credentials.find((c) => c.skill === skillId);
+  const job = useCredentialJob(skillId);
+  const failed = job?.status === "failed";
+  const inFlight = !credential && !failed && (flow.phase === "submitting" || job?.status === "queued" || job?.status === "sent" || job?.status === "confirmed");
+  const progressAt = !job ? 0 : job.status === "queued" ? 1 : 2;
 
   const steps: StepItem[] = DRONE_TESTS.filter((test) => tests[test]).map((test) => {
     const done = report?.steps[test] === true;
@@ -146,22 +143,15 @@ function DroneMint({ itemId, figure }: { itemId: DroneId; figure: FigureHandle |
   if (firstTodo) firstTodo.status = "current";
 
   async function mint() {
-    if (!recorder || !publicKey || !report?.pass) return;
-    setFlow({ phase: "server" });
-    const res = await postJson<AttestOk>("/api/solana/attest", {
-      kind: "drone-safety",
-      itemId,
-      learner: publicKey.toBase58(),
-      run: recorder.runLog(itemId, { pass: report.pass, score: report.score }),
-    });
-    if (!res.ok) {
-      setFlow(res.code === "already_issued" ? { phase: "already" } : { phase: "error", code: res.code });
-      return;
+    if (!recorder || !wallet || !report?.pass) return;
+    setFlow({ phase: "submitting" });
+    try {
+      await submitRun({ kind: "drone-safety", itemId, run: recorder.runLog(itemId, { pass: report.pass, score: report.score }) });
+      bumpBalances();
+      setFlow({ phase: "idle" });
+    } catch (error) {
+      setFlow({ phase: "error", message: error instanceof Error ? error.message : String(error) });
     }
-    setFlow({ phase: "chain", result: res.data });
-    bumpBalances();
-    const onChain = PROGRAM_ID ? await credentialAt(connection, PROGRAM_ID, new PublicKey(res.data.credential)).catch(() => null) : null;
-    setFlow({ phase: "done", result: res.data, onChain });
   }
 
   function restart() {
@@ -198,42 +188,55 @@ function DroneMint({ itemId, figure }: { itemId: DroneId; figure: FigureHandle |
         ) : null}
         {report?.fault ? <Callout tone="warn">{t("panel.fault")}</Callout> : null}
         {recording.started ? (
-          <Button size="sm" variant="ghost" className="justify-self-start" onClick={restart} disabled={busy}>
+          <Button size="sm" variant="ghost" className="justify-self-start" onClick={restart} disabled={inFlight}>
             {t("panel.restart")}
           </Button>
         ) : null}
       </section>
 
-      <SkillBounties skillId={skillId} refresh={flow.phase === "done" ? 1 : 0} />
+      <SkillBounties skillId={skillId} refresh={credential ? 1 : 0} />
 
       <WalletBar />
 
       <section aria-label={t("panel.progressLabel")} className="grid gap-3">
-        {flow.phase === "done" ? (
-          <Success result={flow.result} onChain={flow.onChain} />
+        {credential ? (
+          <Success credential={credential} job={job} />
         ) : (
           <>
-            <Button variant="primary" size="lg" onClick={mint} disabled={busy || !publicKey || !report?.pass} aria-busy={busy}>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={mint}
+              disabled={inFlight || !wallet || !walletLinked || link !== "online" || !report?.pass}
+              aria-busy={inFlight}
+            >
               {t("panel.mint")}
             </Button>
-            {!busy && !report?.pass ? <p className="text-sm text-muted">{t("panel.needsPass")}</p> : null}
-            {!busy && report?.pass && !publicKey ? <p className="text-sm text-muted">{t("panel.needsWallet")}</p> : null}
+            {!inFlight && !report?.pass ? <p className="text-sm text-muted">{t("panel.needsPass")}</p> : null}
+            {!inFlight && report?.pass && !wallet ? <p className="text-sm text-muted">{t("panel.needsWallet")}</p> : null}
+            {report?.pass && wallet && link !== "online" ? <p className="text-sm text-muted">{t("panel.offline")}</p> : null}
           </>
         )}
-        {busy ? <MintProgress flow={flow} /> : null}
-        {flow.phase === "already" ? (
-          <Callout tone="note" live>
-            {t("panel.already")}{" "}
-            {publicKey ? (
-              <Link href={`/${locale}/verify?learner=${publicKey.toBase58()}`} className="font-bold">
-                {t("panel.seeIt")}
-              </Link>
-            ) : null}
+        {inFlight ? <MintProgress at={progressAt} /> : null}
+        {failed ? (
+          <Callout tone="danger" live>
+            {t("panel.failed", { reason: job?.job.error ?? "" })}
           </Callout>
         ) : null}
         {flow.phase === "error" ? (
           <Callout tone="danger" live>
-            {errorText(t, flow.code)}
+            {/already issued/.test(flow.message) ? (
+              <>
+                {t("panel.already")}{" "}
+                {wallet ? (
+                  <Link href={`/${locale}/verify?learner=${wallet}`} className="font-bold">
+                    {t("panel.seeIt")}
+                  </Link>
+                ) : null}
+              </>
+            ) : (
+              flow.message
+            )}
           </Callout>
         ) : null}
       </section>

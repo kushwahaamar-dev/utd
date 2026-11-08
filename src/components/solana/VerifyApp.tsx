@@ -9,9 +9,11 @@ import { useLocale } from "@/i18n/client";
 import { reloadFeatures, useFeatures } from "@/lib/features";
 import { PROGRAM_ID, explorerUrl, isAddress, shortAddress } from "@/lib/solana/config";
 import { SolanaProvider } from "@/lib/solana/provider";
+import { useCredentials } from "@/lib/stdb";
 import { CredentialCard } from "./CredentialCard";
+import { MirrorCredential } from "./MirrorCredential";
 import { useSolanaT } from "./SolanaText";
-import { useConfigIssuer, useCredentialAt, useCredentialsOf, type ChainRead } from "./useChain";
+import { useConfigIssuer, useCredentialAt, type ChainRead } from "./useChain";
 
 function valid(value: string | null): string | null {
   return value && isAddress(value) ? value : null;
@@ -21,13 +23,13 @@ function Results({ learner, credential }: { learner: string | null; credential: 
   const t = useSolanaT();
   const [retry, setRetry] = useState(0);
   const issuer = useConfigIssuer();
-  const many = useCredentialsOf(credential ? null : learner, retry);
   const one = useCredentialAt(credential, retry);
-  const read: ChainRead<unknown> = credential ? one : many;
+  const mirrored = useCredentials(credential ? null : learner);
+  const read: ChainRead<unknown> = one;
 
   if (!learner && !credential) return <p className="max-w-[60ch] text-muted">{t("verify.empty")}</p>;
-  if (read.status === "loading" || read.status === "idle") return <p className="text-muted" aria-busy="true">{t("passport.reading")}</p>;
-  if (read.status === "error")
+  if (credential && (read.status === "loading" || read.status === "idle")) return <p className="text-muted" aria-busy="true">{t("passport.reading")}</p>;
+  if (credential && read.status === "error")
     return (
       <Callout tone="warn">
         <p>{t("passport.readError")}</p>
@@ -40,14 +42,15 @@ function Results({ learner, credential }: { learner: string | null; credential: 
     if (one.status !== "ready" || !one.data) return <Note>{t("verify.noCredential")}</Note>;
     return <CredentialCard credential={one.data} issuer={issuer} />;
   }
-  if (many.status !== "ready" || many.data.length === 0) return <Note>{t("verify.noneForLearner")}</Note>;
+  if (!mirrored.ready) return <p className="text-muted" aria-busy="true">{t("passport.reading")}</p>;
+  if (mirrored.credentials.length === 0) return <Note>{t("verify.noneForLearner")}</Note>;
   return (
     <div className="grid gap-6">
       <h2 className={eyebrow}>{t("verify.resultsFor", { address: shortAddress(learner as string) })}</h2>
       <ul className="grid gap-6 xl:grid-cols-2">
-        {many.data.map((c) => (
-          <li key={c.address}>
-            <CredentialCard credential={c} issuer={issuer} />
+        {mirrored.credentials.map((c) => (
+          <li key={c.id.toString()}>
+            <MirrorCredential credential={c} />
           </li>
         ))}
       </ul>

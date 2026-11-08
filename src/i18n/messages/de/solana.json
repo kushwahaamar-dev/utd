@@ -102,9 +102,9 @@
     "needsPass": "Bestehe alle Tests oben, um ihn auszustellen.",
     "progressLabel": "Ausstellung",
     "phases": {
-      "check": "Durchlauf auf diesem Gerät prüfen",
-      "server": "Der Server spielt ihn erneut ab und stellt aus",
-      "chain": "Von der Chain zurücklesen"
+      "check": "Lauf auf diesem Gerät prüfen",
+      "server": "Das Modul wiederholt ihn und reiht das Zertifikat ein",
+      "chain": "Der Worker signiert es auf Solana Devnet"
     },
     "phaseStatus": {
       "done": "erledigt",
@@ -114,10 +114,10 @@
     "successBody": "{skill} steht mit deinem Replay-Hash im Solana-Devnet. Jeder kann es überprüfen.",
     "viewTx": "Transaktion ansehen",
     "viewVerify": "Öffentliche Prüfseite öffnen",
-    "paidTitle": "Ausgezahlte Prämien",
-    "paidItem": "{amount} SOL aus der Prämie {address}",
     "already": "Diese Wallet hat diesen Nachweis bereits.",
-    "seeIt": "Ansehen"
+    "seeIt": "Ansehen",
+    "offline": "Warte auf die Verbindung zum Echtzeit-Server.",
+    "failed": "Das Zertifikat konnte nicht auf Solana geschrieben werden: {reason}"
   },
   "bounties": {
     "openTitle": "Sponsorenprämien für diese Fähigkeit",
@@ -176,7 +176,9 @@
     "account": "Konto des Nachweises",
     "explorer": "Im Solana Explorer ansehen",
     "verifyLink": "Öffentlicher Prüflink",
-    "soulbound": "Nicht übertragbar: Er liegt an einer Programmadresse, die an diese Wallet und diese Fähigkeit gebunden ist."
+    "soulbound": "Nicht übertragbar: Er liegt an einer Programmadresse, die an diese Wallet und diese Fähigkeit gebunden ist.",
+    "verifyOnChain": "On-Chain prüfen",
+    "tx": "Ausstellungs-Transaktion"
   },
   "passport": {
     "metaTitle": "Dein Pass",
@@ -189,7 +191,10 @@
     "goDrones": "Zu den Drohnen",
     "connectFirst": "Verbinde eine Wallet, um deine Nachweise zu sehen.",
     "reading": "Solana-Devnet wird gelesen …",
-    "readError": "Das Solana-Devnet konnte nicht gelesen werden."
+    "readError": "Das Solana-Devnet konnte nicht gelesen werden.",
+    "racesTitle": "Preisrennen",
+    "racesBody": "Melde dich zu einem Torrennen an, fliege deine beste Runde, und der Pot zahlt das Podium aus.",
+    "racesLink": "Rennen ansehen"
   },
   "verify": {
     "metaTitle": "Einen Nachweis prüfen",
@@ -207,5 +212,63 @@
     "program": "Programm",
     "howTitle": "So funktioniert die Prüfung",
     "how": "Das Labor zeichnet deine Eingaben auf. Der Server spielt sie mit denselben reinen Prüffunktionen ab, die auch die Seite benutzt hat, und signiert erst dann issue_credential. Der sha256 dieser Eingaben wird als Replay-Hash auf der Chain gespeichert."
+  },
+  "races": {
+    "metaTitle": "Preisrennen",
+    "metaDescription": "Starte mit Devnet-SOL bei einem Drohnen-Torrennen, fliege deine beste Runde und gewinne einen Anteil am Pot.",
+    "kicker": "Rennen",
+    "title": "Preisrennen",
+    "lede": "Zahle ein kleines Startgeld aus deiner Wallet, fliege den Kurs, und deine beste geprüfte Runde landet on-chain. Nach Rennende zahlt der Pot die ersten drei aus.",
+    "listTitle": "Rennen",
+    "empty": "Noch keine Rennen. Das nächste öffnet bald.",
+    "loading": "Rennen werden geladen…",
+    "offline": "Der Echtzeit-Server ist nicht erreichbar, Rennen können nicht geladen werden.",
+    "connect": "Verbinde eine Wallet, um teilzunehmen.",
+    "fly": "Dieses Rennen fliegen",
+    "flyHint": "Deine Runden auf diesem Kurs zählen für das Rennen.",
+    "enterError": "Anmeldung fehlgeschlagen: {reason}",
+    "recordError": "Deine Anmeldung ist on-chain durch ({sig}), aber iynk konnte sie nicht speichern: {reason}",
+    "payout": "Auszahlung",
+    "card": {
+      "pot": "Preispot",
+      "entryFee": "Startgeld",
+      "entrants": "Teilnehmer",
+      "closesIn": "Schließt in",
+      "closed": "Geschlossen",
+      "podium": "Podium",
+      "noTimes": "Noch keine geprüften Zeiten",
+      "enter": "Teilnehmen",
+      "entering": "Warte auf Wallet",
+      "entered": "Du bist dabei",
+      "connect": "Wallet verbinden, um teilzunehmen",
+      "settled": "Abgerechnet",
+      "cancelled": "Abgebrochen",
+      "open": "Offen",
+      "closedStatus": "Geschlossen",
+      "viewRace": "Rennkonto",
+      "viewPayout": "Auszahlungs-Transaktion"
+    },
+    "result": {
+      "title": "Auszahlung",
+      "place": "Platz",
+      "winner": "Sieger",
+      "time": "Runde",
+      "prize": "Preis",
+      "share": "Anteil",
+      "total": "Pot",
+      "viewTx": "Transaktion im Solana Explorer ansehen"
+    },
+    "banner": {
+      "title": "Preisrennen",
+      "yourBest": "Deine beste Runde",
+      "rank": "Platz {rank} von {count}",
+      "noLap": "Noch keine Runde. Fliege den Kurs.",
+      "notIn": "Du bist noch nicht in diesem Rennen.",
+      "enterOn": "Melde dich auf der Rennseite an",
+      "allRaces": "Alle Rennen",
+      "otherDrone": "Dieses Rennen wird mit {drone} geflogen.",
+      "flyThere": "Zu dieser Drohne",
+      "closedNote": "Dieses Rennen ist geschlossen."
+    }
   }
 }

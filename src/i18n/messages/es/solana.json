@@ -69,7 +69,10 @@
     "recording": "Grabando esta sesión desde la figura.",
     "restart": "Empezar de nuevo",
     "stepsLabel": "Pruebas de seguridad en el banco",
-    "stepStatus": { "done": "superada", "current": "siguiente" },
+    "stepStatus": {
+      "done": "superada",
+      "current": "siguiente"
+    },
     "steps": {
       "smoke": "Prueba del smoke stopper",
       "smokeHint": "Detecta un cortocircuito antes de que lo haga la batería.",
@@ -88,7 +91,10 @@
     "fault": "El condensador de la batería ha reventado. Desconecta, vuelve a poner el XT60 en el sentido correcto y repite la prueba del smoke stopper.",
     "score": "Puntuación de seguridad",
     "scoreValue": "{score}/100",
-    "pops": { "one": "{count} chispazo al encender", "other": "{count} chispazos al encender" },
+    "pops": {
+      "one": "{count} chispazo al encender",
+      "other": "{count} chispazos al encender"
+    },
     "otherLab": "Las credenciales de lecciones y bancos llegarán cuando el servidor pueda volver a ejecutar esas pruebas. Hoy puedes conseguir la credencial de seguridad en el banco con cualquier dron.",
     "openPassport": "Abrir tu pasaporte",
     "mint": "Emitir mi credencial",
@@ -96,19 +102,22 @@
     "needsPass": "Supera todas las pruebas de arriba para emitirla.",
     "progressLabel": "Emitiendo",
     "phases": {
-      "check": "Comprobando la sesión en este dispositivo",
-      "server": "El servidor la vuelve a ejecutar y la emite",
-      "chain": "Leyéndola de vuelta desde la cadena"
+      "check": "Comprobando la prueba en este dispositivo",
+      "server": "El módulo la repite y pone la credencial en cola",
+      "chain": "El worker la firma en Solana devnet"
     },
-    "phaseStatus": { "done": "hecho", "current": "en curso" },
+    "phaseStatus": {
+      "done": "hecho",
+      "current": "en curso"
+    },
     "successTitle": "Credencial emitida",
     "successBody": "{skill} está en la devnet de Solana con tu hash de repetición. Cualquiera puede verificarla.",
     "viewTx": "Ver la transacción",
     "viewVerify": "Abrir la página pública de verificación",
-    "paidTitle": "Recompensas pagadas",
-    "paidItem": "{amount} SOL de la recompensa {address}",
     "already": "Esta billetera ya tiene esta credencial.",
-    "seeIt": "Verla"
+    "seeIt": "Verla",
+    "offline": "Esperando a que conecte el servidor en tiempo real.",
+    "failed": "No se pudo escribir la credencial en Solana: {reason}"
   },
   "bounties": {
     "openTitle": "Recompensas de patrocinadores para esta habilidad",
@@ -167,7 +176,9 @@
     "account": "Cuenta de la credencial",
     "explorer": "Ver en Solana Explorer",
     "verifyLink": "Enlace público de verificación",
-    "soulbound": "Intransferible: vive en una dirección del programa ligada a esta billetera y a esta habilidad."
+    "soulbound": "Intransferible: vive en una dirección del programa ligada a esta billetera y a esta habilidad.",
+    "verifyOnChain": "Verificar en la cadena",
+    "tx": "Transacción de emisión"
   },
   "passport": {
     "metaTitle": "Tu pasaporte",
@@ -180,7 +191,10 @@
     "goDrones": "Ir a los drones",
     "connectFirst": "Conecta una billetera para ver tus credenciales.",
     "reading": "Leyendo la devnet de Solana…",
-    "readError": "No se pudo leer la devnet de Solana."
+    "readError": "No se pudo leer la devnet de Solana.",
+    "racesTitle": "Carreras con premio",
+    "racesBody": "Entra en una carrera de puertas, vuela tu mejor vuelta y el bote paga al podio.",
+    "racesLink": "Ver las carreras"
   },
   "verify": {
     "metaTitle": "Verificar una credencial",
@@ -198,5 +212,63 @@
     "program": "Programa",
     "howTitle": "Cómo funciona la comprobación",
     "how": "El laboratorio graba tus entradas. El servidor las repite con las mismas funciones puras de comprobación que usó la página, y solo entonces firma issue_credential. El sha256 de esas entradas queda guardado en la cadena como hash de repetición."
+  },
+  "races": {
+    "metaTitle": "Carreras con premio",
+    "metaDescription": "Entra en una carrera de drones con SOL de devnet, vuela tu mejor vuelta y gana parte del bote.",
+    "kicker": "Carreras",
+    "title": "Carreras con premio",
+    "lede": "Paga una pequeña cuota desde tu monedero, vuela el circuito y tu mejor vuelta verificada queda en la cadena. Al cerrar la carrera, el bote paga a los tres primeros.",
+    "listTitle": "Carreras",
+    "empty": "Aún no hay carreras. La próxima abre pronto.",
+    "loading": "Cargando carreras…",
+    "offline": "No se alcanza el servidor en tiempo real, así que no se pueden cargar las carreras.",
+    "connect": "Conecta un monedero para entrar en una carrera.",
+    "fly": "Volar esta carrera",
+    "flyHint": "Tus vueltas en este circuito cuentan para la carrera.",
+    "enterError": "No se pudo entrar en la carrera: {reason}",
+    "recordError": "Tu inscripción se hizo en la cadena ({sig}) pero iynk no pudo registrarla: {reason}",
+    "payout": "Reparto",
+    "card": {
+      "pot": "Bote",
+      "entryFee": "Cuota",
+      "entrants": "Participantes",
+      "closesIn": "Cierra en",
+      "closed": "Cerrada",
+      "podium": "Podio",
+      "noTimes": "Aún sin tiempos verificados",
+      "enter": "Entrar en la carrera",
+      "entering": "Esperando al monedero",
+      "entered": "Estás dentro",
+      "connect": "Conecta un monedero para entrar",
+      "settled": "Liquidada",
+      "cancelled": "Cancelada",
+      "open": "Abierta",
+      "closedStatus": "Cerrada",
+      "viewRace": "Cuenta de la carrera",
+      "viewPayout": "Transacción del reparto"
+    },
+    "result": {
+      "title": "Reparto",
+      "place": "Puesto",
+      "winner": "Ganador",
+      "time": "Vuelta",
+      "prize": "Premio",
+      "share": "Parte",
+      "total": "Bote",
+      "viewTx": "Ver la transacción en Solana Explorer"
+    },
+    "banner": {
+      "title": "Carrera con premio",
+      "yourBest": "Tu mejor vuelta",
+      "rank": "Puesto {rank} de {count}",
+      "noLap": "Aún sin vuelta. Vuela el circuito.",
+      "notIn": "Todavía no estás en esta carrera.",
+      "enterOn": "Entra desde la página de carreras",
+      "allRaces": "Todas las carreras",
+      "otherDrone": "Esta carrera se vuela con {drone}.",
+      "flyThere": "Ir a ese dron",
+      "closedNote": "Esta carrera ha cerrado."
+    }
   }
 }

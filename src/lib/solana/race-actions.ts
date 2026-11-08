@@ -1,18 +1,18 @@
-import type { Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey, type Connection } from "@solana/web3.js";
 import { WalletRequiredError, sendAndConfirm, type Signer } from "./actions";
 import { entryAddress, enterRaceIx, raceAddress, refundEntryIx } from "./race";
 
 // Race transactions the player's own wallet signs.
 
-/** Pays the entry fee of race `raceId` and registers the wallet as an entrant. */
+/** Pays the entry fee of a race, given its id or its account address, and registers the wallet as an entrant. */
 export async function enterRace(
   connection: Connection,
   wallet: Signer,
   programId: PublicKey,
-  raceId: bigint | number,
+  raceId: bigint | number | PublicKey,
 ): Promise<{ signature: string; entry: string }> {
   if (!wallet.publicKey) throw new WalletRequiredError();
-  const race = raceAddress(programId, raceId);
+  const race = raceId instanceof PublicKey ? raceId : raceAddress(programId, raceId);
   const signature = await sendAndConfirm(connection, wallet, enterRaceIx(programId, race, wallet.publicKey));
   return { signature, entry: entryAddress(programId, race, wallet.publicKey).toBase58() };
 }

@@ -9,34 +9,24 @@ import { useLocale } from "@/i18n/client";
 import { reloadFeatures, useFeatures } from "@/lib/features";
 import { PROGRAM_ID } from "@/lib/solana/config";
 import { SolanaProvider } from "@/lib/solana/provider";
+import { useCredentials } from "@/lib/stdb";
 import { BountyForm } from "./BountyForm";
-import { CredentialCard } from "./CredentialCard";
+import { MirrorCredential } from "./MirrorCredential";
 import { useSolanaT } from "./SolanaText";
 import { SponsoredBounties } from "./SponsoredBounties";
 import { WalletBar } from "./WalletBar";
-import { useConfigIssuer, useCredentialsOf } from "./useChain";
 
 function Credentials() {
   const t = useSolanaT();
   const locale = useLocale();
   const { publicKey } = useWallet();
-  const [retry, setRetry] = useState(0);
-  const issuer = useConfigIssuer();
-  const read = useCredentialsOf(publicKey?.toBase58() ?? null, retry);
+  const wallet = publicKey?.toBase58() ?? null;
+  const { credentials, ready } = useCredentials(wallet);
 
   let body: ReactNode;
-  if (read.status === "idle") body = <p className="text-muted">{t("passport.connectFirst")}</p>;
-  else if (read.status === "loading") body = <p className="text-muted" aria-busy="true">{t("passport.reading")}</p>;
-  else if (read.status === "error")
-    body = (
-      <Callout tone="warn">
-        <p>{t("passport.readError")}</p>
-        <Action size="sm" kind="secondary" className="mt-2" onClick={() => setRetry((n) => n + 1)}>
-          {t("retry")}
-        </Action>
-      </Callout>
-    );
-  else if (read.data.length === 0)
+  if (!wallet) body = <p className="text-muted">{t("passport.connectFirst")}</p>;
+  else if (!ready) body = <p className="text-muted" aria-busy="true">{t("passport.reading")}</p>;
+  else if (credentials.length === 0)
     body = (
       <Note
         action={
@@ -52,9 +42,9 @@ function Credentials() {
   else
     body = (
       <ul className="grid gap-6 xl:grid-cols-2">
-        {read.data.map((credential) => (
-          <li key={credential.address}>
-            <CredentialCard credential={credential} issuer={issuer} />
+        {credentials.map((credential) => (
+          <li key={credential.id.toString()}>
+            <MirrorCredential credential={credential} />
           </li>
         ))}
       </ul>
@@ -67,11 +57,23 @@ function Credentials() {
   );
 }
 
+function Races() {
+  const t = useSolanaT();
+  const locale = useLocale();
+  return (
+    <Section id="passport-races" index="03" title={t("passport.racesTitle")} lede={<p>{t("passport.racesBody")}</p>}>
+      <ActionLink href={`/${locale}/races`} kind="secondary" size="lg">
+        {t("passport.racesLink")}
+      </ActionLink>
+    </Section>
+  );
+}
+
 function Bounties() {
   const t = useSolanaT();
   const [created, setCreated] = useState(0);
   return (
-    <Section id="passport-bounties" index="03" title={t("bounties.formTitle")} lede={<p>{t("bounties.formLede")}</p>}>
+    <Section id="passport-bounties" index="04" title={t("bounties.formTitle")} lede={<p>{t("bounties.formLede")}</p>}>
       <div className="grid gap-x-10 gap-y-12 xl:grid-cols-2">
         <BountyForm onCreated={() => setCreated((n) => n + 1)} />
         <div className="border-t border-rule pt-6 xl:border-t-0 xl:border-s xl:ps-10 xl:pt-0">
@@ -106,6 +108,7 @@ function Passport() {
         </div>
       </Section>
       <Credentials />
+      <Races />
       <Bounties />
     </>
   );

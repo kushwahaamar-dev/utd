@@ -4,8 +4,7 @@ import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { IssuerContext } from "@/lib/server/solana/context";
 import { DISCRIMINATORS, credentialAddress, u64le } from "@/lib/solana/passport";
-import type { BenchEvent } from "@/lib/verify/drone-safety";
-import { replayHash, sha256, toHex } from "@/lib/verify/hash";
+import { sha256 } from "@/lib/verify/hash";
 
 vi.mock("next/server", () => ({ connection: async () => {} }));
 
@@ -15,7 +14,6 @@ vi.mock("@/lib/server/solana/context", () => ({
   readContext: () => context.current,
 }));
 
-const { POST: attestPOST } = await import("./attest/route");
 const { POST: faucetPOST } = await import("./faucet/route");
 const { GET: credentialsGET } = await import("./credentials/route");
 
@@ -82,30 +80,6 @@ const programAccount = (data: Buffer): Account => ({
   account: { data, owner: programId, lamports: 1, executable: false },
 });
 
-const BUILT = { FRAME: 0, MOTORS: 0, ESC: 0, WIRES: 0, FC: 0, XT60: 0, CAM: 0, RX: 0, VTX: 0, TOP: 0, BATT: 0, PROPS: 0 } as const;
-const GOOD: BenchEvent[] = [
-  { type: "init", placed: { ...BUILT }, plugged: false, fault: null, smokeOk: true, motorOk: true, accOk: true },
-  { type: "remove", id: "PROPS" },
-  { type: "test", test: "smoke" },
-  { type: "test-end", test: "smoke" },
-  { type: "test", test: "motors" },
-  { type: "test-end", test: "motors" },
-  { type: "unplug" },
-  { type: "test", test: "calibrate" },
-  { type: "test-end", test: "calibrate" },
-  { type: "add", id: "PROPS", orient: 0 },
-];
-
-const runLog = (events: BenchEvent[], itemId = "quad5") => ({
-  v: 1,
-  kind: "drone-safety",
-  itemId,
-  seed: 1,
-  inputs: events.map((action, i) => ({ t: i * 400, action })),
-  result: { pass: true, score: 100 },
-  client: { appVersion: "test" },
-});
-
 let ip = 0;
 const post = (path: string, body: unknown, headers: Record<string, string> = {}) =>
   new Request(`http://localhost${path}`, {
@@ -118,93 +92,6 @@ let fake: ReturnType<typeof fakeConnection>;
 beforeEach(() => {
   fake = fakeConnection();
   context.current = { connection: fake.connection as never, programId, issuer };
-});
-
-describe("POST /api/solana/attest", () => {
-  const body = (events = GOOD, itemId = "quad5") => ({ kind: "drone-safety", itemId, learner: learner.toBase58(), run: runLog(events, itemId) });
-
-  test("re-runs the check, issues the credential and pays the matching bounties", async () => {
-    const hash = await sha256("drone:quad5:safety");
-    const sponsor = Keypair.generate().publicKey;
-    const open = programAccount(bountyData(sponsor, "drone:quad5:safety", hash, { lamports: 50_000_000 }));
-    const mine = programAccount(bountyData(sponsor, "drone:quad5:safety", hash, { learner, lamports: 10_000_000 }));
-    const someoneElse = programAccount(bountyData(sponsor, "drone:quad5:safety", hash, { learner: sponsor, lamports: 1 }));
-    const claimed = programAccount(bountyData(sponsor, "drone:quad5:safety", hash, { claimedBy: sponsor, lamports: 1 }));
-    const otherSkill = programAccount(bountyData(sponsor, "drone:racer:safety", await sha256("drone:racer:safety"), { lamports: 1 }));
-    fake.state.programAccounts.push(open, mine, someoneElse, claimed, otherSkill);
-
-    const res = await attestPOST(post("/api/solana/attest", body()));
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    const credential = credentialAddress(programId, learner, hash).toBase58();
-    expect(json).toMatchObject({ signature: "sig1", credential, skillId: "drone:quad5:safety", score: 100 });
-    expect(json.replayHash).toBe(await replayHash(runLog(GOOD).inputs));
-    expect(json.paid.map((p: { bounty: string }) => p.bounty).sort()).toEqual([open.pubkey.toBase58(), mine.pubkey.toBase58()].sort());
-
-    const [tx] = fake.sent;
-    expect(tx.signatures.find((s) => s.publicKey.equals(issuer.publicKey))?.signature).toBeTruthy();
-    const ix = tx.instructions[0];
-    expect(ix.programId.equals(programId)).toBe(true);
-    expect([...ix.data.subarray(0, 8)]).toEqual([...DISCRIMINATORS.issueCredential]);
-    expect(toHex(ix.data.subarray(ix.data.length - 34, ix.data.length - 2))).toBe(json.replayHash);
-    expect(ix.keys.map((k) => k.pubkey.toBase58())).toContain(credential);
-    expect(ix.keys.slice(-2).map((k) => k.pubkey.toBase58()).sort()).toEqual(json.paid.map((p: { bounty: string }) => p.bounty).sort());
-  });
-
-  test("answers 409 when the credential exists", async () => {
-    const hash = await sha256("drone:quad5:safety");
-    fake.state.accounts.set(credentialAddress(programId, learner, hash).toBase58(), programAccount(Buffer.alloc(8)).account);
-    const res = await attestPOST(post("/api/solana/attest", body()));
-    expect(res.status).toBe(409);
-    expect((await res.json()).error.code).toBe("already_issued");
-    expect(fake.sent).toHaveLength(0);
-  });
-
-  test("maps a lost race on the credential account to 409", async () => {
-    fake.state.failSend = Object.assign(new Error("Simulation failed"), { logs: ["Allocate: account Address { .. } already in use"] });
-    const res = await attestPOST(post("/api/solana/attest", body()));
-    expect(res.status).toBe(409);
-  });
-
-  test("refuses a run that does not pass, without sending anything", async () => {
-    const res = await attestPOST(post("/api/solana/attest", body(GOOD.slice(0, 6))));
-    expect(res.status).toBe(422);
-    expect((await res.json()).error.code).toBe("not_passed");
-    expect(fake.sent).toHaveLength(0);
-  });
-
-  test("refuses a tampered log", async () => {
-    const tampered = { ...body(), itemId: "racer" };
-    const res = await attestPOST(post("/api/solana/attest", tampered));
-    expect(res.status).toBe(400);
-    expect((await res.json()).error.code).toBe("run_mismatch");
-  });
-
-  test("validates the body", async () => {
-    const res = await attestPOST(post("/api/solana/attest", { ...body(), learner: "not-an-address" }));
-    expect(res.status).toBe(400);
-    const res2 = await attestPOST(new Request("http://localhost/api/solana/attest", { method: "POST", body: "{}", headers: { "content-type": "text/plain" } }));
-    expect(res2.status).toBe(415);
-  });
-
-  test("reports an RPC failure as 502 without details", async () => {
-    fake.state.failSend = new Error("fetch failed: https://secret-rpc.example");
-    const res = await attestPOST(post("/api/solana/attest", body()));
-    expect(res.status).toBe(502);
-    expect(JSON.stringify(await res.json())).not.toContain("secret-rpc");
-  });
-
-  test("says when Solana is not set up", async () => {
-    context.current = null;
-    const res = await attestPOST(post("/api/solana/attest", body()));
-    expect(res.status).toBe(503);
-    expect((await res.json()).error.code).toBe("not_configured");
-  });
-
-  test("refuses other origins", async () => {
-    const res = await attestPOST(post("/api/solana/attest", body(), { origin: "https://evil.example" }));
-    expect(res.status).toBe(403);
-  });
 });
 
 describe("POST /api/solana/faucet", () => {

@@ -102,9 +102,9 @@
     "needsPass": "Réussissez tous les tests ci-dessus pour l’émettre.",
     "progressLabel": "Émission",
     "phases": {
-      "check": "Vérification de la session sur cet appareil",
-      "server": "Le serveur la rejoue et l’émet",
-      "chain": "Relecture depuis la chaîne"
+      "check": "Vérification de la manche sur cet appareil",
+      "server": "Le module la rejoue et met le certificat en file",
+      "chain": "Le worker la signe sur Solana devnet"
     },
     "phaseStatus": {
       "done": "fait",
@@ -114,10 +114,10 @@
     "successBody": "{skill} est sur le devnet de Solana avec votre hash de rejeu. Tout le monde peut le vérifier.",
     "viewTx": "Voir la transaction",
     "viewVerify": "Ouvrir la page publique de vérification",
-    "paidTitle": "Primes versées",
-    "paidItem": "{amount} SOL de la prime {address}",
     "already": "Ce portefeuille possède déjà ce certificat.",
-    "seeIt": "Le voir"
+    "seeIt": "Le voir",
+    "offline": "En attente de la connexion au serveur temps réel.",
+    "failed": "Le certificat n'a pas pu être écrit sur Solana : {reason}"
   },
   "bounties": {
     "openTitle": "Primes de sponsors pour cette compétence",
@@ -176,7 +176,9 @@
     "account": "Compte du certificat",
     "explorer": "Voir sur Solana Explorer",
     "verifyLink": "Lien public de vérification",
-    "soulbound": "Non transférable : il réside à une adresse du programme liée à ce portefeuille et à cette compétence."
+    "soulbound": "Non transférable : il réside à une adresse du programme liée à ce portefeuille et à cette compétence.",
+    "verifyOnChain": "Vérifier sur la chaîne",
+    "tx": "Transaction d'émission"
   },
   "passport": {
     "metaTitle": "Votre passeport",
@@ -189,7 +191,10 @@
     "goDrones": "Aller aux drones",
     "connectFirst": "Connectez un portefeuille pour voir vos certificats.",
     "reading": "Lecture du devnet de Solana…",
-    "readError": "Impossible de lire le devnet de Solana."
+    "readError": "Impossible de lire le devnet de Solana.",
+    "racesTitle": "Courses à prix",
+    "racesBody": "Inscris-toi à une course de portes, vole ton meilleur tour et la cagnotte paie le podium.",
+    "racesLink": "Voir les courses"
   },
   "verify": {
     "metaTitle": "Vérifier un certificat",
@@ -207,5 +212,63 @@
     "program": "Programme",
     "howTitle": "Comment fonctionne la vérification",
     "how": "Le labo enregistre vos actions. Le serveur les rejoue avec les mêmes fonctions de test pures que la page, et seulement ensuite il signe issue_credential. Le sha256 de ces actions est stocké sur la chaîne comme hash de rejeu."
+  },
+  "races": {
+    "metaTitle": "Courses à prix",
+    "metaDescription": "Inscris-toi à une course de drones avec des SOL devnet, vole ton meilleur tour et gagne une part de la cagnotte.",
+    "kicker": "Courses",
+    "title": "Courses à prix",
+    "lede": "Paie un petit droit d'entrée depuis ton portefeuille, vole le parcours et ton meilleur tour vérifié est inscrit sur la chaîne. À la clôture, la cagnotte paie les trois premiers.",
+    "listTitle": "Courses",
+    "empty": "Pas encore de course. La prochaine ouvre bientôt.",
+    "loading": "Chargement des courses…",
+    "offline": "Le serveur temps réel est injoignable, les courses ne peuvent pas se charger.",
+    "connect": "Connecte un portefeuille pour t'inscrire.",
+    "fly": "Voler cette course",
+    "flyHint": "Tes tours sur ce parcours comptent pour la course.",
+    "enterError": "Inscription impossible : {reason}",
+    "recordError": "Ton inscription est passée sur la chaîne ({sig}) mais iynk n'a pas pu l'enregistrer : {reason}",
+    "payout": "Gains",
+    "card": {
+      "pot": "Cagnotte",
+      "entryFee": "Entrée",
+      "entrants": "Inscrits",
+      "closesIn": "Clôture dans",
+      "closed": "Close",
+      "podium": "Podium",
+      "noTimes": "Pas encore de temps vérifié",
+      "enter": "S'inscrire",
+      "entering": "En attente du portefeuille",
+      "entered": "Tu es inscrit",
+      "connect": "Connecte un portefeuille pour t'inscrire",
+      "settled": "Réglée",
+      "cancelled": "Annulée",
+      "open": "Ouverte",
+      "closedStatus": "Close",
+      "viewRace": "Compte de la course",
+      "viewPayout": "Transaction de paiement"
+    },
+    "result": {
+      "title": "Gains",
+      "place": "Place",
+      "winner": "Vainqueur",
+      "time": "Tour",
+      "prize": "Gain",
+      "share": "Part",
+      "total": "Cagnotte",
+      "viewTx": "Voir la transaction sur Solana Explorer"
+    },
+    "banner": {
+      "title": "Course à prix",
+      "yourBest": "Ton meilleur tour",
+      "rank": "Rang {rank} sur {count}",
+      "noLap": "Pas encore de tour. Vole le parcours.",
+      "notIn": "Tu n'es pas encore inscrit à cette course.",
+      "enterOn": "Inscris-toi sur la page des courses",
+      "allRaces": "Toutes les courses",
+      "otherDrone": "Cette course se vole avec {drone}.",
+      "flyThere": "Aller à ce drone",
+      "closedNote": "Cette course est close."
+    }
   }
 }
