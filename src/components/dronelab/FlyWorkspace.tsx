@@ -9,6 +9,8 @@ import { BreakIt } from "@/components/flight/BreakIt";
 import { challengeWords, DailyChallengeCard, type ChallengeEntry } from "@/components/flight/DailyChallenge";
 import { FlightRange } from "@/components/flight/FlightRange";
 import { useRoomGhosts } from "@/components/flight/room-ghosts";
+import { FlyRaceBanner } from "@/components/solana/FlyRaceBanner";
+import { RacesLink } from "@/components/solana/RacesLink";
 import { SoundToggle } from "@/components/settings";
 import { WorkspaceBar, WorkspaceFrame } from "@/components/shell/workspace";
 import { Chip } from "@/components/ui/Chip";
@@ -81,6 +83,9 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
     const c = link ? dailyChallenge(link.date, pool) : null;
     if (c) store.dispatch({ type: "challenge", challenge: c });
   }, [link, pool, store]);
+
+  const raceId = useMemo(() => new URLSearchParams(search).get("race"), [search]);
+  const onRaceCourse = useCallback((courseId: string) => store.dispatch({ type: "course", id: courseId }), [store]);
 
   const { source, bench, challenge, breaks } = state;
   const pick = useMemo(() => flyPick(content, { source, bench, challenge }), [content, source, bench, challenge]);
@@ -211,6 +216,7 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
         onStop={() => store.dispatch({ type: "challenge", challenge: null })}
         t={flight}
       />
+      {raceId ? <FlyRaceBanner raceId={raceId} drone={id} onCourse={onRaceCourse} /> : null}
       {flightCourse && course ? (
         <Leaderboard
           key={challenge?.board ?? flightCourse.id}
@@ -221,6 +227,7 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
           messages={board}
         />
       ) : null}
+      <RacesLink />
     </Panel>
   );
 
