@@ -24,6 +24,9 @@ const eslintConfig = defineConfig([
     "coverage/**",
     // Spike and schema-check scripts in the master plan are throwaway, not app source.
     "docs/MASTER_PLAN/**",
+    // SpacetimeDB module bundle and generated client bindings.
+    "spacetime/dist/**",
+    "src/lib/stdb/bindings/**",
   ]),
 ]);
 
