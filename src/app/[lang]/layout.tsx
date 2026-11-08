@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/shell";
 import { SkipLink } from "@/components/ui/SkipLink";
 import { I18nProvider } from "@/i18n/client";
+import { StdbProvider } from "@/lib/stdb";
 import { LOCALES, htmlLang, isLocale } from "@/i18n/config";
 import { siteUrl } from "@/i18n/seo";
 import { getMessages, getT } from "@/i18n/server";
@@ -65,12 +66,14 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
       <body className="flex flex-col">
         <I18nProvider locale={lang} messages={common.client}>
           <SettingsSync />
-          <SkipLink label={t("a11y.skipToContent")} target={mainId} />
-          <SiteHeader lang={lang} />
-          <main id={mainId} tabIndex={-1} className="flex-1 outline-none">
-            {children}
-          </main>
-          <SiteFooter lang={lang} />
+          <StdbProvider>
+            <SkipLink label={t("a11y.skipToContent")} target={mainId} />
+            <SiteHeader lang={lang} />
+            <main id={mainId} tabIndex={-1} className="flex-1 outline-none">
+              {children}
+            </main>
+            <SiteFooter lang={lang} />
+          </StdbProvider>
         </I18nProvider>
       </body>
     </html>
