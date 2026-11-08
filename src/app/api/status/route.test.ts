@@ -15,7 +15,7 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe("GET /api/status", () => {
   it("reports booleans only, never values", async () => {
-    const { GET } = await load({ META_API_KEY: "sk-very-secret", SERPAPI_KEY: "" });
+    const { GET } = await load({ NVIDIA_API_KEY: "sk-very-secret", SERPAPI_KEY: "" });
     const res = await GET(new Request("http://localhost/api/status"));
     expect(res.status).toBe(200);
     const text = await res.text();

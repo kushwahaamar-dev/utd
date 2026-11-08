@@ -1,7 +1,7 @@
 {
   "panel": {
     "title": "Lab partner",
-    "byline": "Muse Spark · hints first, friends first",
+    "byline": "Nemotron · hints first, friends first",
     "intro": "Ask about your wiring, your code or a fault. I give hints before answers, and if a friend in your room has done this lesson, I ask them first.",
     "inputLabel": "Ask your lab partner",
     "placeholder": "Ask about the bench…",
@@ -90,7 +90,7 @@
   "status": {
     "loading": "Waking up your lab partner…",
     "unavailable": "The lab partner isn’t set up on this deployment",
-    "unavailableBody": "Everything else in the lab works without it. The partner needs a Meta Model API key or a Gemini API key on the server.",
+    "unavailableBody": "Everything else in the lab works without it. The partner needs an NVIDIA API key (Nemotron) on the server.",
     "unreachable": "Couldn’t reach the server to check the partner.",
     "check": "Check again"
   },

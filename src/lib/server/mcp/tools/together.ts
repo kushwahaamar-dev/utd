@@ -29,7 +29,7 @@ export const planBuildNight = defineTool({
   name: "plan_build_night",
   title: "Plan a build night",
   description:
-    "Plans one iynk project a group will all enjoy, using Muse Spark: it weighs what each person wants and how much they already know, picks a board, robotics bench or drone, gives everyone a role and a first task, and lists the steps (and parts, when there are any). Use it for requests like \"plan a drone night with my cousins\". Follow with create_room to give the group a live room on that item.",
+    "Plans one iynk project a group will all enjoy, using Nemotron: it weighs what each person wants and how much they already know, picks a board, robotics bench or drone, gives everyone a role and a first task, and lists the steps (and parts, when there are any). Use it for requests like \"plan a drone night with my cousins\". Follow with create_room to give the group a live room on that item.",
   input: z.object({
     participants: z.array(participant).min(1).max(MAX_PEERS).describe(`Everyone taking part, at most ${MAX_PEERS}.`),
     locale: localeInput.describe("Language the plan is written in."),
@@ -43,7 +43,7 @@ export const planBuildNight = defineTool({
   openWorld: true,
   idempotent: false,
   async run({ participants, locale, messages }, ctx) {
-    if (!features.ai) throw new ToolError("not_configured", "The Build Night planner (Muse Spark) is not set up on this deployment.");
+    if (!features.ai) throw new ToolError("not_configured", "The Build Night planner (Nemotron) is not set up on this deployment.");
     const plan = await postRoute("The Build Night planner", "/api/ai/plan", planShape, { locale, participants, messages }, 45_000);
     if (!findEntry(plan.item.lab, plan.item.id)) throw new ToolError("upstream", "The planner picked an item iynk does not have. Try again.");
     return { ...plan, url: itemUrl(ctx.siteUrl, locale, plan.item.lab, plan.item.id) };

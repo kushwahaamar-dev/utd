@@ -23,7 +23,7 @@ export function guardAi(req: Request, route: string, perMinute: number, feature:
   return budget.ok ? null : tooManyRequests(budget);
 }
 
-/** The hashed caller id sent as Meta's safety_identifier. */
+/** The hashed caller id sent as the upstream user field. */
 export const aiUser = (req: Request) => safetyId(clientIp(req));
 
 /** Maps a failure to the contract's error response; upstream detail stays in the log. */

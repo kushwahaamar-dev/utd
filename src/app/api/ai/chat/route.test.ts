@@ -22,7 +22,7 @@ vi.mock("@/lib/server/search/serpapi", () => ({
 
 let ip = 0;
 
-async function load(vars: Record<string, string> = { META_API_KEY: "k", SERPAPI_KEY: "s" }) {
+async function load(vars: Record<string, string> = { NVIDIA_API_KEY: "k", SERPAPI_KEY: "s" }) {
   vi.resetModules();
   for (const [k, v] of Object.entries(vars)) vi.stubEnv(k, v);
   return (await import("./route")).POST;
@@ -94,7 +94,7 @@ describe("POST /api/ai/chat", () => {
     expect(await readEvents(res)).toEqual([
       { type: "text", delta: "¿Qué " },
       { type: "text", delta: "pata va a GND?" },
-      { type: "done", usage: { provider: "meta", inTokens: 100, outTokens: 9 } },
+      { type: "done", usage: { provider: "nemotron", inTokens: 100, outTokens: 9 } },
     ]);
     const body = calls[0].body as { messages: Array<{ role: string; content: string }>; tools: Array<{ function: { name: string } }> };
     expect(body.messages[0].content).toContain("You are the iynk lab partner");
@@ -106,7 +106,7 @@ describe("POST /api/ai/chat", () => {
 
   it("leaves the search tools out when SerpApi is not set up", async () => {
     const { calls } = fakeFetch(sseOf([delta({ content: "ok" }, "stop")]));
-    const POST = await load({ META_API_KEY: "k" });
+    const POST = await load({ NVIDIA_API_KEY: "k" });
     await readEvents(await POST(post(ask)));
     const names = (calls[0].body as { tools: Array<{ function: { name: string } }> }).tools.map((t) => t.function.name);
     expect(names).not.toContain("search_datasheet");
@@ -130,7 +130,7 @@ describe("POST /api/ai/chat", () => {
       { type: "citation", url: "https://ds.example/led", title: "LED datasheet", snippet: "Vf 2.0 V" },
       { type: "text", delta: "\n\n" },
       { type: "text", delta: "About 2 V, per the datasheet." },
-      { type: "done", usage: { provider: "meta", inTokens: 130, outTokens: 12 } },
+      { type: "done", usage: { provider: "nemotron", inTokens: 130, outTokens: 12 } },
     ]);
     const second = calls[1].body as { messages: Array<Record<string, unknown>> };
     expect(second.messages.at(-2)).toEqual({
@@ -168,7 +168,7 @@ describe("POST /api/ai/chat", () => {
     const events = await readEvents(await POST(post(ask)));
     expect(events).toEqual([
       { type: "tool_call", id: "h1", name: "highlight_part", args: { partId: "led1", note: "Mira la pata larga" } },
-      { type: "done", usage: { provider: "meta", inTokens: 60, outTokens: 6 } },
+      { type: "done", usage: { provider: "nemotron", inTokens: 60, outTokens: 6 } },
     ]);
     expect(calls).toHaveLength(1);
     expect(search.web).not.toHaveBeenCalled();
@@ -225,7 +225,7 @@ describe("POST /api/ai/chat", () => {
       });
     // Without a key every call is refused before the limiter, so set one up and fail upstream instead.
     expect((await POST(req())).status).toBe(503);
-    const keyed = await load({ META_API_KEY: "k" });
+    const keyed = await load({ NVIDIA_API_KEY: "k" });
     fakeFetch(...Array.from({ length: 40 }, () => apiError(400)));
     const statuses: number[] = [];
     for (let i = 0; i < 21; i++) statuses.push((await keyed(req())).status);

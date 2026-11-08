@@ -1,4 +1,4 @@
-// MediaRecorder hands back webm, ogg or mp4. Muse Voice Transcribe takes a
+// MediaRecorder hands back webm, ogg or mp4. Speech-to-text wants a
 // 16-bit PCM WAV, so both voice paths decode the clip in the browser and
 // upload that WAV. 60 seconds of 16 kHz mono is about 1.9 MB.
 

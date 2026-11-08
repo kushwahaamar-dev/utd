@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { apiError, completion, delta, fakeFetch, sse, sseOf, usageChunk } from "./__test__/upstream";
 
-async function load(vars: Record<string, string> = { META_API_KEY: "meta-key" }) {
+async function load(vars: Record<string, string> = { NVIDIA_API_KEY: "nv-key" }) {
   vi.resetModules();
   for (const [k, v] of Object.entries(vars)) vi.stubEnv(k, v);
   return import("./provider");
@@ -27,21 +27,21 @@ describe("chat streaming", () => {
   it("streams text deltas and reports usage from the final chunk", async () => {
     const { calls } = fakeFetch(sseOf([delta({ role: "assistant", content: "Check " }), delta({ content: "the polarity." }, "stop"), usageChunk(42, 7)]));
     const { chat } = await load();
-    const events = await drain(chat({ messages, stream: true, maxTokens: 500, cacheKey: "k", user: "u" }));
+    const events = await drain(chat({ messages, stream: true, maxTokens: 500, user: "u" }));
     expect(events).toEqual([
       { type: "text", delta: "Check " },
       { type: "text", delta: "the polarity." },
-      { type: "done", finishReason: "stop", usage: { provider: "meta", inTokens: 42, outTokens: 7, cachedTokens: 0 } },
+      { type: "done", finishReason: "stop", usage: { provider: "nemotron", inTokens: 42, outTokens: 7, cachedTokens: 0 } },
     ]);
-    expect(calls[0].url).toBe("https://api.meta.ai/v1/chat/completions");
-    expect((calls[0].init.headers as Record<string, string>).authorization).toBe("Bearer meta-key");
+    expect(calls[0].url).toBe("https://integrate.api.nvidia.com/v1/chat/completions");
+    expect((calls[0].init.headers as Record<string, string>).authorization).toBe("Bearer nv-key");
     expect(calls[0].body).toMatchObject({
-      model: "muse-spark-1.3",
+      model: "nvidia/nemotron-3.5-lightning-30b-a3b",
       stream: true,
       stream_options: { include_usage: true },
-      max_completion_tokens: 500,
-      prompt_cache_key: "k",
-      safety_identifier: "u",
+      max_tokens: 500,
+      user: "u",
+      chat_template_kwargs: { enable_thinking: false },
     });
   });
 
@@ -92,7 +92,7 @@ describe("chat streaming", () => {
     expect(seen).toEqual([{ type: "text", delta: "Hi" }]);
   });
 
-  it("retries once on a 5xx, then succeeds", async () => {
+  it("retries on a 5xx, then succeeds", async () => {
     const { calls } = fakeFetch(apiError(503), sseOf([delta({ content: "ok" }, "stop")]));
     const { chat } = await load();
     const events = await drain(chat({ messages, stream: true }));
@@ -111,33 +111,31 @@ describe("chat streaming", () => {
     expect((error as Error).message).not.toContain("nope");
   });
 
-  it("reports a 429 that persists after the retry as upstream_busy", async () => {
+  it("reports a 429 that persists through the retries as upstream_busy", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
-    fakeFetch(apiError(429, "rate_limit_error"), apiError(429, "rate_limit_error"));
+    const { calls } = fakeFetch(apiError(429, "rate_limit_error"), apiError(429, "rate_limit_error"), apiError(429, "rate_limit_error"));
     const { chat } = await load();
     const error = await drain(chat({ messages, stream: true })).catch((e: { code: string }) => e);
     expect(error).toMatchObject({ code: "upstream_busy", status: 502 });
-  });
+    expect(calls).toHaveLength(3);
+  }, 10_000);
 
-  it("falls back to Gemini's OpenAI-compatible endpoint when Meta keeps failing", async () => {
+  it("tries the self-hosted vLLM first and falls back to the hosted API when it fails", async () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
-    const { calls } = fakeFetch(apiError(500), apiError(500), sseOf([delta({ content: "hola" }, "stop"), usageChunk(3, 1)]));
-    const { chat } = await load({ META_API_KEY: "m", GEMINI_API_KEY: "g" });
-    const events = await drain(chat({ messages, stream: true, maxTokens: 100, user: "u", cacheKey: "k" }));
-    expect(calls[2].url).toBe("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions");
-    expect((calls[2].init.headers as Record<string, string>).authorization).toBe("Bearer g");
-    expect(calls[2].body).toMatchObject({ model: "gemini-3.5-flash", max_tokens: 100 });
-    expect(calls[2].body).not.toHaveProperty("safety_identifier");
-    expect(calls[2].body).not.toHaveProperty("prompt_cache_key");
-    expect(events.at(-1)).toMatchObject({ type: "done", usage: { provider: "gemini", inTokens: 3, outTokens: 1 } });
+    const { calls } = fakeFetch(apiError(400), sseOf([delta({ content: "hola" }, "stop"), usageChunk(3, 1)]));
+    const { chat } = await load({ NVIDIA_API_KEY: "nv", NEMOTRON_BASE_URL: "http://gpu.example:8000/v1/" });
+    const events = await drain(chat({ messages, stream: true, model: "planner" }));
+    expect(calls[0].url).toBe("http://gpu.example:8000/v1/chat/completions");
+    expect(calls[1].url).toBe("https://integrate.api.nvidia.com/v1/chat/completions");
+    expect(calls[1].body).toMatchObject({ model: "nvidia/nemotron-3-super-120b-a12b" });
+    expect(events.at(-1)).toMatchObject({ type: "done", usage: { provider: "nemotron", inTokens: 3, outTokens: 1 } });
   });
 
-  it("uses Gemini alone when only its key is set", async () => {
+  it("uses only the self-hosted endpoint when no hosted key is set", async () => {
     const { calls } = fakeFetch(completion("ok"));
-    const { chat } = await load({ GEMINI_API_KEY: "g" });
-    const result = await chat({ messages });
-    expect(calls[0].url).toContain("generativelanguage.googleapis.com");
-    expect(result.usage.provider).toBe("gemini");
+    const { chat } = await load({ NEMOTRON_BASE_URL: "http://gpu.example:8000/v1" });
+    await chat({ messages });
+    expect(calls[0].url).toBe("http://gpu.example:8000/v1/chat/completions");
   });
 
   it("refuses with not_configured when no key is set", async () => {
@@ -191,9 +189,27 @@ describe("chat (non-streaming) and chatJson", () => {
     const { chat } = await load();
     expect(await chat({ messages })).toEqual({
       text: "",
+      reasoning: "",
       toolCalls: [{ id: "c1", name: "find_parts", arguments: '{"parts":["SG90"]}' }],
       finishReason: "tool_calls",
-      usage: { provider: "meta", inTokens: 9, outTokens: 4, cachedTokens: 8 },
+      usage: { provider: "nemotron", inTokens: 9, outTokens: 4, cachedTokens: 8 },
+    });
+  });
+
+  it("turns thinking on for the planner and reads reasoning_content", async () => {
+    const { calls } = fakeFetch(
+      Response.json({
+        choices: [{ message: { role: "assistant", content: "", reasoning_content: "thinking it through" }, finish_reason: "length" }],
+        usage: { prompt_tokens: 1, completion_tokens: 1 },
+      }),
+    );
+    const { chat } = await load();
+    const result = await chat({ messages, model: "planner", reasoning: "low" });
+    expect(result).toMatchObject({ text: "", reasoning: "thinking it through" });
+    expect(calls[0].body).toMatchObject({
+      model: "nvidia/nemotron-3-super-120b-a12b",
+      chat_template_kwargs: { enable_thinking: true },
+      low_effort: true,
     });
   });
 
@@ -203,7 +219,6 @@ describe("chat (non-streaming) and chatJson", () => {
     const { data } = await chatJson(z.object({ answer: z.string() }), "probe", { messages, reasoning: "low" });
     expect(data).toEqual({ answer: "42" });
     expect(calls[0].body).toMatchObject({
-      reasoning_effort: "low",
       response_format: { type: "json_schema", json_schema: { name: "probe", schema: { type: "object" } } },
     });
     expect(JSON.stringify(calls[0].body)).not.toContain("$schema");
@@ -215,40 +230,5 @@ describe("chat (non-streaming) and chatJson", () => {
     const schema = z.object({ answer: z.string() });
     await expect(chatJson(schema, "probe", { messages })).rejects.toMatchObject({ code: "bad_output" });
     await expect(chatJson(schema, "probe", { messages })).rejects.toMatchObject({ code: "bad_output" });
-  });
-});
-
-describe("generateImage", () => {
-  it("posts to /images/generations and returns a data URL", async () => {
-    const { calls } = fakeFetch(Response.json({ created: 1, data: [{ b64_json: "AAAA" }], output_format: "webp" }));
-    const { generateImage } = await load();
-    expect(await generateImage({ prompt: "a red LED" })).toEqual({ dataUrl: "data:image/webp;base64,AAAA" });
-    expect(calls[0].url).toBe("https://api.meta.ai/v1/images/generations");
-    expect(calls[0].body).toMatchObject({ model: "muse-image-1.0", prompt: "a red LED", n: 1, response_format: "b64_json" });
-  });
-
-  it("downloads the image when the API answers with a URL", async () => {
-    fakeFetch(
-      Response.json({ created: 1, data: [{ url: "https://cdn.example/x.png" }] }),
-      new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "image/png" } }),
-    );
-    const { generateImage } = await load();
-    expect(await generateImage({ prompt: "x" })).toEqual({ dataUrl: "data:image/png;base64,AQID" });
-  });
-});
-
-describe("transcribeWav", () => {
-  it("sends the documented multipart body: a JSON request part and a WAV audio part", async () => {
-    const { calls } = fakeFetch(Response.json({ sessionId: "s", transcript: " hola ", audioDurationMs: 900, turns: [] }));
-    const { transcribeWav } = await load();
-    const result = await transcribeWav({ wav: new Uint8Array([82, 73, 70, 70]), languages: ["Spanish"] });
-    expect(result).toEqual({ text: "hola", durationMs: 900 });
-    expect(calls[0].url).toBe("https://api.meta.ai/v1/asr/transcribe");
-    const headers = calls[0].init.headers as Record<string, string>;
-    expect(headers["content-type"]).toMatch(/^multipart\/form-data; boundary=/);
-    const body = Buffer.from(calls[0].init.body as Uint8Array).toString("latin1");
-    expect(body).toContain('Content-Disposition: form-data; name="request"\r\nContent-Type: application/json');
-    expect(body).toContain('"model":"muse-voice-transcribe-1.0","audioEncoding":"WAV","mode":"PUSH_TO_TALK","languageBias":["Spanish"]');
-    expect(body).toContain('name="audio"; filename="audio.wav"\r\nContent-Type: audio/wav\r\n\r\nRIFF');
   });
 });

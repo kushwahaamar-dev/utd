@@ -14,7 +14,7 @@ export type Features = ServerFeatures & { hw: boolean };
  */
 export type FeatureState = { status: "loading" | "ready" | "error"; features: Features };
 
-const FEATURE_KEYS = ["ai", "image", "voice", "search", "solana", "db", "realtime", "gemini", "hw"] as const satisfies readonly (keyof Features)[];
+const FEATURE_KEYS = ["ai", "image", "voice", "search", "solana", "db", "realtime", "hw"] as const satisfies readonly (keyof Features)[];
 
 export const NO_FEATURES: Features = Object.freeze({
   ai: false,
@@ -24,7 +24,6 @@ export const NO_FEATURES: Features = Object.freeze({
   solana: false,
   db: false,
   realtime: false,
-  gemini: false,
   hw: false,
 });
 

@@ -6,7 +6,7 @@ import { LANGUAGE_NAMES, quoted } from "./language";
 
 /**
  * The lab partner's system prompt (HX-CONTRACT H4). The rules never change,
- * so they come first and stay byte-identical across requests (Meta's prefix
+ * so they come first and stay byte-identical across requests (the upstream prefix
  * cache); everything about this learner follows in a second system message.
  */
 export const PARTNER_RULES = `You are the iynk lab partner: a friendly, patient electronics, robotics and drone mentor inside a browser hardware simulator. Learners wire boards, write Arduino C++, MicroPython or Verilog, build robots and fly drones in the sim, often together in a room with friends.

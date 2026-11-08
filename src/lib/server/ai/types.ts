@@ -4,7 +4,7 @@
 import type { LabKind } from "@/components/dock/types";
 import type { Locale } from "@/i18n/config";
 
-export type AiProvider = "meta" | "gemini";
+export type AiProvider = "nemotron";
 
 /** A tool call as the client sees it: `args` is the parsed JSON object. */
 export type ChatToolCall = { id: string; name: string; args: unknown };

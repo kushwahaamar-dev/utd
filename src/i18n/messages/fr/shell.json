@@ -114,7 +114,7 @@
       },
       "partner": {
         "title": "Un partenaire de labo",
-        "text": "Muse Spark vous trouve un partenaire dont les compétences complètent les vôtres, puis prépare une soirée de construction qui plaira à tous."
+        "text": "Nemotron vous trouve un partenaire dont les compétences complètent les vôtres, puis prépare une soirée de construction qui plaira à tous."
       },
       "languages": {
         "title": "Six langues",
@@ -160,5 +160,108 @@
     "builtWithTitle": "Réalisé avec",
     "builtWith": "Next.js, React et Tailwind CSS (tous sous licence MIT), plus le moteur Colorfigures pour chaque figure.",
     "colorfigures": "Page de la skill Colorfigures"
+  },
+  "landing": {
+    "title": "iynk est un *labo de hardware* gratuit dans votre navigateur.",
+    "p1": "Câblez, programmez, cassez et pilotez de vraies cartes, de vrais robots et de vrais drones. Votre code tourne sur de vrais interpréteurs Arduino, MicroPython et Verilog.",
+    "p2": "Des agents conçoivent, simulent et chiffrent votre montage avant que vous n'achetiez la moindre pièce. Faites la course en direct avec vos amis et gagnez une preuve sur Solana.",
+    "scene": {
+      "alt": "Un atelier dessiné avec des caractères : un drone flotte près d'une fenêtre au-dessus d'un établi avec un Arduino, un écran et un fer à souder.",
+      "time": "Heure du jour",
+      "dawn": "Aube",
+      "noon": "Midi",
+      "dusk": "Crépuscule",
+      "night": "Nuit"
+    },
+    "labs": {
+      "title": "Labos",
+      "board": {
+        "title": "Labo des cartes",
+        "meta": "{count} cartes",
+        "text": "Arduino, ESP32, Pico et FPGA. Écrivez du code et regardez réagir les broches, le moniteur série et le circuit."
+      },
+      "robotics": {
+        "title": "Labo de robotique",
+        "meta": "{count} bancs",
+        "text": "Pilotes de moteur, capteurs et étages de puissance, câblés sur un banc avec un solveur de pannes qui sait ce que vous avez cassé."
+      },
+      "drones": {
+        "title": "Labo des drones",
+        "meta": "{count} drones",
+        "text": "Choisissez les pièces d'un whoop ou d'un octocoptère et voyez poids, poussée et autonomie avant de construire."
+      },
+      "flight": {
+        "title": "Simulateur de vol",
+        "meta": "FPV",
+        "text": "Pilotez votre montage sur un parcours en vue subjective, avec la physique des pièces choisies."
+      }
+    },
+    "mission": {
+      "title": "Centre de mission",
+      "text": "Briefez les agents. Ils esquissent la conception, lancent la simulation, chiffrent les pièces et montrent leur raisonnement.",
+      "cta": "Ouvrir le centre de mission"
+    },
+    "live": {
+      "title": "En direct",
+      "rooms": "Salons",
+      "leaderboard": "Classement",
+      "lobby": "Ouvrir le salon d'accueil",
+      "points": "pts",
+      "players": "{count} dans le salon",
+      "sample": {
+        "r1": "Course Blink, Uno",
+        "r2": "Suiveur de ligne, TB6612",
+        "r3": "Slalom de whoops"
+      }
+    },
+    "solana": {
+      "title": "Preuves sur Solana",
+      "pools": {
+        "title": "Cagnottes des courses",
+        "text": "Les inscriptions forment une cagnotte versée aux montages les plus rapides à la fin de la course."
+      },
+      "creds": {
+        "title": "Certificats",
+        "text": "Terminez un labo et émettez un certificat que chacun peut vérifier sur la chaîne, sans compte."
+      },
+      "passport": "Ouvrir votre passeport",
+      "verify": "Vérifier un certificat"
+    },
+    "built": {
+      "title": "Comment c'est fait",
+      "stdb": {
+        "title": "SpacetimeDB",
+        "meta": "Backend",
+        "text": "Une base de données temps réel contient salons, courses et scores. Chaque client s'y abonne et voit le même banc."
+      },
+      "agents": {
+        "title": "Agents Nemotron",
+        "meta": "Concevoir, simuler, chiffrer",
+        "text": "Les agents appellent, par des outils, les mêmes simulateurs et catalogues que vous, et montrent chaque étape."
+      },
+      "chain": {
+        "title": "Solana",
+        "meta": "Cagnottes et certificats",
+        "text": "Les cagnottes et les certificats sont sur la chaîne. Vérifier un certificat ne demande que son adresse."
+      },
+      "cloud": {
+        "title": "Vultr",
+        "meta": "Cloud",
+        "text": "L'application web, la base de données et l'agent tournent sur des machines Vultr."
+      }
+    },
+    "footer": {
+      "builtOn": "Construit avec",
+      "agents": "Agents",
+      "chain": "Chaîne",
+      "cloud": "Cloud",
+      "source": "Code source"
+    },
+    "controls": {
+      "font": "Police de lecture",
+      "theme": "Thème",
+      "light": "Clair",
+      "dark": "Sombre"
+    }
   }
 }

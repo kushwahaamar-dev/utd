@@ -114,7 +114,7 @@
       },
       "partner": {
         "title": "Un compañero de laboratorio",
-        "text": "Muse Spark te encuentra un compañero cuyas habilidades encajan con las tuyas y planea una noche de montaje que os guste a todos."
+        "text": "Nemotron te encuentra un compañero cuyas habilidades encajan con las tuyas y planea una noche de montaje que os guste a todos."
       },
       "languages": {
         "title": "Seis idiomas",
@@ -160,5 +160,108 @@
     "builtWithTitle": "Hecho con",
     "builtWith": "Next.js, React y Tailwind CSS (todos con licencia MIT), más el motor Colorfigures para cada figura.",
     "colorfigures": "Página de la skill Colorfigures"
+  },
+  "landing": {
+    "title": "iynk es un *laboratorio de hardware* gratuito en tu navegador.",
+    "p1": "Cablea, programa, rompe y haz volar placas, robots y drones reales. Tu código se ejecuta en intérpretes reales de Arduino, MicroPython y Verilog.",
+    "p2": "Los agentes diseñan, simulan y presupuestan tu montaje antes de que compres una sola pieza. Compite en vivo con amigos y consigue pruebas en Solana.",
+    "scene": {
+      "alt": "Un taller dibujado con caracteres de texto: un dron flota junto a una ventana sobre un banco con un Arduino, un monitor y un soldador.",
+      "time": "Hora del día",
+      "dawn": "Amanecer",
+      "noon": "Mediodía",
+      "dusk": "Atardecer",
+      "night": "Noche"
+    },
+    "labs": {
+      "title": "Laboratorios",
+      "board": {
+        "title": "Laboratorio de placas",
+        "meta": "{count} placas",
+        "text": "Arduino, ESP32, Pico y FPGA. Escribe código y mira cómo reaccionan los pines, el monitor serie y el circuito."
+      },
+      "robotics": {
+        "title": "Laboratorio de robótica",
+        "meta": "{count} bancos",
+        "text": "Controladores de motor, sensores y etapas de potencia, cableados en un banco con un solucionador de fallos que sabe qué rompiste."
+      },
+      "drones": {
+        "title": "Laboratorio de drones",
+        "meta": "{count} drones",
+        "text": "Elige las piezas de un whoop o un octocóptero y mira peso, empuje y autonomía antes de construirlo."
+      },
+      "flight": {
+        "title": "Simulador de vuelo",
+        "meta": "FPV",
+        "text": "Vuela tu montaje por un circuito en primera persona, con la física de las piezas que elegiste."
+      }
+    },
+    "mission": {
+      "title": "Centro de misión",
+      "text": "Da instrucciones a los agentes. Redactan el diseño, ejecutan la simulación, presupuestan las piezas y muestran su trabajo.",
+      "cta": "Abrir el centro de misión"
+    },
+    "live": {
+      "title": "En vivo ahora",
+      "rooms": "Salas",
+      "leaderboard": "Clasificación",
+      "lobby": "Abrir el vestíbulo",
+      "points": "pts",
+      "players": "{count} en la sala",
+      "sample": {
+        "r1": "Carrera de Blink, Uno",
+        "r2": "Seguidor de línea, TB6612",
+        "r3": "Eslalon de whoops"
+      }
+    },
+    "solana": {
+      "title": "Pruebas en Solana",
+      "pools": {
+        "title": "Premios de las carreras",
+        "text": "Las inscripciones forman un premio que se reparte entre los montajes más rápidos al cerrar la carrera."
+      },
+      "creds": {
+        "title": "Credenciales",
+        "text": "Termina un laboratorio y emite una credencial que cualquiera puede verificar en la cadena, sin cuenta."
+      },
+      "passport": "Abrir tu pasaporte",
+      "verify": "Verificar una credencial"
+    },
+    "built": {
+      "title": "Cómo está hecho",
+      "stdb": {
+        "title": "SpacetimeDB",
+        "meta": "Backend",
+        "text": "Una base de datos en tiempo real guarda salas, carreras y puntuaciones. Todos los clientes se suscriben y ven el mismo banco."
+      },
+      "agents": {
+        "title": "Agentes Nemotron",
+        "meta": "Diseñar, simular, presupuestar",
+        "text": "Los agentes usan, mediante herramientas, los mismos simuladores y catálogos que tú, y muestran cada paso."
+      },
+      "chain": {
+        "title": "Solana",
+        "meta": "Premios y credenciales",
+        "text": "Los premios y las credenciales viven en la cadena. Verificar una solo requiere su dirección."
+      },
+      "cloud": {
+        "title": "Vultr",
+        "meta": "Nube",
+        "text": "La aplicación web, la base de datos y el agente se ejecutan en máquinas de Vultr."
+      }
+    },
+    "footer": {
+      "builtOn": "Construido con",
+      "agents": "Agentes",
+      "chain": "Cadena",
+      "cloud": "Nube",
+      "source": "Código"
+    },
+    "controls": {
+      "font": "Fuente de lectura",
+      "theme": "Tema",
+      "light": "Claro",
+      "dark": "Oscuro"
+    }
   }
 }

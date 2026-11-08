@@ -67,9 +67,9 @@ describe("parseChatEvent", () => {
       title: "https://example.com/ds.pdf",
       snippet: "5 V",
     });
-    expect(parseChatEvent('{"type":"done","usage":{"provider":"meta","inTokens":10,"outTokens":"x"}}')).toEqual({
+    expect(parseChatEvent('{"type":"done","usage":{"provider":"nemotron","inTokens":10,"outTokens":"x"}}')).toEqual({
       type: "done",
-      usage: { provider: "meta", inTokens: 10, outTokens: 0 },
+      usage: { provider: "nemotron", inTokens: 10, outTokens: 0 },
     });
     expect(parseChatEvent("not json")).toBeNull();
     expect(parseChatEvent('{"type":"text"}')).toBeNull();
@@ -91,7 +91,7 @@ describe("errorCode", () => {
 
 describe("streamChat", () => {
   test("posts the request and yields events in order", async () => {
-    const fetch = vi.fn(async () => new Response(body(sse([{ type: "text", delta: "Look " }, { type: "text", delta: "here." }, { type: "done", usage: { provider: "meta", inTokens: 3, outTokens: 2 } }])), { status: 200, headers: { "content-type": "text/event-stream" } }));
+    const fetch = vi.fn(async () => new Response(body(sse([{ type: "text", delta: "Look " }, { type: "text", delta: "here." }, { type: "done", usage: { provider: "nemotron", inTokens: 3, outTokens: 2 } }])), { status: 200, headers: { "content-type": "text/event-stream" } }));
     const events: ChatEvent[] = await collect(streamChat(request, { fetch }));
     expect(events.map((e) => e.type)).toEqual(["text", "text", "done"]);
     const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];

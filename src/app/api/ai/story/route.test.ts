@@ -4,7 +4,7 @@ import { completion, fakeFetch } from "@/lib/server/ai/__test__/upstream";
 
 let ip = 0;
 
-async function load(vars: Record<string, string> = { META_API_KEY: "k" }) {
+async function load(vars: Record<string, string> = { NVIDIA_API_KEY: "k" }) {
   vi.resetModules();
   for (const [k, v] of Object.entries(vars)) vi.stubEnv(k, v);
   return (await import("./route")).POST;

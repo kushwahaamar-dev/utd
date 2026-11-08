@@ -114,7 +114,7 @@
       },
       "partner": {
         "title": "Ein Laborpartner",
-        "text": "Muse Spark findet dir einen Bau-Buddy, dessen Können zu deinem passt, und plant einen Bauabend, der allen gefällt."
+        "text": "Nemotron findet dir einen Bau-Buddy, dessen Können zu deinem passt, und plant einen Bauabend, der allen gefällt."
       },
       "languages": {
         "title": "Sechs Sprachen",
@@ -160,5 +160,108 @@
     "builtWithTitle": "Gebaut mit",
     "builtWith": "Next.js, React und Tailwind CSS (alle unter MIT-Lizenz) sowie der Colorfigures-Engine für jede Figur.",
     "colorfigures": "Seite des Colorfigures-Skills"
+  },
+  "landing": {
+    "title": "iynk ist ein kostenloses *Hardware-Labor* in deinem Browser.",
+    "p1": "Verdrahte, programmiere, zerstöre und fliege echte Boards, Roboter und Drohnen. Dein Code läuft auf echten Arduino-, MicroPython- und Verilog-Interpretern.",
+    "p2": "Agenten entwerfen, simulieren und kalkulieren deinen Aufbau, bevor du ein einziges Teil kaufst. Tritt live gegen Freunde an und sichere dir einen Nachweis auf Solana.",
+    "scene": {
+      "alt": "Eine Werkstatt aus Textzeichen: Eine Drohne schwebt am Fenster über einer Werkbank mit Arduino, Monitor und Lötkolben.",
+      "time": "Tageszeit",
+      "dawn": "Morgen",
+      "noon": "Mittag",
+      "dusk": "Abend",
+      "night": "Nacht"
+    },
+    "labs": {
+      "title": "Labore",
+      "board": {
+        "title": "Board-Labor",
+        "meta": "{count} Boards",
+        "text": "Arduino, ESP32, Pico und FPGAs. Schreibe Code und sieh zu, wie Pins, serieller Monitor und Schaltung reagieren."
+      },
+      "robotics": {
+        "title": "Robotik-Labor",
+        "meta": "{count} Aufbauten",
+        "text": "Motortreiber, Sensoren und Leistungsstufen, verdrahtet auf einer Werkbank mit einem Fehlerlöser, der weiß, was du kaputt gemacht hast."
+      },
+      "drones": {
+        "title": "Drohnen-Labor",
+        "meta": "{count} Drohnen",
+        "text": "Wähle die Teile für einen Whoop oder einen Oktokopter und sieh Gewicht, Schub und Flugzeit, bevor du baust."
+      },
+      "flight": {
+        "title": "Flugsimulator",
+        "meta": "FPV",
+        "text": "Fliege deinen Aufbau in der Ich-Perspektive durch einen Parcours, mit der Physik deiner gewählten Teile."
+      }
+    },
+    "mission": {
+      "title": "Missionskontrolle",
+      "text": "Briefe die Agenten. Sie entwerfen, simulieren, kalkulieren die Teile und zeigen ihren Rechenweg.",
+      "cta": "Missionskontrolle öffnen"
+    },
+    "live": {
+      "title": "Gerade live",
+      "rooms": "Räume",
+      "leaderboard": "Bestenliste",
+      "lobby": "Lobby öffnen",
+      "points": "Pkt.",
+      "players": "{count} im Raum",
+      "sample": {
+        "r1": "Blink-Rennen, Uno",
+        "r2": "Linienfolger, TB6612",
+        "r3": "Whoop-Slalom"
+      }
+    },
+    "solana": {
+      "title": "Nachweise auf Solana",
+      "pools": {
+        "title": "Preispools der Rennen",
+        "text": "Startgelder bilden einen Preispool, der nach dem Rennen an die schnellsten Aufbauten geht."
+      },
+      "creds": {
+        "title": "Zertifikate",
+        "text": "Schließe ein Labor ab und erhalte ein Zertifikat, das jeder auf der Chain prüfen kann, ohne Konto."
+      },
+      "passport": "Pass öffnen",
+      "verify": "Zertifikat prüfen"
+    },
+    "built": {
+      "title": "So ist es gebaut",
+      "stdb": {
+        "title": "SpacetimeDB",
+        "meta": "Backend",
+        "text": "Eine Echtzeit-Datenbank hält Räume, Rennen und Punkte. Jeder Client abonniert sie und sieht dieselbe Werkbank."
+      },
+      "agents": {
+        "title": "Nemotron-Agenten",
+        "meta": "Entwerfen, simulieren, kalkulieren",
+        "text": "Agenten nutzen über Werkzeuge dieselben Simulatoren und Kataloge wie du und zeigen jeden Schritt."
+      },
+      "chain": {
+        "title": "Solana",
+        "meta": "Preise und Zertifikate",
+        "text": "Preispools und Zertifikate liegen auf der Chain. Zum Prüfen genügt die Adresse."
+      },
+      "cloud": {
+        "title": "Vultr",
+        "meta": "Cloud",
+        "text": "Web-App, Datenbank und Agent-Worker laufen auf Vultr-Maschinen."
+      }
+    },
+    "footer": {
+      "builtOn": "Gebaut mit",
+      "agents": "Agenten",
+      "chain": "Chain",
+      "cloud": "Cloud",
+      "source": "Quellcode"
+    },
+    "controls": {
+      "font": "Lesefont",
+      "theme": "Darstellung",
+      "light": "Hell",
+      "dark": "Dunkel"
+    }
   }
 }

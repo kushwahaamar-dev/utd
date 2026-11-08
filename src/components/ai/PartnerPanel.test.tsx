@@ -19,7 +19,7 @@ function sse(events: object[]) {
   );
 }
 
-const done = { type: "done", usage: { provider: "meta", inTokens: 1, outTokens: 1 } };
+const done = { type: "done", usage: { provider: "nemotron", inTokens: 1, outTokens: 1 } };
 
 type Handler = (body: Record<string, unknown>) => Response;
 
@@ -65,7 +65,7 @@ async function renderPanel(store: LabStore, figure: FigureHandle | null) {
   );
 }
 
-const FULL = { ai: true, image: true, voice: true, search: true, solana: false, db: false, realtime: false, gemini: false };
+const FULL = { ai: true, image: true, voice: true, search: true, solana: false, db: false, realtime: false };
 
 beforeEach(() => {
   Element.prototype.scrollTo ??= () => {};

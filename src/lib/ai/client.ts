@@ -150,7 +150,7 @@ export function parseChatEvent(data: string): ChatEvent | null {
       return {
         type: "done",
         usage: {
-          provider: usage.provider === "gemini" ? "gemini" : "meta",
+          provider: "nemotron",
           inTokens: Number(usage.inTokens) || 0,
           outTokens: Number(usage.outTokens) || 0,
         },

@@ -150,7 +150,7 @@
   },
   "lobby": {
     "metaTitle": "Construire ensemble",
-    "metaDescription": "Ouvrez un salon de construction en direct sur n'importe quelle carte, robot ou drone, trouvez un partenaire et planifiez une soirée de construction avec Muse Spark.",
+    "metaDescription": "Ouvrez un salon de construction en direct sur n'importe quelle carte, robot ou drone, trouvez un partenaire et planifiez une soirée de construction avec Nemotron.",
     "eyebrow": "iynk Ensemble",
     "title": "Personne ne construit seul",
     "lede": "Ouvrez un salon sur n'importe quelle carte, robot ou drone et envoyez le lien. Tout le monde voit le même établi, une seule personne tape à la fois, et le chat affiche chaque message dans votre langue.",
@@ -180,7 +180,7 @@
     },
     "buddies": {
       "title": "Partenaires de construction",
-      "lede": "Dites ce que vous avez construit et ce que vous voulez faire ensuite. Muse Spark propose des personnes dont les compétences complètent les vôtres, et explique pourquoi.",
+      "lede": "Dites ce que vous avez construit et ce que vous voulez faire ensuite. Nemotron propose des personnes dont les compétences complètent les vôtres, et explique pourquoi.",
       "privacy": "Votre profil ne contient aucune coordonnée et il est supprimé au bout de 24 heures. Vous vous retrouvez par invitation à un salon.",
       "name": "Votre nom",
       "interests": "Centres d'intérêt",
@@ -207,7 +207,7 @@
     },
     "plan": {
       "title": "Planificateur de soirée de construction",
-      "lede": "Chacun dit ce qu'il aimerait faire. Muse Spark choisit un projet qui plaira à tout le monde et donne à chacun un rôle et une première tâche.",
+      "lede": "Chacun dit ce qu'il aimerait faire. Nemotron choisit un projet qui plaira à tout le monde et donne à chacun un rôle et une première tâche.",
       "people": "Qui construit",
       "person": "Personne {n}",
       "name": "Nom",

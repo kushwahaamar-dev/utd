@@ -114,7 +114,7 @@
       },
       "partner": {
         "title": "A lab partner",
-        "text": "Muse Spark finds you a build buddy whose skills fit yours, then plans a build night you'll all enjoy."
+        "text": "Nemotron finds you a build buddy whose skills fit yours, then plans a build night you'll all enjoy."
       },
       "languages": {
         "title": "Six languages",
@@ -160,5 +160,108 @@
     "builtWithTitle": "Built with",
     "builtWith": "Next.js, React and Tailwind CSS (all MIT licensed), plus the Colorfigures engine for every figure.",
     "colorfigures": "Colorfigures skill page"
+  },
+  "landing": {
+    "title": "iynk is a free *hardware lab* in your browser.",
+    "p1": "Wire, code, break and fly real boards, robots and drones. Your code runs on real Arduino, MicroPython and Verilog interpreters.",
+    "p2": "Agents design, simulate and price your build before you buy a single part. Race friends live and earn proof on Solana.",
+    "scene": {
+      "alt": "A workshop drawn in text characters: a drone hovers by a window above a bench with an Arduino, a monitor and a soldering iron.",
+      "time": "Time of day",
+      "dawn": "Dawn",
+      "noon": "Noon",
+      "dusk": "Dusk",
+      "night": "Night"
+    },
+    "labs": {
+      "title": "Labs",
+      "board": {
+        "title": "Board Lab",
+        "meta": "{count} boards",
+        "text": "Arduino, ESP32, Pico and FPGAs. Write code and watch the pins, the serial monitor and the circuit react."
+      },
+      "robotics": {
+        "title": "Robotics Lab",
+        "meta": "{count} benches",
+        "text": "Motor drivers, sensors and power stages, wired on a bench with a fault solver that knows what you broke."
+      },
+      "drones": {
+        "title": "Drone Lab",
+        "meta": "{count} drones",
+        "text": "Pick the parts for a whoop or an octocopter and see weight, thrust and flight time before you build."
+      },
+      "flight": {
+        "title": "Flight sim",
+        "meta": "FPV",
+        "text": "Fly your build through a range in first person, with the physics of the parts you chose."
+      }
+    },
+    "mission": {
+      "title": "Mission Control",
+      "text": "Brief the agents. They draft the design, run the simulation, price the parts and show their working.",
+      "cta": "Open Mission Control"
+    },
+    "live": {
+      "title": "Live now",
+      "rooms": "Rooms",
+      "leaderboard": "Leaderboard",
+      "lobby": "Open the lobby",
+      "points": "pts",
+      "players": "{count} in the room",
+      "sample": {
+        "r1": "Blink race, Uno",
+        "r2": "Line follower, TB6612",
+        "r3": "Whoop slalom"
+      }
+    },
+    "solana": {
+      "title": "Proof on Solana",
+      "pools": {
+        "title": "Race prize pools",
+        "text": "Entry fees pool into a prize that pays the fastest builds when the race closes."
+      },
+      "creds": {
+        "title": "Credentials",
+        "text": "Finish a lab and mint a credential anyone can verify on chain, no account needed."
+      },
+      "passport": "Open your passport",
+      "verify": "Verify a credential"
+    },
+    "built": {
+      "title": "How it's built",
+      "stdb": {
+        "title": "SpacetimeDB",
+        "meta": "Backend",
+        "text": "One realtime database holds rooms, races and scores. Every client subscribes, so everyone sees the same bench."
+      },
+      "agents": {
+        "title": "Nemotron agents",
+        "meta": "Design, simulate, price",
+        "text": "Agents call the same simulators and catalogues you use, through tools, and show each step."
+      },
+      "chain": {
+        "title": "Solana",
+        "meta": "Prizes and credentials",
+        "text": "Prize pools and credentials live on chain. Verifying one needs only its address."
+      },
+      "cloud": {
+        "title": "Vultr",
+        "meta": "Cloud",
+        "text": "The web app, the database and the agent worker run on Vultr machines."
+      }
+    },
+    "footer": {
+      "builtOn": "Built on",
+      "agents": "Agents",
+      "chain": "Chain",
+      "cloud": "Cloud",
+      "source": "Source"
+    },
+    "controls": {
+      "font": "Reading font",
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark"
+    }
   }
 }

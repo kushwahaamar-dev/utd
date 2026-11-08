@@ -1,4 +1,4 @@
-// Fakes for the Meta Model API in unit tests: SSE bodies, JSON replies and a recording fetch.
+// Fakes for the Nemotron API in unit tests: SSE bodies, JSON replies and a recording fetch.
 import { vi } from "vitest";
 
 const encoder = new TextEncoder();

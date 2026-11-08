@@ -114,7 +114,7 @@
       },
       "partner": {
         "title": "实验伙伴",
-        "text": "Muse Spark 为你找到技能互补的组装伙伴，再安排一场大家都喜欢的组装之夜。"
+        "text": "Nemotron 为你找到技能互补的组装伙伴，再安排一场大家都喜欢的组装之夜。"
       },
       "languages": {
         "title": "六种语言",
@@ -160,5 +160,108 @@
     "builtWithTitle": "技术栈",
     "builtWith": "Next.js、React 和 Tailwind CSS（均为 MIT 许可证），每个模型都使用 Colorfigures 引擎。",
     "colorfigures": "Colorfigures 技能页面"
+  },
+  "landing": {
+    "title": "iynk 是一个在浏览器里免费使用的*硬件实验室*。",
+    "p1": "接线、编程、搞坏、再飞起来：真实的开发板、机器人和无人机。你的代码运行在真实的 Arduino、MicroPython 和 Verilog 解释器上。",
+    "p2": "智能体在你买任何零件之前就完成设计、仿真和报价。和朋友实时竞速，并在 Solana 上留下凭证。",
+    "scene": {
+      "alt": "用文字字符画成的工作室：一架无人机悬在窗边，下面的工作台上有 Arduino、显示器和电烙铁。",
+      "time": "时间",
+      "dawn": "黎明",
+      "noon": "正午",
+      "dusk": "黄昏",
+      "night": "夜晚"
+    },
+    "labs": {
+      "title": "实验室",
+      "board": {
+        "title": "开发板实验室",
+        "meta": "{count} 块开发板",
+        "text": "Arduino、ESP32、Pico 和 FPGA。写代码，看引脚、串口监视器和电路如何响应。"
+      },
+      "robotics": {
+        "title": "机器人实验室",
+        "meta": "{count} 个工作台",
+        "text": "电机驱动、传感器和电源级，在工作台上接线，故障求解器知道你弄坏了什么。"
+      },
+      "drones": {
+        "title": "无人机实验室",
+        "meta": "{count} 架无人机",
+        "text": "为微型机或八旋翼选好零件，动手前先看重量、推力和续航。"
+      },
+      "flight": {
+        "title": "飞行模拟",
+        "meta": "FPV",
+        "text": "以第一人称驾驶你的作品飞越赛场，物理参数来自你选的零件。"
+      }
+    },
+    "mission": {
+      "title": "任务控制台",
+      "text": "给智能体下达任务。它们起草设计、运行仿真、为零件报价，并展示推理过程。",
+      "cta": "打开任务控制台"
+    },
+    "live": {
+      "title": "正在进行",
+      "rooms": "房间",
+      "leaderboard": "排行榜",
+      "lobby": "打开大厅",
+      "points": "分",
+      "players": "房间内 {count} 人",
+      "sample": {
+        "r1": "Blink 竞速，Uno",
+        "r2": "循线小车，TB6612",
+        "r3": "微型机绕桩"
+      }
+    },
+    "solana": {
+      "title": "Solana 上的凭证",
+      "pools": {
+        "title": "竞速奖池",
+        "text": "报名费汇成奖池，比赛结束后发给最快的作品。"
+      },
+      "creds": {
+        "title": "证书",
+        "text": "完成一个实验室即可铸造证书，任何人都能在链上验证，无需账号。"
+      },
+      "passport": "打开你的护照",
+      "verify": "验证证书"
+    },
+    "built": {
+      "title": "它是怎么搭起来的",
+      "stdb": {
+        "title": "SpacetimeDB",
+        "meta": "后端",
+        "text": "一个实时数据库保存房间、比赛和分数。每个客户端订阅它，所以大家看到同一个工作台。"
+      },
+      "agents": {
+        "title": "Nemotron 智能体",
+        "meta": "设计、仿真、报价",
+        "text": "智能体通过工具调用与你相同的仿真器和零件目录，并展示每一步。"
+      },
+      "chain": {
+        "title": "Solana",
+        "meta": "奖金与证书",
+        "text": "奖池和证书都在链上，验证只需要地址。"
+      },
+      "cloud": {
+        "title": "Vultr",
+        "meta": "云",
+        "text": "网页应用、数据库和智能体服务都运行在 Vultr 的机器上。"
+      }
+    },
+    "footer": {
+      "builtOn": "技术栈",
+      "agents": "智能体",
+      "chain": "区块链",
+      "cloud": "云",
+      "source": "源码"
+    },
+    "controls": {
+      "font": "阅读字体",
+      "theme": "主题",
+      "light": "浅色",
+      "dark": "深色"
+    }
   }
 }

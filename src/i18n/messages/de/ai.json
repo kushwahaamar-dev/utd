@@ -1,7 +1,7 @@
 {
   "panel": {
     "title": "Laborpartner",
-    "byline": "Muse Spark · erst Tipps, erst Freunde",
+    "byline": "Nemotron · erst Tipps, erst Freunde",
     "intro": "Frag nach deiner Verkabelung, deinem Code oder einem Fehler. Ich gebe Tipps vor Antworten, und wenn jemand in deinem Raum diese Lektion schon gemacht hat, frage ich zuerst diese Person.",
     "inputLabel": "Frag deinen Laborpartner",
     "placeholder": "Frag etwas zum Aufbau …",
@@ -90,7 +90,7 @@
   "status": {
     "loading": "Dein Laborpartner wird geweckt …",
     "unavailable": "Der Laborpartner ist in dieser Installation nicht eingerichtet",
-    "unavailableBody": "Alles andere im Labor funktioniert auch ohne ihn. Der Partner braucht auf dem Server einen Schlüssel für die Meta-Modell-API oder die Gemini-API.",
+    "unavailableBody": "Alles andere im Labor funktioniert auch ohne ihn. Der Partner braucht auf dem Server einen Schlüssel für die NVIDIA-API (Nemotron).",
     "unreachable": "Der Server ist nicht erreichbar, um den Partner zu prüfen.",
     "check": "Erneut prüfen"
   },

@@ -16,7 +16,6 @@ const flags = vi.hoisted(() => ({
     solana: false,
     db: false,
     realtime: false,
-    gemini: false,
     hw: false,
   },
 }));

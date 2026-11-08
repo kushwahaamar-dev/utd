@@ -27,7 +27,7 @@ const Message = z.discriminatedUnion("role", [
 
 type Message = z.output<typeof Message>;
 
-/** Meta rejects a tool result that doesn't answer the assistant turn right before it, so check that here. */
+/** The API rejects a tool result that doesn't answer the assistant turn right before it, so check that here. */
 function wellFormed(messages: Message[]): boolean {
   let open = new Set<string>();
   for (const m of messages) {
@@ -91,7 +91,7 @@ async function* converse(body: Body, req: Request): AsyncGenerator<ChatEvent> {
     ...body.messages.map(toProvider),
   ];
   const tools = partnerToolSpecs();
-  const usage: ChatUsage = { provider: "meta", inTokens: 0, outTokens: 0 };
+  const usage: ChatUsage = { provider: "nemotron", inTokens: 0, outTokens: 0 };
   let wrote = false;
 
   for (let round = 1; round <= MAX_ROUNDS; round++) {
@@ -104,10 +104,9 @@ async function* converse(body: Body, req: Request): AsyncGenerator<ChatEvent> {
         tools: last ? undefined : tools,
         stream: true,
         signal: req.signal,
-        // Hints should start streaming fast; reasoning tokens count against maxTokens.
-        reasoning: "low",
+        // The fast model with thinking off: hints should start streaming at once.
+        reasoning: "minimal",
         maxTokens: 6000,
-        cacheKey: "iynk-partner",
         user: aiUser(req),
       })) {
         if (event.type === "text") {

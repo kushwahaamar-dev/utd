@@ -29,13 +29,11 @@ const keypair = z
   .transform((bytes) => Uint8Array.from(bytes));
 
 const schema = {
-  META_API_KEY: text.optional(),
-  META_API_BASE: url.default("https://api.meta.ai/v1"),
-  META_MODEL: text.default("muse-spark-1.3"),
-  META_IMAGE_MODEL: text.default("muse-image-1.0"),
-  META_TRANSCRIBE_MODEL: text.default("muse-voice-transcribe-1.0"),
-  GEMINI_API_KEY: text.optional(),
-  GEMINI_MODEL: text.default("gemini-3.5-flash"),
+  NVIDIA_API_KEY: text.optional(),
+  NEMOTRON_BASE_URL: url.optional(),
+  NEMOTRON_FAST_MODEL: text.default("nvidia/nemotron-3.5-lightning-30b-a3b"),
+  NEMOTRON_PLANNER_MODEL: text.default("nvidia/nemotron-3-super-120b-a12b"),
+  NEMOTRON_VISION_MODEL: text.default("nvidia/nemotron-3.5-super-vl-120b-a12b"),
   SERPAPI_KEY: text.optional(),
   SERPAPI_MONTHLY_BUDGET: z.coerce.number().int().min(0).default(200),
   SOLANA_RPC_URL: url.default("https://api.devnet.solana.com"),
@@ -60,10 +58,9 @@ export type Features = {
   solana: boolean;
   db: boolean;
   realtime: boolean;
-  gemini: boolean;
 };
 
-const URL_VARS = new Set<EnvName>(["META_API_BASE", "SOLANA_RPC_URL", "NEXT_PUBLIC_SOLANA_RPC_URL", "NEXT_PUBLIC_SITE_URL"]);
+const URL_VARS = new Set<EnvName>(["NEMOTRON_BASE_URL", "SOLANA_RPC_URL", "NEXT_PUBLIC_SOLANA_RPC_URL", "NEXT_PUBLIC_SITE_URL"]);
 
 export function readEnv(source: Record<string, string | undefined>): { env: Env; issues: EnvName[] } {
   const out: Record<string, unknown> = {};
@@ -86,18 +83,15 @@ export function readEnv(source: Record<string, string | undefined>): { env: Env;
 }
 
 export function featuresOf(e: Env): Features {
-  const meta = Boolean(e.META_API_KEY);
-  const gemini = Boolean(e.GEMINI_API_KEY);
   return {
-    // Gemini only stands in for Muse Spark's text work; Muse Image and voice need Meta.
-    ai: meta || gemini,
-    image: meta,
-    voice: meta,
+    ai: Boolean(e.NVIDIA_API_KEY || e.NEMOTRON_BASE_URL),
+    // Nemotron has no image generation or speech-to-text model; both stay off.
+    image: false,
+    voice: false,
     search: Boolean(e.SERPAPI_KEY),
     solana: Boolean(e.SOLANA_ISSUER_KEYPAIR && e.NEXT_PUBLIC_SOLANA_PROGRAM_ID),
     db: Boolean(e.DATABASE_URL),
     realtime: Boolean(e.NEXT_PUBLIC_REALTIME_URL),
-    gemini,
   };
 }
 
