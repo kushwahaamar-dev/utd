@@ -11,7 +11,6 @@ import { createDemoAdapter, MissionDataProvider, useMission, useMissionMode, use
 import { JobHeader } from "./JobHeader";
 import { liveAdapter } from "./live";
 import { Proposals, ResultPanel } from "./ResultPanel";
-import { StdbProvider } from "@/lib/stdb";
 import { MissionTextProvider, useMissionText, type MissionMessages } from "./text";
 import { Trace } from "./Trace";
 import { isActive, type JobKind, type Step } from "./types";
@@ -38,7 +37,8 @@ function Frame({ lang, head }: { lang: Locale; head?: ReactNode }) {
   const adapter = useMemo(() => (demo ? createDemoAdapter(speed) : liveAdapter), [demo, speed]);
   const roomCode = params.get("room")?.slice(0, 12) || undefined;
 
-  const body = (
+  // The language layout already mounts the one StdbProvider the live adapter reads.
+  return (
     <MissionDataProvider adapter={adapter}>
       {jobId ? null : <div className={page}>{head}</div>}
       <div className={cx(page, "pb-[clamp(72px,10vw,160px)]")}>
@@ -46,7 +46,6 @@ function Frame({ lang, head }: { lang: Locale; head?: ReactNode }) {
       </div>
     </MissionDataProvider>
   );
-  return demo ? body : <StdbProvider>{body}</StdbProvider>;
 }
 
 function demoQuery(search: URLSearchParams, keys: readonly string[] = ["demo", "speed", "room"]): string {
