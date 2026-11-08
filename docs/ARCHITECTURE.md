@@ -85,3 +85,21 @@ Every table name is snake_case. "JSON" means a string column holding JSON. Times
 - Next.js here is 16.4. Read `node_modules/next/dist/docs/` before using a Next API.
 - `npm run typecheck`, `npx eslint . --quiet` and the tests for the paths you touched must pass before a commit.
 - Secrets live only in `.env.local` and module env vars. Never commit them.
+
+## What runs where
+
+SpacetimeDB holds every piece of shared, persistent or trusted state. The rest are thin edges that need a
+server-side secret or stream tokens to one browser, and none of them keep state of their own.
+
+| Runs in the SpacetimeDB module | Runs outside it, and why |
+|---|---|
+| Profiles, wallets links, presence | `/api/ai/chat`: the lab partner streams Nemotron tokens to one browser (SSE) |
+| Rooms: membership, action order, snapshots, baton, kicks | `/api/ai/plan`, `/api/ai/story`: one-shot Nemotron calls for one person |
+| Chat and its translations (procedure → Nemotron) | `/api/search/{nearby,events,videos}`: SerpApi lookups that are not shared |
+| Cursors and flight ghosts (event tables) | `/api/solana/faucet`: holds the devnet issuer key to top up a new wallet |
+| Progress, laps, leaderboards, live activity | `/api/solana/credentials`: reads the chain for `/verify` |
+| Buddy profiles and expiry | `/api/mcp`, `/api/openapi.json`: the MCP and REST surface for AI assistants |
+| Agent jobs, steps, proposals (the worker writes through worker-only reducers) | `/api/status`: which features this deployment has |
+| Part prices and web search (procedures, cached) | The worker: runs the Nemotron loop and signs Solana transactions, and reads and writes only through the module |
+| Run verification before credentials, race entries, race close and settlement queue | |
+| Rate limits, scheduled cleanup and rollups | |
