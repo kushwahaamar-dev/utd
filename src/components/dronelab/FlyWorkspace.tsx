@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { DroneContent } from "@/content/schema";
-import { Leaderboard, type DataMessages } from "@/components/data";
+import { Leaderboard, LiveCounter, type DataMessages } from "@/components/data";
 import { LabDock } from "@/components/dock/LabDock";
 import type { FigureHandle } from "@/components/figure";
 import { BreakIt } from "@/components/flight/BreakIt";
@@ -48,6 +48,7 @@ type Props = {
   /** Every craft that flies, for the daily challenge. */
   pool: ChallengeEntry[];
   board: DataMessages["leaderboard"];
+  live: DataMessages["live"];
   /** The untranslated chip, from the server page. */
   notice?: ReactNode;
 };
@@ -56,7 +57,7 @@ const noSubscribe = () => () => {};
 const readSearch = () => window.location.search;
 const noSearch = () => "";
 
-export function FlyWorkspace({ lang, content, text, messages, flight, pool, board, notice }: Props) {
+export function FlyWorkspace({ lang, content, text, messages, flight, pool, board, live, notice }: Props) {
   const room = useRoom();
   const { submitLap } = useStdbActions();
   const t = useMemo(() => droneLabT(lang, messages), [lang, messages]);
@@ -227,6 +228,7 @@ export function FlyWorkspace({ lang, content, text, messages, flight, pool, boar
           messages={board}
         />
       ) : null}
+      <LiveCounter messages={live} />
       <RacesLink />
     </Panel>
   );

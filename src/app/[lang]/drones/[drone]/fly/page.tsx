@@ -63,6 +63,7 @@ async function Fly({ params }: Pick<Props, "params">) {
         flight={flight}
         pool={pool}
         board={data.leaderboard}
+        live={data.live}
         notice={<UntranslatedNotice lang={lang} textLang={craft.textLang} variant="chip" />}
       />
     </LabRoom>
