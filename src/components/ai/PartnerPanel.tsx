@@ -241,7 +241,7 @@ function PartnerChat({ lab, itemId, store, figure, t, locale, log, voice, image 
               )}
             </div>
 
-            <div className="space-y-2 border-t-[1.5px] border-rule pt-3">
+            <div className="space-y-2 border-t border-rule pt-3">
               {ideas.length || !busy ? (
                 <div
                   role="group"
@@ -259,7 +259,7 @@ function PartnerChat({ lab, itemId, store, figure, t, locale, log, voice, image 
                         type="button"
                         onClick={() => send(text, "suggestion")}
                         className={cx(
-                          "min-h-9 rounded-full border-[1.5px] border-line bg-surface px-3 py-1 text-start text-sm font-semibold leading-snug hover:bg-sunken [@media(pointer:coarse)]:min-h-11",
+                          "min-h-9 rounded-full border border-(--card-line) bg-surface px-3 py-1 text-start text-sm font-semibold leading-snug hover:bg-sunken [@media(pointer:coarse)]:min-h-11",
                           turns.length ? "shrink-0 whitespace-nowrap" : "max-w-full",
                         )}
                       >
@@ -314,7 +314,7 @@ function PartnerChat({ lab, itemId, store, figure, t, locale, log, voice, image 
                       submit();
                     }
                   }}
-                  className="field-sizing-content max-h-32 min-h-11 min-w-0 flex-1 resize-none rounded-ink-sm border-2 border-line bg-paper px-3 py-2 text-sm placeholder:text-muted"
+                  className="field-sizing-content max-h-32 min-h-11 min-w-0 flex-1 resize-none rounded-xl border border-line bg-paper px-3 py-2 text-sm placeholder:text-muted focus-visible:border-(--focus)"
                 />
                 <MicButton t={t} voice={voice} phase={mic.phase} start={start} stop={stop} toggle={toggle} />
                 {busy ? (

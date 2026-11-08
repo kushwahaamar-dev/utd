@@ -331,6 +331,7 @@ export function LabShell({
               />
             </div>
             <div
+              tabIndex={leftFlush ? undefined : 0}
               className={cx(
                 "min-h-0 flex-1",
                 leftFlush ? "flex flex-col" : "overflow-y-auto p-4",

@@ -41,9 +41,9 @@ export function ChangeCard({
   return (
     <section
       aria-labelledby={titleId}
-      className="overflow-hidden rounded-ink border-2 border-line bg-surface shadow-ink-sm"
+      className="overflow-hidden rounded-ink-sm border border-line bg-surface"
     >
-      <header className="flex items-center justify-between gap-2 border-b-2 border-line bg-mustard px-3 py-2 text-on-color">
+      <header className="flex items-center justify-between gap-2 border-b border-rule border-s-4 border-s-mustard bg-sunken px-3 py-2">
         <h3 id={titleId} className="ink-kicker text-ink">
           {t(`tools.change.${card.change.kind}`)}
         </h3>
@@ -58,7 +58,7 @@ export function ChangeCard({
         role="group"
         tabIndex={0}
         aria-label={t("tools.diffLabel")}
-        className="m-3 max-h-64 overflow-auto rounded-ink-sm border-2 border-line bg-paper font-ui text-xs leading-5"
+        className="m-3 max-h-64 overflow-auto rounded-ink-sm border border-rule bg-paper font-ui text-xs leading-5"
       >
         {rows.map((row, i) =>
           row.op === "skip" ? (

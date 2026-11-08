@@ -23,7 +23,7 @@ export function TurnView({ turn, first, t, busy, onRetry, onDecide, onFlash, onI
   if (turn.role === "user") {
     return (
       <div className="flex justify-end ps-8 motion-safe:animate-ink-rise">
-        <p className="max-w-full whitespace-pre-wrap break-words rounded-ink border-2 border-line bg-mustard px-3 py-2 text-sm text-on-color shadow-ink-sm">
+        <p className="max-w-full whitespace-pre-wrap break-words rounded-2xl rounded-ee-md bg-ink px-3.5 py-2 text-sm leading-relaxed text-paper">
           <span className="sr-only">{t("panel.you")}: </span>
           {turn.via === "voice" ? (
             <span className="me-1 inline-block align-[-3px]" aria-hidden="true">
@@ -52,7 +52,7 @@ export function TurnView({ turn, first, t, busy, onRetry, onDecide, onFlash, onI
       <span
         aria-hidden="true"
         className={cx(
-          "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-line bg-mint text-on-color",
+          "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-paper",
           !first && "invisible",
         )}
       >
@@ -61,7 +61,7 @@ export function TurnView({ turn, first, t, busy, onRetry, onDecide, onFlash, onI
       <div className="min-w-0 flex-1 space-y-2" aria-busy={streaming}>
         <span className="sr-only">{t("panel.partner")}: </span>
         {turn.text ? (
-          <div className="rounded-ink border-2 border-line bg-surface px-3 py-2 text-sm leading-relaxed shadow-ink-sm">
+          <div className="rounded-2xl rounded-ss-md border border-(--card-line) bg-surface px-3.5 py-2.5 text-sm leading-relaxed">
             <Markdown text={turn.text} labels={labels} />
             {streaming ? <span aria-hidden="true" className="ms-0.5 inline-block h-4 w-1.5 animate-pulse bg-ink align-middle" /> : null}
           </div>
@@ -128,9 +128,9 @@ function Citations({ citations, label }: { citations: Citation[]; label: string 
               href={citation.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex gap-2 rounded-ink-sm border-2 border-line bg-paper p-2 no-underline shadow-ink-sm hover:-translate-y-px hover:shadow-ink"
+              className="flex gap-2 rounded-ink-sm border border-(--card-line) bg-surface p-2 no-underline hover:border-line hover:bg-sunken"
             >
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-line bg-cobalt font-ui text-xs font-bold text-on-color">
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-sunken font-ui text-xs font-bold text-ink">
                 {i + 1}
               </span>
               <span className="min-w-0">

@@ -93,12 +93,12 @@ function TabBody({ tab, ...lab }: LabDockProps & { tab: DockTab }) {
  * the right edge that leaves the figure in view, on a phone a bottom sheet.
  */
 // Where the screen has room, the open drawer pushes the page over instead of covering the rail, so in a room you can
-// work the steps or the code and still see the keyboard and the chat. Narrower desks keep the overlay. The figure gives
-// up its room first, down to about 34rem, and then the rail, down to 22rem (its width on a 1024 px screen), so a lesson's
-// code stays readable beside the drawer on a wide screen (64rem: the drawer, the figure's 34rem, the gap and padding).
+// work the steps or the code and still see the keyboard and the chat. Narrower desks keep the overlay. The lab shell's
+// rails give up their room first (down to 12rem and 18rem) and the stage keeps at least 24rem.
 const PUSH_PAGE = `@media (width >= 80rem) {
   body:has(> [data-testid="lab-dock"][data-layout="desk"]:not([hidden])) > :is(main, footer) { padding-inline-end: 26rem; }
-  body:has(> [data-testid="lab-dock"][data-layout="desk"]:not([hidden])) .ws { grid-template-columns: minmax(0, 1fr) min(var(--rail-w), max(22rem, 100vw - 64rem)); }
+  body:has(> [data-testid="lab-dock"][data-layout="desk"]:not([hidden])) .lab-shell { grid-template-columns: minmax(12rem, min(var(--l-eff, var(--l-default)), 15vw)) var(--sp) minmax(24rem, 1fr) var(--sp) minmax(18rem, min(var(--r-eff, var(--r-default)), 25vw)); }
+  body:has(> [data-testid="lab-dock"][data-layout="desk"]:not([hidden])) .lab-shell[data-left="none"] { grid-template-columns: minmax(24rem, 1fr) var(--sp) minmax(18rem, min(var(--r-eff, var(--r-default)), 25vw)); }
 }`;
 
 export function LabDock<S, A extends { type: string }>(props: LabDockProps<S, A>) {
@@ -283,7 +283,7 @@ export function LabDock<S, A extends { type: string }>(props: LabDockProps<S, A>
                 data-layout="desk"
                 hidden={!isOpen}
                 onKeyDown={onDrawerKey}
-                className="fixed end-0 top-(--header-h) bottom-0 z-30 flex w-[min(26rem,calc(100vw-3rem))] flex-col border-s-2 border-line bg-surface shadow-[-4px_0_0_var(--shadow-c)] animate-ink-from-end"
+                className="fixed end-0 top-(--header-h) bottom-0 z-30 flex w-[min(26rem,calc(100vw-3rem))] flex-col border-s border-(--card-line) bg-surface shadow-ink-lg animate-ink-from-end"
               >
                 <div className="flex min-h-14 shrink-0 items-center gap-2 border-b-[1.5px] border-rule ps-4 pe-2">
                   <Icon name="tools" size={18} className="text-muted" />
