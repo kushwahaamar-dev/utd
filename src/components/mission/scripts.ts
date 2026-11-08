@@ -40,7 +40,7 @@ export const droneBuild: Script = {
     {
       role: "planner",
       title: "Plan the build",
-      model: ULTRA,
+      model: SUPER,
       ms: 3200,
       input: { goal: "5-inch drone that flies 8 minutes, under $400" },
       output: {
@@ -92,7 +92,7 @@ export const droneBuild: Script = {
     {
       role: "critic",
       title: "Review against the criteria",
-      model: ULTRA,
+      model: SUPER,
       ms: 2600,
       input: { criteria: "flight >= 8 min" },
       output: {
@@ -117,7 +117,7 @@ export const droneBuild: Script = {
     {
       role: "critic",
       title: "Review revision 1",
-      model: ULTRA,
+      model: SUPER,
       ms: 2200,
       input: { criteria: "flight >= 8 min" },
       output: {
@@ -169,7 +169,7 @@ export const droneBuild: Script = {
     {
       role: "critic",
       title: "Final review",
-      model: ULTRA,
+      model: SUPER,
       ms: 2600,
       input: { criteria: ["flight >= 8 min", "T:W > 4", "total <= $400", "no faults"] },
       output: { verdict: "approve", reasons: ["Flight time 8.4 min, thrust-to-weight 4.2", "$164.42 is $15.58 under budget", "Simulator and bench both clean"] },
@@ -217,7 +217,7 @@ export const ledDiagnosis: Script = {
     {
       role: "planner",
       title: "Plan the diagnosis",
-      model: ULTRA,
+      model: SUPER,
       ms: 2400,
       input: { goal: "Why does my LED burn out?" },
       output: {
@@ -250,7 +250,7 @@ export const ledDiagnosis: Script = {
     {
       role: "critic",
       title: "Review the finding",
-      model: ULTRA,
+      model: SUPER,
       ms: 2000,
       input: {},
       output: { verdict: "revise", revision: 1, reasons: ["The cause is clear, but the fix is not yet checked on the bench"] },
@@ -272,7 +272,7 @@ export const ledDiagnosis: Script = {
     {
       role: "critic",
       title: "Final review",
-      model: ULTRA,
+      model: SUPER,
       ms: 1900,
       input: {},
       output: { verdict: "approve", reasons: ["13.6 mA is under the 20 mA limit", "Bench reports no faults"] },
