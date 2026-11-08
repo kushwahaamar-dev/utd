@@ -647,43 +647,45 @@ html:lang(zh-Hans) body {
 
 /* The hero's time-of-day slider: a track painted with the four skies and a paper thumb. */
 .time-slider {
+  --knob: color-mix(in oklab, #ffd36a calc((1 - var(--night, 0)) * 100%), #e4e9ff);
+  --knob-glow: color-mix(in oklab, #ffb347 calc((1 - var(--night, 0)) * 100%), #8fa3ff);
   appearance: none;
   display: block;
   width: 100%;
-  height: 20px;
+  height: 22px;
   margin: 0;
   background: transparent;
   cursor: pointer;
 }
 .time-slider::-webkit-slider-runnable-track {
-  height: 5px;
+  height: 6px;
   border-radius: 999px;
-  background: linear-gradient(to right, #f7a77c, #bfe3ff 33%, #ff8a4c 66%, #1a2a5a);
-  opacity: 0.8;
+  background: linear-gradient(to right, #f29a8a, #8cc8f5 33%, #ffa24f 66%, #1b2a66);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
 }
 .time-slider::-moz-range-track {
-  height: 5px;
+  height: 6px;
   border-radius: 999px;
-  background: linear-gradient(to right, #f7a77c, #bfe3ff 33%, #ff8a4c 66%, #1a2a5a);
-  opacity: 0.8;
+  background: linear-gradient(to right, #f29a8a, #8cc8f5 33%, #ffa24f 66%, #1b2a66);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
 }
 .time-slider::-webkit-slider-thumb {
   appearance: none;
-  width: 18px;
-  height: 18px;
-  margin-top: -6.5px;
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
   border-radius: 999px;
-  border: 1px solid var(--card-line);
-  background: var(--surface);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  border: 2px solid var(--surface);
+  background: radial-gradient(circle at 36% 32%, #fff 0, var(--knob) 55%);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.14), 0 0 12px 2px var(--knob-glow), 0 2px 4px rgb(0 0 0 / 0.25);
 }
 .time-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
-  border: 1px solid var(--card-line);
-  background: var(--surface);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  border: 2px solid var(--surface);
+  background: radial-gradient(circle at 36% 32%, #fff 0, var(--knob) 55%);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.14), 0 0 12px 2px var(--knob-glow), 0 2px 4px rgb(0 0 0 / 0.25);
 }
 .time-slider:focus-visible { border-radius: 999px; }
 

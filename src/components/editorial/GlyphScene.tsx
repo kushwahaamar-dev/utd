@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cx } from "@/components/ui/cx";
-import { SCENE_H, SCENE_W, drawScene } from "./scene";
-
+import { SCENE_H, SCENE_W, createScene } from "./scene";
 export type GlyphSceneLabels = {
   /** The canvas's text alternative. */
   scene: string;
@@ -15,11 +14,13 @@ export type GlyphSceneLabels = {
   night: string;
 };
 
-const RAMP = " .:-=+*#%@";
+const RAMP = " .,:;-=+*#%@";
 const FRAME_MS = 1000 / 30;
 const PHASES = ["dawn", "noon", "dusk", "night"] as const;
 const PHASE_AT = [0, 1 / 3, 2 / 3, 1];
 const STATIC_TIME = 1.3;
+const DEFAULT_TIME = 0.64;
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((n) => (n + 0.5) / 16 - 0.5);
 
 function hash(n: number) {
   const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
@@ -38,6 +39,7 @@ type Grid = {
   cellW: number;
   cellH: number;
   keep: Float32Array;
+  shown: Uint8Array;
 };
 
 function buildAtlas(cellW: number, cellH: number, dpr: number, family: string) {
@@ -49,23 +51,23 @@ function buildAtlas(cellW: number, cellH: number, dpr: number, family: string) {
   const ctx = atlas.getContext("2d");
   if (ctx) {
     ctx.fillStyle = "#fff";
-    ctx.font = `700 ${Math.round(h * 0.92)}px ${family}`;
+    ctx.font = `700 ${Math.round(h * 1.02)}px ${family}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    for (let i = 1; i < RAMP.length; i++) ctx.fillText(RAMP[i], i * w + w / 2, h / 2 + h * 0.04);
+    for (let i = 1; i < RAMP.length; i++) ctx.fillText(RAMP[i], i * w + w / 2, h / 2 + h * 0.05);
   }
   return atlas;
 }
 
 function buildGrid(width: number, height: number, dpr: number, family: string): Grid {
-  const target = width < 520 ? 5 : 6;
-  const cols = Math.max(24, Math.round(width / target));
-  const rows = Math.max(16, Math.round(height / (target * 1.6)));
+  const cellTarget = width < 520 ? 3.4 : 4.2;
+  const cols = Math.max(48, Math.round(width / cellTarget));
+  const rows = Math.max(30, Math.round(height / (cellTarget * 1.45)));
   const cellW = width / cols;
   const cellH = height / rows;
   const keep = new Float32Array(cols * rows);
-  const bandX = 0.07;
-  const bandY = 0.1;
+  const bandX = 0.12;
+  const bandY = 0.16;
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const dx = Math.min(x + 0.5, cols - x - 0.5) / cols / bandX;
@@ -75,7 +77,7 @@ function buildGrid(width: number, height: number, dpr: number, family: string): 
       keep[y * cols + x] = hash(y * cols + x) < fall ? 1 : 0;
     }
   }
-  return { cols, rows, dpr, atlas: buildAtlas(cellW, cellH, dpr, family), cellW, cellH, keep };
+  return { cols, rows, dpr, atlas: buildAtlas(cellW, cellH, dpr, family), cellW, cellH, keep, shown: new Uint8Array(cols * rows).fill(255) };
 }
 
 function phaseOf(t: number) {
@@ -86,11 +88,16 @@ function phaseOf(t: number) {
   return PHASES[best];
 }
 
+const nightOf = (t: number) => {
+  const k = Math.min(1, Math.max(0, (t - 0.62) / 0.28));
+  return k * k * (3 - 2 * k);
+};
+
 /**
  * The landing's hero: a procedurally drawn workshop, sampled into coloured glyphs chosen by luminance. The slider
  * moves the time of day. It draws at 30 fps, only while on screen and visible, and once for reduced motion.
  */
-export function GlyphScene({ labels, className, initial = 0.62 }: { labels: GlyphSceneLabels; className?: string; initial?: number }) {
+export function GlyphScene({ labels, className, initial = DEFAULT_TIME }: { labels: GlyphSceneLabels; className?: string; initial?: number }) {
   const [time, setTime] = useState(initial);
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -101,15 +108,18 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!wrap || !canvas || !ctx) return;
+    const scene = createScene();
+    if (!wrap || !canvas || !ctx || !scene) return;
 
-    const scene = document.createElement("canvas");
-    scene.width = SCENE_W;
-    scene.height = SCENE_H;
-    const sceneCtx = scene.getContext("2d");
+    const frame = document.createElement("canvas");
+    frame.width = SCENE_W * 2;
+    frame.height = SCENE_H * 2;
+    const frameCtx = frame.getContext("2d");
     const sample = document.createElement("canvas");
     const sampleCtx = sample.getContext("2d", { willReadFrequently: true });
-    if (!sceneCtx || !sampleCtx) return;
+    const glyphs = document.createElement("canvas");
+    const glyphCtx = glyphs.getContext("2d");
+    if (!frameCtx || !sampleCtx || !glyphCtx) return;
 
     let grid: Grid | null = null;
     let current = target.current;
@@ -120,13 +130,15 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
     let visible = !document.hidden;
     let reduced = wantsReducedMotion();
     let family = "monospace";
-    let paperLum = 1;
+    let light = true;
     let disposed = false;
 
-    // Glyph weight follows how far a pixel is from the page: ink on light paper, light on dark.
+    // Light paper takes dark ink where the scene is dark; dark paper takes light ink where it is bright.
     const readPaper = () => {
       const [r, g, b] = (getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g) ?? [250, 250, 250]).map(Number);
-      paperLum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+      const next = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.5;
+      if (next !== light && grid) grid.shown.fill(255);
+      light = next;
     };
 
     const resize = () => {
@@ -136,6 +148,8 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
+      glyphs.width = canvas.width;
+      glyphs.height = canvas.height;
       grid = buildGrid(width, height, dpr, family);
       sample.width = grid.cols;
       sample.height = grid.rows;
@@ -144,37 +158,48 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
 
     const paint = () => {
       if (!grid) return;
-      const { cols, rows, dpr, atlas, cellW, cellH, keep } = grid;
-      drawScene(sceneCtx, current, reduced ? STATIC_TIME : clock);
+      const { cols, rows, dpr, atlas, cellW, cellH, keep, shown } = grid;
+      scene.draw(frameCtx, current, reduced ? STATIC_TIME : clock);
       sampleCtx.imageSmoothingEnabled = true;
       sampleCtx.imageSmoothingQuality = "high";
-      sampleCtx.drawImage(scene, 0, 0, cols, rows);
+      sampleCtx.drawImage(frame, 0, 0, cols, rows);
       const { data } = sampleCtx.getImageData(0, 0, cols, rows);
 
+      // Only cells whose glyph changed are redrawn: the static workshop costs nothing after the first frame.
       const gw = Math.ceil(cellW * dpr);
       const gh = Math.ceil(cellH * dpr);
-      ctx.globalCompositeOperation = "source-over";
-      ctx.globalAlpha = 1;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const top = RAMP.length - 1;
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const cell = y * cols + x;
-          if (keep[cell] === 0) continue;
           const o = cell * 4;
           const lum = (0.2126 * data[o] + 0.7152 * data[o + 1] + 0.0722 * data[o + 2]) / 255;
-          const weight = Math.min(1, Math.abs(lum - paperLum) / 0.8);
-          const glyph = Math.round(Math.pow(weight, 1.1) * (RAMP.length - 1));
-          if (glyph === 0) continue;
-          ctx.drawImage(atlas, glyph * gw, 0, gw, gh, Math.round(x * cellW * dpr), Math.round(y * cellH * dpr), gw, gh);
+          const density = light ? 0.16 + 0.84 * Math.pow(1 - lum, 0.85) : 0.1 + 0.9 * Math.pow(lum, 0.9);
+          const level = keep[cell] === 0 ? 0 : Math.max(0, Math.min(top, Math.floor(density * top + 0.5 + BAYER[(y & 3) * 4 + (x & 3)])));
+          if (shown[cell] === level) continue;
+          shown[cell] = level;
+          const dx = Math.round(x * cellW * dpr);
+          const dy = Math.round(y * cellH * dpr);
+          glyphCtx.clearRect(dx, dy, gw, gh);
+          if (level > 0) glyphCtx.drawImage(atlas, level * gw, 0, gw, gh, dx, dy, gw, gh);
         }
       }
+
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(glyphs, 0, 0);
       ctx.globalCompositeOperation = "source-in";
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(sample, 0, 0, canvas.width, canvas.height);
-      ctx.globalCompositeOperation = "destination-over";
       ctx.imageSmoothingEnabled = true;
-      ctx.globalAlpha = 0.12;
-      ctx.drawImage(sample, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(sample, 0, 0, w, h);
+      ctx.globalCompositeOperation = "source-atop";
+      ctx.fillStyle = light ? "rgba(18,12,30,0.34)" : "rgba(255,246,232,0.22)";
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.globalAlpha = light ? 0.82 : 0.9;
+      ctx.drawImage(frame, 0, 0, w, h);
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = "source-over";
     };
@@ -187,7 +212,7 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
       clock += Math.min(now - last, 100) / 1000;
       last = now;
       const gap = target.current - current;
-      current = Math.abs(gap) < 0.002 ? target.current : current + gap * 0.16;
+      current = Math.abs(gap) < 0.002 ? target.current : current + gap * 0.18;
       paint();
     };
 
@@ -260,6 +285,7 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
   }, []);
 
   const phase = phaseOf(time);
+  const feather = "linear-gradient(to right, transparent, #000 11%, #000 89%, transparent), linear-gradient(to bottom, transparent, #000 13%, #000 87%, transparent)";
 
   return (
     <figure className={cx("m-0", className)}>
@@ -267,34 +293,39 @@ export function GlyphScene({ labels, className, initial = 0.62 }: { labels: Glyp
         ref={wrapRef}
         role="img"
         aria-label={labels.scene}
-        className="relative aspect-[144/88] w-full overflow-hidden rounded-[28px]"
-        style={{
-          maskImage: "linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent)",
-          maskComposite: "intersect",
-          WebkitMaskImage: "linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent)",
-          WebkitMaskComposite: "source-in",
-        }}
+        className="relative aspect-[8/5] w-full overflow-hidden"
+        style={{ maskImage: feather, maskComposite: "intersect", WebkitMaskImage: feather, WebkitMaskComposite: "source-in" }}
       >
-        <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 size-full [filter:saturate(1.45)_contrast(1.12)]" />
+        <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 size-full [filter:saturate(1.25)_contrast(1.05)]" />
       </div>
-      <div className="mx-auto mt-3 w-[min(22rem,80%)]">
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.001}
-          value={time}
-          onChange={(event) => setTarget(Number(event.target.value))}
-          aria-label={labels.time}
-          aria-valuetext={labels[phase]}
-          className="time-slider"
-        />
-        <div aria-hidden="true" className="mt-1 flex justify-between font-ui text-[11px] leading-4 tracking-[0.06em] text-muted">
-          {PHASES.map((name) => (
-            <span key={name} className={cx("transition-colors", name === phase && "text-ink")}>
-              {labels[name]}
-            </span>
-          ))}
+      <div className="mx-auto mt-2 w-[min(24rem,86%)]">
+        <div className="relative px-[11px]">
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.001}
+            value={time}
+            onChange={(event) => setTarget(Number(event.target.value))}
+            aria-label={labels.time}
+            aria-valuetext={labels[phase]}
+            className="time-slider"
+            style={{ "--night": nightOf(time).toFixed(3) } as React.CSSProperties}
+          />
+          <div aria-hidden="true" className="relative mt-1 h-4 font-ui text-[11px] leading-4 tracking-[0.06em] text-muted">
+            {PHASES.map((name, i) => (
+              <button
+                key={name}
+                type="button"
+                tabIndex={-1}
+                onClick={() => setTarget(PHASE_AT[i])}
+                style={{ left: `${PHASE_AT[i] * 100}%` }}
+                className={cx("absolute -translate-x-1/2 cursor-pointer whitespace-nowrap bg-transparent p-0 transition-colors hover:text-ink", name === phase && "text-ink")}
+              >
+                {labels[name]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </figure>
