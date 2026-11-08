@@ -62,16 +62,21 @@ function LessonRow({ lang, board, lesson }: { lang: string; board: string; lesso
       <Link
         href={`/${lang}/boards/${board}/${lesson.id}`}
         className="-mx-2 flex min-h-11 items-center gap-3 rounded-ink-sm px-2 py-1.5 text-sm text-ink no-underline hover:bg-sunken"
-        aria-label={`${t("board.openLesson", { n: lesson.n, title: lesson.title })}${done ? ` · ${t("lesson.done")}` : ""}`}
       >
         <span
-          aria-hidden="true"
           className={cx(
             "tabular inline-flex size-6 shrink-0 items-center justify-center rounded-full border-[1.5px] font-ui text-xs font-bold",
             done ? "border-good bg-good text-paper" : "border-rule text-muted",
           )}
         >
-          {done ? <Icon name="check" size={12} /> : lesson.n}
+          {done ? (
+            <>
+              <Icon name="check" size={12} aria-hidden="true" />
+              <span className="sr-only">{t("lesson.done")}</span>
+            </>
+          ) : (
+            lesson.n
+          )}
         </span>
         <span className="min-w-0 flex-1 font-semibold leading-snug">{lesson.title}</span>
         <span className="shrink-0 text-xs text-muted">{t(`level.${lesson.level}`)}</span>
@@ -312,7 +317,7 @@ function Overview({ lang, data, notice }: { lang: Locale; data: BoardOverview; n
       label: t("board.lessons"),
       content: (
         <div data-testid="board-lessons">
-          <h3 className="sr-only">{t("board.lessons")}</h3>
+          <h2 className="sr-only">{t("board.lessons")}</h2>
           <p className="mb-2 text-sm text-muted">{t("board.lessonsLede")}</p>
           <ol>
             {lessons.map((l) => (

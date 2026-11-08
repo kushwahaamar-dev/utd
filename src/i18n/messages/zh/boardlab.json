@@ -105,7 +105,6 @@
     "variant": "版本",
     "lessons": "课程",
     "lessonsLede": "每节课都在开发板上运行你自己的代码。通过这节课的检查，就能把它打勾完成。",
-    "openLesson": "第 {n} 课：{title}",
     "sources": "核对来源",
     "start": "开始：{title}",
     "continue": "继续：{title}",

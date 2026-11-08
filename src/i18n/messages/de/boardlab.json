@@ -105,7 +105,6 @@
     "variant": "Variante",
     "lessons": "Lektionen",
     "lessonsLede": "Jede Lektion führt deinen eigenen Code auf dem Board aus. Besteh ihre Prüfungen, um sie abzuhaken.",
-    "openLesson": "Lektion {n}: {title}",
     "sources": "Geprüft anhand von",
     "start": "Starten: {title}",
     "continue": "Weiter: {title}",

@@ -105,7 +105,6 @@
     "variant": "Variante",
     "lessons": "Lecciones",
     "lessonsLede": "Cada lección ejecuta tu propio código en la placa. Supera sus comprobaciones para marcarla.",
-    "openLesson": "Lección {n}: {title}",
     "sources": "Contrastado con",
     "start": "Empezar: {title}",
     "continue": "Continuar: {title}",

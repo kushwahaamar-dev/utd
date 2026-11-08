@@ -105,7 +105,6 @@
     "variant": "Variante",
     "lessons": "Leçons",
     "lessonsLede": "Chaque leçon fait tourner votre propre code sur la carte. Réussissez ses vérifications pour la valider.",
-    "openLesson": "Leçon {n} : {title}",
     "sources": "Sources vérifiées",
     "start": "Commencer : {title}",
     "continue": "Continuer : {title}",

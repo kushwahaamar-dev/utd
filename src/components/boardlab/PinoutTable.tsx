@@ -15,7 +15,7 @@ export function PinoutTable({ board, rows }: { board: string; rows: PinRow[] }) 
   const shown = cap === "all" ? rows : rows.filter((r) => r.caps.includes(cap));
 
   return (
-    <section aria-labelledby={`${id}-title`} data-testid="pinout">
+    <div data-testid="pinout">
       <div className="flex flex-wrap items-center gap-3">
         <h2 id={`${id}-title`} className="sr-only">
           {t("pinout.title")}
@@ -70,6 +70,6 @@ export function PinoutTable({ board, rows }: { board: string; rows: PinRow[] }) 
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   );
 }

@@ -105,7 +105,6 @@
     "variant": "Variant",
     "lessons": "Lessons",
     "lessonsLede": "Each lesson runs your own code on the board. Finish its checks to tick it off.",
-    "openLesson": "Lesson {n}: {title}",
     "sources": "Checked against",
     "start": "Start: {title}",
     "continue": "Continue: {title}",

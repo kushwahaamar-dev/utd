@@ -79,7 +79,7 @@ describe("BenchWorkspace", () => {
     expect(screen.getByRole("heading", { name: "Build and break" })).toBeTruthy();
     expect(screen.getByRole("tab", { name: /^Steps\s*0\/5$/ }).getAttribute("aria-selected")).toBe("true");
     expect(screen.getByRole("heading", { name: "Practice tasks" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Bench notes", expanded: false })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Bench notes/, expanded: false })).toBeTruthy();
     fireEvent.click(screen.getByRole("tab", { name: "Status" }));
     expect(screen.getByRole("heading", { name: "Live status" })).toBeTruthy();
     expect(screen.getByRole("meter")).toBeTruthy();

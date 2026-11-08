@@ -30,7 +30,6 @@ export function StageDrawer({ title, summary, open, onOpenChange, height = 200, 
         type="button"
         aria-expanded={open}
         aria-controls={id}
-        aria-label={title}
         onClick={() => onOpenChange(!open)}
         className="flex min-h-10 w-full items-center gap-3 bg-sunken px-3 text-start focus-visible:outline-offset-[-4px] focus-visible:shadow-none [@media(pointer:coarse)]:min-h-11"
       >
