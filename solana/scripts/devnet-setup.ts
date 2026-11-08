@@ -1,10 +1,12 @@
 // Initializes the deployed program on devnet and, with --smoke, records one
 // bounty and one credential so the deploy can be checked end to end.
 //
-//   node scripts/devnet-setup.ts [--fund-issuer <SOL>] [--smoke]
+//   node scripts/devnet-setup.ts [--fund-issuer <SOL>] [--set-issuer] [--smoke]
 //
 // Keys come from ~/.config/solana/iynk (deployer = upgrade authority and
-// admin, issuer = the server's key). Only public keys and signatures are printed.
+// admin, issuer = the server's key; IYNK_KEYS_DIR overrides the folder). Only
+// public keys and signatures are printed. --set-issuer rotates the config's
+// issuer to this machine's issuer key when they differ.
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -21,12 +23,12 @@ const anchor = createRequire(import.meta.url)("@coral-xyz/anchor") as typeof Anc
 const { BN, web3 } = anchor;
 
 const { values: flags } = parseArgs({
-  options: { smoke: { type: "boolean", default: false }, "fund-issuer": { type: "string" } },
+  options: { smoke: { type: "boolean", default: false }, "set-issuer": { type: "boolean", default: false }, "fund-issuer": { type: "string" } },
 });
 
 const SMOKE_SKILL = "board:uno-r3:lesson:deploy-check";
 const url = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
-const keys = join(homedir(), ".config", "solana", "iynk");
+const keys = process.env.IYNK_KEYS_DIR ?? join(homedir(), ".config", "solana", "iynk");
 
 function keypair(name: string): Keypair {
   return web3.Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(join(keys, name), "utf8"))));
@@ -74,8 +76,10 @@ if (fundIssuer) {
 const existing = await program.account.config.fetchNullable(configAddress);
 if (!existing) {
   record.initialize = await program.methods.initialize(issuer.publicKey).accounts({ admin: deployer.publicKey }).rpc();
+} else if (!existing.issuer.equals(issuer.publicKey) && flags["set-issuer"]) {
+  record.setIssuer = await program.methods.setIssuer(issuer.publicKey).accounts({ admin: deployer.publicKey }).rpc();
 } else if (!existing.issuer.equals(issuer.publicKey)) {
-  console.warn(`Config issuer is ${existing.issuer.toBase58()}, not this machine's issuer key; leaving it as is.`);
+  console.warn(`Config issuer is ${existing.issuer.toBase58()}, not this machine's issuer key; leaving it as is (pass --set-issuer to rotate).`);
 }
 
 if (flags.smoke) {

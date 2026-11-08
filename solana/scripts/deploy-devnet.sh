@@ -42,6 +42,12 @@ fi
 
 if solana program show "$PROGRAM_ID" --url "$URL" >/dev/null 2>&1; then
   echo "upgrading the existing program"
+  # An upgrade cannot grow past the space the first deploy reserved. Extend by the shortfall.
+  CURRENT=$(solana program show "$PROGRAM_ID" --url "$URL" | awk '/Data Length:/ {print $3}')
+  if [ -n "$CURRENT" ] && [ "$SIZE" -gt "$CURRENT" ]; then
+    echo "extending the program by $((SIZE - CURRENT)) bytes"
+    solana program extend "$PROGRAM_ID" "$((SIZE - CURRENT))" --keypair "$DEPLOYER" --url "$URL"
+  fi
   solana program deploy "$SO" --program-id "$PROGRAM_ID" --upgrade-authority "$DEPLOYER" \
     --buffer "$BUFFER" --keypair "$DEPLOYER" --url "$URL" --use-rpc --max-sign-attempts 50
 else
@@ -61,4 +67,15 @@ else
 fi
 
 solana program show "$PROGRAM_ID" --url "$URL"
+
+# Initialize the config (or rotate its issuer to this machine's issuer key) and create a
+# demo prize race. Neither airdrops anything. SKIP_SETUP=1 / SKIP_DEMO_RACE=1 skip a step;
+# the race can be made later with node scripts/devnet-demo-race.ts (flags in solana/README.md).
+if [ "${SKIP_SETUP:-0}" != "1" ]; then
+  node scripts/devnet-setup.ts --set-issuer
+fi
+if [ "${SKIP_DEMO_RACE:-0}" != "1" ]; then
+  node scripts/devnet-demo-race.ts
+fi
+
 echo "https://explorer.solana.com/address/$PROGRAM_ID?cluster=devnet"
