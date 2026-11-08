@@ -4,6 +4,7 @@ import { useId } from "react";
 import type { DesignPick, DroneContent } from "@/content/schema";
 import { Callout } from "@/components/ui/Callout";
 import { Chip, type ChipTone } from "@/components/ui/Chip";
+import { cx } from "@/components/ui/cx";
 import { htmlLang, type Locale } from "@/i18n/config";
 import { checkLevel, tileDigits, verdicts, type DesignCheck } from "@/lib/drone/calc";
 import { evaluateDesign } from "@/lib/drone/design";
@@ -11,6 +12,7 @@ import type { DesignKey } from "@/lib/dronelab/store";
 import { formatNumber, type ContentT, type DroneLabT } from "./text";
 
 const LEVEL_TONE: Record<string, ChipTone> = { danger: "tomato", warn: "mustard", info: "cobalt" };
+const HERO = new Set(["tw", "hoverThr", "flyMin"]);
 const LEVEL_BORDER: Record<string, string> = { danger: "border-tomato", warn: "border-mustard", info: "border-cobalt" };
 
 type Props = {
@@ -29,24 +31,27 @@ export function DesignPanel({ lang, content, pick, t, ct, onPick }: Props) {
   const kind = design.model.flight.kind;
   const n = (value: number, digits: number) => formatNumber(lang, value, digits);
 
-  const tiles: { id: string; label: string; value: string }[] = [
+  const tiles: { id: string; label: string; value: string; bar?: number }[] = [
     { id: "auw", label: t("design.tiles.auw"), value: t("design.units.g", { value: n(r.auw, tileDigits.auw) }) },
-    { id: "tw", label: t("design.tiles.tw"), value: t("design.units.tw", { value: n(r.tw, tileDigits.tw) }) },
+    { id: "tw", label: t("design.tiles.tw"), value: t("design.units.tw", { value: n(r.tw, tileDigits.tw) }), bar: r.tw / 12 },
     {
       id: "hoverThr",
       label: kind === "wing" ? t("design.tiles.cruiseThr") : t("design.tiles.hoverThr"),
       value: t("design.units.pct", { value: n(r.hoverThr * 100, tileDigits.hoverThrPercent) }),
+      bar: r.hoverThr,
     },
     { id: "maxA", label: t("design.tiles.maxA"), value: t("design.units.a", { value: n(r.maxA, tileDigits.maxA) }) },
     {
       id: "hoverMin",
       label: kind === "wing" ? t("design.tiles.cruiseMin") : t("design.tiles.hoverMin"),
       value: t("design.units.min", { value: n(r.hoverMin, tileDigits.hoverMin) }),
+      bar: r.hoverMin / 20,
     },
     {
       id: "flyMin",
       label: kind === "vtol" ? t("design.tiles.cruiseMin") : t("design.tiles.flyMin"),
       value: t("design.units.min", { value: n(r.flyMin, tileDigits.flyMin) }),
+      bar: r.flyMin / 10,
     },
   ];
   if (r.cruise) {
@@ -63,6 +68,12 @@ export function DesignPanel({ lang, content, pick, t, ct, onPick }: Props) {
     .filter((v) => v === "ok")
     .map((v) => `design.verdict.${v}`)
     .filter((key) => ct.has(key));
+  const alarm: Record<string, "bad" | "warn" | undefined> = {};
+  for (const check of checks) {
+    if (check.code === "weak" || check.code === "cannot-hover") alarm.tw = "bad";
+    if (check.code === "hover-high") alarm.hoverThr = "warn";
+    if (check.code === "short-flight") alarm.flyMin = "warn";
+  }
   const electrical = design.fixed.filter((p) => p.category === "Electrical").length + 2;
   const mechanical = design.fixed.filter((p) => p.category === "Mechanical").length + 1;
   const money = (value: number) => t("design.cost.money", { value: n(value, 0) });
@@ -105,13 +116,34 @@ export function DesignPanel({ lang, content, pick, t, ct, onPick }: Props) {
         <h3 id={`${base}-results`} className="ink-kicker">
           {t("design.results")}
         </h3>
-        <dl className="mt-2 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3" aria-live="polite" data-testid="design-tiles">
-          {tiles.map((tile) => (
-            <div key={tile.id} className="min-w-0" data-tile={tile.id}>
-              <dt className="ink-label hyphens-auto">{tile.label}</dt>
-              <dd className="tabular whitespace-nowrap font-ui text-lg font-bold leading-tight">{tile.value}</dd>
-            </div>
-          ))}
+        <dl className="@container mt-2 grid grid-cols-12 gap-2" aria-live="polite" data-testid="design-tiles">
+          {tiles.map((tile) => {
+            const hero = HERO.has(tile.id);
+            const tone = alarm[tile.id];
+            return (
+              <div
+                key={tile.id}
+                data-tile={tile.id}
+                className={cx(
+                  "min-w-0 rounded-ink-sm border border-(--card-line) p-3",
+                  hero ? "order-1 col-span-4 bg-surface" : "order-2 col-span-12 flex items-baseline justify-between gap-3 bg-sunken py-2 @md:col-span-6",
+                )}
+              >
+                <dt className="ink-label hyphens-auto">{tile.label}</dt>
+                <dd className={cx("tabular whitespace-nowrap font-ui font-bold leading-tight", hero ? "mt-1 text-xl @md:text-3xl" : "text-base", tone === "bad" && "text-bad", tone === "warn" && "text-warn")}>
+                  {tile.value}
+                </dd>
+                {hero && tile.bar !== undefined ? (
+                  <span aria-hidden="true" className="mt-2 block h-1.5 overflow-hidden rounded-full bg-sunken">
+                    <span
+                      className={cx("block h-full rounded-full bg-good", tone === "bad" && "bg-bad", tone === "warn" && "bg-warn")}
+                      style={{ width: `${Math.round(Math.min(1, Math.max(0.04, tile.bar)) * 100)}%` }}
+                    />
+                  </span>
+                ) : null}
+              </div>
+            );
+          })}
         </dl>
       </section>
 

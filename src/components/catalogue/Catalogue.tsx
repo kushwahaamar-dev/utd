@@ -18,7 +18,8 @@ export const eyebrow = "font-ui text-[11px] font-medium uppercase leading-4 trac
 export function CataloguePage({ children }: { children: ReactNode }) {
   return (
     <div
-      className="mx-auto w-full max-w-[1440px] px-[clamp(16px,4vw,56px)] pb-[clamp(72px,10vw,160px)] pt-[clamp(40px,6vw,96px)] [--cat-pad:clamp(16px,1.6vw,24px)]"
+      data-catalogue
+      className="mx-auto w-full max-w-[2000px] px-[clamp(16px,3vw,56px)] pb-[clamp(56px,6vw,112px)] pt-[clamp(24px,3.5vw,56px)] [--cat-pad:clamp(16px,1.6vw,24px)]"
     >
       {children}
     </div>
@@ -39,6 +40,7 @@ export function CatalogueHead({
   count,
   countText,
   numberLocale,
+  filter,
 }: {
   /** "01": the lab's place among the three. */
   ordinal: string;
@@ -50,29 +52,31 @@ export function CatalogueHead({
   /** The translated count, "12 boards"; the number is drawn big and the words sit under it. */
   countText: string;
   numberLocale: string;
+  /** A <CatalogueFilter> at the end of the head. */
+  filter?: ReactNode;
 }) {
   return (
-    <header className="grid grid-cols-1 gap-x-6 gap-y-10 lg:grid-cols-12 lg:items-end">
-      <div className={cx("lg:col-span-9", enter)}>
+    <header className="grid grid-cols-1 gap-x-8 gap-y-6 lg:grid-cols-12 lg:items-end">
+      <div className={cx("lg:col-span-7 xl:col-span-5", enter)}>
         <p className={cx(eyebrow, "flex items-center gap-3")}>
           <span className="tabular text-ink">{ordinal}</span>
           <span aria-hidden="true" className="h-px w-8 bg-current opacity-40" />
           <span>{kicker}</span>
         </p>
-        <h1
-          id={titleId}
-          className={cx(typeClass.display, "mt-6 max-w-[16ch] sm:mt-8")}
-        >
+        <h1 id={titleId} className={cx(typeClass.display, "mt-4 max-w-[18ch] !text-[clamp(40px,5vw,84px)] sm:mt-5")}>
           {title}
         </h1>
-        <p className="mt-6 max-w-[62ch] text-base leading-[1.55] text-muted sm:mt-8 sm:text-[17px]">{lede}</p>
       </div>
-      <p className={cx("flex items-end gap-3 lg:col-span-3 lg:flex-col lg:items-end lg:gap-2 lg:text-end", enter)}>
-        <span className="tabular font-body text-[clamp(64px,9vw,152px)] font-light leading-[0.78] tracking-[-0.05em]">
-          {new Intl.NumberFormat(numberLocale).format(count)}
-        </span>
-        <span className={eyebrow}>{countWords(countText, count)}</span>
-      </p>
+      <p className={cx("max-w-[52ch] text-base leading-[1.55] text-muted lg:col-span-5 xl:col-span-3", enter)}>{lede}</p>
+      <div className={cx("flex items-end justify-between gap-6 lg:col-span-12 xl:col-span-4 xl:justify-end xl:gap-10", enter)}>
+        <p className="flex shrink-0 items-end gap-3 xl:flex-col xl:items-end xl:gap-1">
+          <span className="tabular font-body text-[clamp(48px,5vw,88px)] font-light leading-[0.8] tracking-[-0.05em]">
+            {new Intl.NumberFormat(numberLocale).format(count)}
+          </span>
+          <span className={eyebrow}>{countWords(countText, count)}</span>
+        </p>
+        {filter}
+      </div>
     </header>
   );
 }
@@ -83,17 +87,15 @@ export function CatalogueHead({
  */
 export function CatalogueGroup({ id, kicker, title, aside, children }: { id: string; kicker: string | null; title: string; aside?: ReactNode; children: ReactNode }) {
   return (
-    <section aria-labelledby={id} className="grid grid-cols-1 lg:grid-cols-12 [&+&]:mt-[clamp(48px,6vw,96px)]">
-      <div className="border-t border-rule pb-6 pt-(--cat-pad) lg:col-span-3 lg:pe-8">
-        <div className="flex flex-col gap-4 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
-          <h2 id={id} className="font-body text-[clamp(24px,2.2vw,32px)] font-medium leading-[1.05] tracking-[-0.02em]">
-            {kicker ? <span className={cx(eyebrow, "mb-3 block")}>{kicker}</span> : null}
-            {title}
-          </h2>
-          {aside}
-        </div>
+    <section aria-labelledby={id} data-catalogue-group className="[&+&]:mt-[clamp(32px,4vw,64px)]">
+      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3 pb-4">
+        <h2 id={id} className="font-body text-[clamp(22px,2vw,30px)] font-medium leading-[1.05] tracking-[-0.02em]">
+          {kicker ? <span className={cx(eyebrow, "mb-2 block")}>{kicker}</span> : null}
+          {title}
+        </h2>
+        {aside ? <div className="w-full sm:w-56">{aside}</div> : null}
       </div>
-      <div className="lg:col-span-9">{children}</div>
+      {children}
     </section>
   );
 }
@@ -107,7 +109,7 @@ export function CatalogueGrid({ wide = true, labelledBy, testId, children }: { w
         data-testid={testId}
         className={cx(
           "-me-px grid grid-cols-1 border-t border-rule sm:grid-cols-2",
-          wide ? "lg:grid-cols-3 xl:grid-cols-4" : "xl:grid-cols-3",
+          wide ? "lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5" : "xl:grid-cols-3 2xl:grid-cols-4",
         )}
       >
         {children}
@@ -135,13 +137,16 @@ type CardProps = {
   specs?: ReactNode;
   tags?: ReactNode;
   progress?: ReactNode;
+  /** What the search matches; the name, the line under it and the meta by default. */
+  search?: string;
 };
 
 const slot = "min-w-0";
 
-export function CatalogueCard({ data, item, fig, meta, heading: Heading, titleId, name, href, openLabel, sub, specs, tags, progress }: CardProps) {
+export function CatalogueCard({ data, item, fig, meta, heading: Heading, titleId, name, href, openLabel, sub, specs, tags, progress, search: searchText }: CardProps) {
+  const search = searchText ?? [name, typeof sub === "string" ? sub : "", typeof meta === "string" ? meta : ""].join(" ");
   return (
-    <li className="row-span-6 grid grid-rows-subgrid border-b border-e border-rule">
+    <li data-catalogue-item data-search={search} className="row-span-6 grid grid-rows-subgrid border-b border-e border-rule">
       <article
         {...data}
         aria-labelledby={titleId}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { BoardProgress } from "@/components/boardlab/BoardProgress";
+import { CatalogueFilter } from "@/components/catalogue/CatalogueFilter";
 import { CatalogueCard, CatalogueGrid, CatalogueHead, CataloguePage, SpecLine, TagLine } from "@/components/catalogue/Catalogue";
 import { htmlLang, isLocale } from "@/i18n/config";
 import { alternatesFor } from "@/i18n/seo";
@@ -50,8 +51,9 @@ async function Boards({ params }: Pick<Props, "params">) {
         count={boards.length}
         countText={t("index.count", { count: boards.length })}
         numberLocale={htmlLang(lang)}
+        filter={<CatalogueFilter total={boards.length} />}
       />
-      <div className="mt-[clamp(48px,6vw,96px)]">
+      <div className="mt-[clamp(24px,3vw,48px)]">
         <CatalogueGrid testId="board-grid">
           {boards.map(({ id, board, meta, tc }, i) => {
             const mcu = board.mcu;

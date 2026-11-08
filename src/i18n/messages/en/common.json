@@ -64,6 +64,12 @@
       "expand": "Expand {panel}",
       "guide": "Guide",
       "inspector": "Inspector"
+    },
+    "catalogue": {
+      "search": "Search",
+      "all": "{total} shown",
+      "some": "{shown} of {total} shown",
+      "none": "Nothing matches. Clear the search to see everything."
     }
   }
 }

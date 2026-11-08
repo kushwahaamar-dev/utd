@@ -7,6 +7,7 @@ import { FigureFrame, type FigureEvent, type FigureHandle, type HostCommand } fr
 import { SoundToggle } from "@/components/settings";
 import { StageDrawer, WorkspaceBar } from "@/components/shell/workspace";
 import { LabShell } from "@/components/dock/LabShell";
+import { Icon } from "@/components/ui/icons";
 import { useCommonT } from "@/i18n/client";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
@@ -393,12 +394,12 @@ export function DroneWorkspace({ lang, content, text, messages, notice }: Props)
               <ButtonLink
                 href={withRoom(`/${lang}/drones/${id}/fly`, room?.id)}
                 variant="primary"
-                size="sm"
                 data-testid="fly-link"
                 aria-describedby={`fly-note-${id}`}
                 title={flyNote}
                 className="shrink-0 whitespace-nowrap"
               >
+                <Icon name="play" size={14} aria-hidden="true" />
                 {t("workspace.fly")}
               </ButtonLink>
               <span id={`fly-note-${id}`} className="sr-only">

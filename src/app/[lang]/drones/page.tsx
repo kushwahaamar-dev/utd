@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { CatalogueFilter } from "@/components/catalogue/CatalogueFilter";
 import { CatalogueCard, CatalogueGrid, CatalogueHead, CataloguePage, eyebrow } from "@/components/catalogue/Catalogue";
 import { CraftProgress } from "@/components/dronelab/CraftProgress";
 import { loadCards } from "@/components/dronelab/data";
@@ -49,8 +50,9 @@ async function DronesIndex({ params }: Pick<Props, "params">) {
         count={DRONE_IDS.length}
         countText={t("index.count", { count: DRONE_IDS.length })}
         numberLocale={htmlLang(lang)}
+        filter={<CatalogueFilter total={DRONE_IDS.length} />}
       />
-      <div className="mt-[clamp(48px,6vw,96px)]">
+      <div className="mt-[clamp(24px,3vw,48px)]">
         <CatalogueGrid labelledBy={headingId}>
           {cards.map((card) => {
             const fig = t("index.fig", { n: String(card.fig).padStart(2, "0") });

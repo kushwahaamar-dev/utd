@@ -64,6 +64,12 @@
       "expand": "{panel} ausklappen",
       "guide": "Leitfaden",
       "inspector": "Inspektor"
+    },
+    "catalogue": {
+      "search": "Suchen",
+      "all": "{total} angezeigt",
+      "some": "{shown} von {total} angezeigt",
+      "none": "Nichts passt. Leere die Suche, um alles zu sehen."
     }
   }
 }

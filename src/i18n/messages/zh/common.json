@@ -64,6 +64,12 @@
       "expand": "展开{panel}",
       "guide": "指南",
       "inspector": "检查器"
+    },
+    "catalogue": {
+      "search": "搜索",
+      "all": "显示全部 {total} 项",
+      "some": "显示 {shown} / {total} 项",
+      "none": "没有匹配项。清除搜索即可查看全部。"
     }
   }
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { CatalogueFilter } from "@/components/catalogue/CatalogueFilter";
 import { CatalogueCard, CatalogueGrid, CatalogueGroup, CatalogueHead, CataloguePage, TagLine } from "@/components/catalogue/Catalogue";
 import { BenchProgress } from "@/components/robotics/BenchProgress";
 import { ROBOTICS, ROBOTICS_IDS, type RoboticsId } from "@/content/ids";
@@ -65,9 +66,10 @@ async function RoboticsIndex({ params }: Pick<Props, "params">) {
         count={ROBOTICS_IDS.length}
         countText={t("index.count", { count: ROBOTICS_IDS.length })}
         numberLocale={htmlLang(lang)}
+        filter={<CatalogueFilter total={ROBOTICS_IDS.length} />}
       />
 
-      <div className="mt-[clamp(48px,6vw,96px)]">
+      <div className="mt-[clamp(24px,3vw,48px)]">
         {benchesByMonth().map(({ month, ids }) => {
           const { kicker, title } = monthParts(t(`index.months.m${month}`));
           const monthKeys = ids.flatMap((id) => {

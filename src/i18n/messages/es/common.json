@@ -64,6 +64,12 @@
       "expand": "Expandir {panel}",
       "guide": "Guía",
       "inspector": "Inspector"
+    },
+    "catalogue": {
+      "search": "Buscar",
+      "all": "{total} mostrados",
+      "some": "{shown} de {total} mostrados",
+      "none": "Nada coincide. Borra la búsqueda para verlo todo."
     }
   }
 }
