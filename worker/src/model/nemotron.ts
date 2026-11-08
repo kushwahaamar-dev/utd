@@ -3,7 +3,6 @@ import { env } from "@/lib/server/env";
 import { RateGate } from "./gate";
 import type { ModelClient, ModelReply, ModelRequest } from "./types";
 
-const modelName = (role: ModelRequest["role"]) => (role === "planner" ? env.NEMOTRON_PLANNER_MODEL : env.NEMOTRON_FAST_MODEL);
 
 const BUSY_WAITS_MS = [5_000, 10_000, 20_000];
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -14,6 +13,10 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  */
 export class NemotronModel implements ModelClient {
   private readonly gate = new RateGate(env.NEMOTRON_BASE_URL ? 0 : Number(process.env.NEMOTRON_RPM ?? 30));
+
+  modelName(role: ModelRequest["role"]) {
+    return role === "planner" ? env.NEMOTRON_PLANNER_MODEL : env.NEMOTRON_FAST_MODEL;
+  }
 
   async complete(req: ModelRequest): Promise<ModelReply> {
     const ask = async (maxTokens: number) => {
@@ -40,6 +43,6 @@ export class NemotronModel implements ModelClient {
     let result = await ask(req.maxTokens);
     // With thinking on, a small max_tokens can be spent entirely on reasoning and leave content empty.
     if (!result.text.trim() && !result.toolCalls.length && result.finishReason === "length") result = await ask(req.maxTokens * 2);
-    return { text: result.text, reasoning: result.reasoning, toolCalls: result.toolCalls, model: modelName(req.role) };
+    return { text: result.text, reasoning: result.reasoning, toolCalls: result.toolCalls, model: this.modelName(req.role) };
   }
 }

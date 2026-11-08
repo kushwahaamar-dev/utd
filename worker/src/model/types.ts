@@ -51,4 +51,6 @@ export type ModelReply = {
 
 export interface ModelClient {
   complete(req: ModelRequest): Promise<ModelReply>;
+  /** The model id a role talks to, for the trace. */
+  modelName(role: ModelRequest["role"]): string;
 }

@@ -2,7 +2,7 @@ import type { Evidence, ModelClient, ModelReply, ModelRequest, Plan, Scope } fro
 
 type Obj = Record<string, unknown>;
 
-const FAKE_MODEL = "scripted-nemotron";
+const FAKE_MODELS = { fast: "scripted-lightning", planner: "scripted-super" } as const;
 
 const isObj = (v: unknown): v is Obj => typeof v === "object" && v !== null && !Array.isArray(v);
 const obj = (v: unknown): Obj => (isObj(v) ? v : {});
@@ -295,6 +295,10 @@ export type FakeOptions = {
 export class FakeModel implements ModelClient {
   constructor(private readonly options: FakeOptions = {}) {}
 
+  modelName(role: ModelRequest["role"]) {
+    return FAKE_MODELS[role];
+  }
+
   async complete(req: ModelRequest): Promise<ModelReply> {
     if (this.options.delayMs) await new Promise((resolve) => setTimeout(resolve, this.options.delayMs));
     const { scope } = req;
@@ -302,7 +306,7 @@ export class FakeModel implements ModelClient {
       text,
       reasoning: "",
       toolCalls,
-      model: req.role === "planner" ? "scripted-planner" : FAKE_MODEL,
+      model: FAKE_MODELS[req.role],
     });
 
     switch (req.phase) {

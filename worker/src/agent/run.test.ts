@@ -38,6 +38,10 @@ describe("build job with the scripted model", () => {
     expect(result.within_budget).toBe(false);
     expect(result.total_usd).toBeGreaterThan(180);
     expect(result.summary).toContain("nearest feasible");
+    const revision = sink.steps.find((s) => s.title === "Revision 1");
+    expect(revision?.end?.output).toMatchObject({ revision: 1, change: { metric: "budget searched (USD)", from: 180 } });
+    expect(sink.result).toMatchObject({ budget: { usd: 180 } });
+    expect(sink.steps.every((s) => s.role === "tool" || s.model)).toBe(true);
     expect(result.verification.find((v) => v.check.includes("180"))?.passed).toBe(false);
   });
 
@@ -102,6 +106,7 @@ describe("plan and match jobs", () => {
 /** A model whose replies come from a script, for the paths the scripted Nemotron stand-in does not take. */
 class ScriptedModel implements ModelClient {
   readonly seen: ModelRequest[] = [];
+  modelName = (role: ModelRequest["role"]) => `scripted-${role}`;
   constructor(private readonly respond: (req: ModelRequest, n: number) => Partial<ModelReply> | string) {}
   async complete(req: ModelRequest): Promise<ModelReply> {
     this.seen.push(req);

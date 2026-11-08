@@ -109,7 +109,7 @@ async function planPhase(run: Run): Promise<void> {
   ];
   let thinking = "";
   const plan = await run.step(
-    { role: "planner", title: "Plan the work", input: { goal: job.goal, context: clip(job.context) } },
+    { role: "planner", title: "Plan the work", input: { goal: job.goal, context: clip(job.context) }, model: deps.model.modelName("planner") },
     async () => {
       const { data, reply } = await run.askJson({ phase: "plan", role: "planner", reasoning: "high", messages, maxTokens: 8000 }, PlanSchema);
       thinking = reply.reasoning;
@@ -122,6 +122,7 @@ async function planPhase(run: Run): Promise<void> {
 
 async function executeStep(run: Run, title: string, goal: string, index: number, fixes?: string[]): Promise<void> {
   const { job, deps } = run;
+  const before = fixes ? snapshot(run.evidence) : null;
   const findings = run.summaries.length ? run.summaries.map((s) => `- ${s}`).join("\n") : "(nothing yet)";
   const messages: ProviderMessage[] = [
     { role: "system", content: executorPrompt(job.kind) },
@@ -144,7 +145,7 @@ async function executeStep(run: Run, title: string, goal: string, index: number,
   const scope: Partial<Scope> = { stepIndex: index, ...(fixes ? { fixes } : {}) };
 
   await run.step(
-    { role: "executor", title, input: { goal } },
+    { role: "executor", title, input: { goal }, model: deps.model.modelName("fast") },
     async () => {
       for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
         const last = round === MAX_TOOL_ROUNDS - 1;
@@ -167,10 +168,43 @@ async function executeStep(run: Run, title: string, goal: string, index: number,
       }
       return "(the step hit its tool-call limit)";
     },
-    (summary) => ({ summary }),
+    (summary) => ({ summary, ...(before ? { revision: run.revisions, change: changeSince(before, snapshot(run.evidence), fixes?.[0]) } : {}) }),
   ).then((summary) => {
     run.summaries.push(`${title}: ${summary}`);
   });
+}
+
+type Snapshot = { budget?: number; cost?: number; flightMinutes?: number };
+
+const asNumber = (v: unknown): number | undefined => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
+const asRecord = (v: unknown): Record<string, unknown> => (typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
+
+/** The build numbers the evidence currently supports, so a revision can say what it moved. */
+function snapshot(evidence: readonly Evidence[]): Snapshot {
+  const snap: Snapshot = {};
+  for (const e of evidence) {
+    if (!e.ok) continue;
+    const v = asRecord(e.value);
+    if (e.tool === "drone_optimize") {
+      const pick = asRecord(v.best ?? v.cheapestThatWorks);
+      snap.budget = asNumber(asRecord(v.constraints).budgetUsd) ?? snap.budget;
+      snap.cost = asNumber(pick.costUsd) ?? snap.cost;
+      snap.flightMinutes = asNumber(pick.flightMinutes) ?? snap.flightMinutes;
+    } else if (e.tool === "drone_calc") {
+      snap.flightMinutes = asNumber(asRecord(v.result).flightMinutes) ?? snap.flightMinutes;
+    }
+  }
+  return snap;
+}
+
+function changeSince(before: Snapshot, after: Snapshot, fix: string | undefined) {
+  const what = fix?.slice(0, 160);
+  if (before.budget !== undefined && after.budget !== undefined && before.budget !== after.budget) return { what, metric: "budget searched (USD)", from: before.budget, to: after.budget };
+  if (before.cost !== undefined && after.cost !== undefined && before.cost !== after.cost) return { what, metric: "parts cost (USD)", from: before.cost, to: after.cost };
+  if (before.flightMinutes !== undefined && after.flightMinutes !== undefined && before.flightMinutes !== after.flightMinutes) {
+    return { what, metric: "flight minutes", from: before.flightMinutes, to: after.flightMinutes };
+  }
+  return { what };
 }
 
 const safeJson = (text: string): unknown => {
@@ -198,7 +232,7 @@ async function review(run: Run): Promise<Critique> {
   ];
   let thinking = "";
   return run.step(
-    { role: "critic", title: run.revisions ? `Review (revision ${run.revisions})` : "Review the evidence", input: { criteria: run.plan.success_criteria, toolCalls: run.evidence.length } },
+    { role: "critic", title: run.revisions ? `Review (revision ${run.revisions})` : "Review the evidence", input: { criteria: run.plan.success_criteria, toolCalls: run.evidence.length }, model: deps.model.modelName("planner") },
     async () => {
       const { data, reply } = await run.askJson({ phase: "critic", role: "planner", reasoning: "low", messages, maxTokens: 6000 }, CriticSchema);
       thinking = reply.reasoning;
@@ -225,7 +259,7 @@ async function finalize(run: Run, critique: Critique): Promise<JobResult> {
     },
   ];
   return run.step(
-    { role: "planner", title: "Assemble the result", input: { evidence: run.evidence.length } },
+    { role: "planner", title: "Assemble the result", input: { evidence: run.evidence.length }, model: run.deps.model.modelName("planner") },
     async () => (await run.askJson({ phase: "final", role: "planner", reasoning: "low", messages, maxTokens: 8000 }, ResultSchema, checkResult)).data,
     (result) => result,
   );
@@ -249,7 +283,7 @@ export async function runJob(job: AgentJob, deps: RunDeps): Promise<JobOutcome> 
     }
 
     const result = await finalize(run, critique);
-    await deps.sink.setStatus("done", { result: { ...result, critique: critique.verdict, revisions: run.revisions } });
+    await deps.sink.setStatus("done", { result: { ...result, budget: run.plan.budget, critique: critique.verdict, revisions: run.revisions } });
     return { plan: run.plan, result, revisions: run.revisions, critique };
   } catch (error) {
     if (error instanceof JobCancelled) {
