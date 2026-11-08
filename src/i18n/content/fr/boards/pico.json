@@ -728,7 +728,7 @@
       "lede": "Sur une Pico W ou une Pico 2 W, rejoignez un réseau, faites clignoter la LED pendant la connexion, puis récupérez une page en HTTP.",
       "steps": {
         "1": "Choisissez le modèle Pico W ou Pico 2 W : les cartes simples n'ont pas de radio.",
-        "2": "Lancez : la LED clignote vite pendant que la carte rejoint le réseau HackTX.",
+        "2": "Lancez : la LED clignote vite pendant que la carte rejoint le réseau HackUTD.",
         "3": "Une fois connectée, la LED reste allumée et le moniteur série affiche l'adresse IP de la carte.",
         "4": "La carte récupère ensuite l'heure auprès d'une API web et affiche la réponse."
       },
@@ -744,7 +744,7 @@
         },
         "2": {
           "label": "Réseau",
-          "value": "HackTX (WPA2), DHCP"
+          "value": "HackUTD (WPA2), DHCP"
         },
         "3": {
           "label": "Liaison avec le microcontrôleur",
@@ -762,7 +762,7 @@
         "3": "Utilise Pin(\"LED\") et network.WLAN"
       },
       "world": {
-        "net": "Réseau Wi-Fi HackTX"
+        "net": "Réseau Wi-Fi HackUTD"
       },
       "pins": {
         "WL_GPIO0": {

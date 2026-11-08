@@ -521,7 +521,7 @@
         "1": "Keep the LED on GPIO4.",
         "2": "Run the sketch: the RGB LED blinks blue while it connects, then turns green and the monitor prints the IP address.",
         "3": "Open /on and /off from the phone: the LED follows and the monitor logs each request.",
-        "4": "Pick the HackTX network with the same password and watch it never connect."
+        "4": "Pick the HackUTD network with the same password and watch it never connect."
       },
       "hints": {
         "1": "WiFi.h and WebServer.h ship with the ESP32 core; nothing to install.",
@@ -547,7 +547,7 @@
         "3": "Wi-Fi bursts need a good USB supply"
       },
       "params": {
-        "ssid": { "label": "Network", "bench-lab": "bench-lab", "HackTX": "HackTX", "note": "Its password is not robotics, so the board keeps trying" }
+        "ssid": { "label": "Network", "bench-lab": "bench-lab", "HackUTD": "HackUTD", "note": "Its password is not robotics, so the board keeps trying" }
       },
       "world": {
         "phone": "Phone request"

@@ -728,7 +728,7 @@
       "lede": "在 Pico W 或 Pico 2 W 上连接一个网络，连接时让 LED 闪烁，然后通过 HTTP 获取一个网页。",
       "steps": {
         "1": "选择 Pico W 或 Pico 2 W 型号：普通版没有无线芯片。",
-        "2": "运行：板子连接 HackTX 网络时，LED 快速闪烁。",
+        "2": "运行：板子连接 HackUTD 网络时，LED 快速闪烁。",
         "3": "连上之后 LED 常亮，串口监视器打印板子的 IP 地址。",
         "4": "然后板子从一个网络 API 获取时间，并打印回复。"
       },
@@ -744,7 +744,7 @@
         },
         "2": {
           "label": "网络",
-          "value": "HackTX（WPA2），DHCP"
+          "value": "HackUTD（WPA2），DHCP"
         },
         "3": {
           "label": "与 MCU 的连接",
@@ -762,7 +762,7 @@
         "3": "使用了 Pin(\"LED\") 和 network.WLAN"
       },
       "world": {
-        "net": "Wi-Fi 网络 HackTX"
+        "net": "Wi-Fi 网络 HackUTD"
       },
       "pins": {
         "WL_GPIO0": {

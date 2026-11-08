@@ -726,7 +726,7 @@
         "1": "Behalte die LED an GPIO4.",
         "2": "Führ den Sketch aus: Die RGB-LED blinkt blau, während er sich verbindet, wird dann grün, und der Monitor gibt die IP-Adresse aus.",
         "3": "Öffne /on und /off vom Handy aus: Die LED folgt, und der Monitor protokolliert jede Anfrage.",
-        "4": "Wähl das Netz HackTX mit demselben Passwort und sieh zu, wie es nie eine Verbindung bekommt."
+        "4": "Wähl das Netz HackUTD mit demselben Passwort und sieh zu, wie es nie eine Verbindung bekommt."
       },
       "hints": {
         "1": "WiFi.h und WebServer.h kommen mit dem ESP32-Core; nichts zu installieren.",
@@ -770,7 +770,7 @@
         "ssid": {
           "label": "Netz",
           "bench-lab": "bench-lab",
-          "HackTX": "HackTX",
+          "HackUTD": "HackUTD",
           "note": "Sein Passwort ist nicht robotics, also versucht es das Board immer weiter"
         }
       },

@@ -164,7 +164,7 @@ from machine import Pin
 led = Pin("LED", Pin.OUT)    # {{t:lessons.wifi.code.led}}
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
-wlan.connect("HackTX", "hackathon")
+wlan.connect("HackUTD", "hackathon")
 
 while not wlan.isconnected():
     led.toggle()             # {{t:lessons.wifi.code.wait}}
@@ -350,7 +350,7 @@ const lessons: Lesson[] = [
     circuit: null,
     world: {
       inputs: [
-        { id: 'net', quantity: 'request', device: { kind: 'network', ssid: 'HackTX', ip: '192.168.4.20', requests: ['GET http://worldtimeapi.org/api/ip'] }, pins: [], part: 'SH1', min: 0, max: 0, step: 1, default: 0, gesture: 'tap', label: 'lessons.wifi.world.net' },
+        { id: 'net', quantity: 'request', device: { kind: 'network', ssid: 'HackUTD', ip: '192.168.4.20', requests: ['GET http://worldtimeapi.org/api/ip'] }, pins: [], part: 'SH1', min: 0, max: 0, step: 1, default: 0, gesture: 'tap', label: 'lessons.wifi.world.net' },
       ],
       script: [],
     },

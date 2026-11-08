@@ -347,7 +347,7 @@
       "lede": "On a Pico W or Pico 2 W, join a network, blink the LED while it connects, then fetch a page over HTTP.",
       "steps": {
         "1": "Pick the Pico W or Pico 2 W variant: the plain boards have no radio.",
-        "2": "Run: the LED blinks fast while the board joins the HackTX network.",
+        "2": "Run: the LED blinks fast while the board joins the HackUTD network.",
         "3": "Once connected the LED stays on and the serial monitor prints the board's IP address.",
         "4": "The board then fetches the time from a web API and prints the reply."
       },
@@ -358,12 +358,12 @@
       },
       "specs": {
         "1": { "label": "Radio", "value": "CYW43439, 2.4 GHz 802.11n" },
-        "2": { "label": "Network", "value": "HackTX (WPA2), DHCP" },
+        "2": { "label": "Network", "value": "HackUTD (WPA2), DHCP" },
         "3": { "label": "Link to the MCU", "value": "SPI on GP23, GP24, GP25, GP29" }
       },
       "features": { "1": "Join a Wi-Fi network", "2": "An HTTP GET", "3": "LED status through the radio" },
       "checks": { "1": "Prints the IP address after connecting", "2": "Prints the web reply", "3": "Uses Pin(\"LED\") and network.WLAN" },
-      "world": { "net": "Wi-Fi network HackTX" },
+      "world": { "net": "Wi-Fi network HackUTD" },
       "pins": { "WL_GPIO0": { "to": "On-board LED", "role": "Radio GPIO" } },
       "callouts": { "SH1": "The radio under its shield", "ANT": "The printed antenna", "D2": "Driven by the radio" },
       "code": {

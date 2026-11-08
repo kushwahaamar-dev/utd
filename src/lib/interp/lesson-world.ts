@@ -87,7 +87,7 @@ export function drivesFor(input: WorldInput, value: number, logicV: number): Pin
 const DEFAULT_NETWORKS: WifiNetwork[] = [
   { ssid: 'bench-lab', password: 'robotics', rssi: -48, channel: 6 },
   { ssid: 'iynk-guest', password: null, rssi: -67, channel: 11 },
-  { ssid: 'HackTX', password: 'hackathon', rssi: -71, channel: 1 },
+  { ssid: 'HackUTD', password: 'hackathon', rssi: -71, channel: 1 },
 ];
 
 type NetworkDevice = Extract<DeviceModel, { kind: 'network' }>;

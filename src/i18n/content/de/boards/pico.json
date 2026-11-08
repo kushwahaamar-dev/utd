@@ -728,7 +728,7 @@
       "lede": "Verbinde dich auf einem Pico W oder Pico 2 W mit einem Netz, lass die LED beim Verbinden blinken und ruf dann eine Seite über HTTP ab.",
       "steps": {
         "1": "Wähl die Variante Pico W oder Pico 2 W: Die einfachen Boards haben kein Funkteil.",
-        "2": "Führ es aus: Die LED blinkt schnell, während sich das Board mit dem Netz HackTX verbindet.",
+        "2": "Führ es aus: Die LED blinkt schnell, während sich das Board mit dem Netz HackUTD verbindet.",
         "3": "Sobald die Verbindung steht, bleibt die LED an, und der serielle Monitor gibt die IP-Adresse des Boards aus.",
         "4": "Danach ruft das Board die Uhrzeit von einer Web-API ab und gibt die Antwort aus."
       },
@@ -744,7 +744,7 @@
         },
         "2": {
           "label": "Netz",
-          "value": "HackTX (WPA2), DHCP"
+          "value": "HackUTD (WPA2), DHCP"
         },
         "3": {
           "label": "Verbindung zur MCU",
@@ -762,7 +762,7 @@
         "3": "Nutzt Pin(\"LED\") und network.WLAN"
       },
       "world": {
-        "net": "WLAN-Netz HackTX"
+        "net": "WLAN-Netz HackUTD"
       },
       "pins": {
         "WL_GPIO0": {

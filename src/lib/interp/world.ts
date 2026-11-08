@@ -193,7 +193,7 @@ export class World {
     this.networks = opts.networks ?? [
       { ssid: 'bench-lab', password: 'robotics', rssi: -48, channel: 6 },
       { ssid: 'iynk-guest', password: null, rssi: -67, channel: 11 },
-      { ssid: 'HackTX', password: 'hackathon', rssi: -71, channel: 1 },
+      { ssid: 'HackUTD', password: 'hackathon', rssi: -71, channel: 1 },
     ];
     this.web = opts.web ?? {
       'http://example.com/': '<h1>Example Domain</h1>',

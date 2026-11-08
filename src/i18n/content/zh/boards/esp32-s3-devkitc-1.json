@@ -726,7 +726,7 @@
         "1": "保留接在 GPIO4 上的 LED。",
         "2": "运行程序：连接时 RGB LED 闪烁蓝色，然后变绿，监视器打印 IP 地址。",
         "3": "在手机上打开 /on 和 /off：LED 跟着变化，监视器记录每一个请求。",
-        "4": "选择 HackTX 网络，密码不变，看它永远连不上。"
+        "4": "选择 HackUTD 网络，密码不变，看它永远连不上。"
       },
       "hints": {
         "1": "WiFi.h 和 WebServer.h 随 ESP32 核心一起提供；什么都不用安装。",
@@ -770,7 +770,7 @@
         "ssid": {
           "label": "网络",
           "bench-lab": "bench-lab",
-          "HackTX": "HackTX",
+          "HackUTD": "HackUTD",
           "note": "它的密码不是 robotics，所以板子会一直尝试"
         }
       },

@@ -726,7 +726,7 @@
         "1": "Gardez la LED sur GPIO4.",
         "2": "Lancez le sketch : la LED RGB clignote en bleu pendant la connexion, puis passe au vert et le moniteur affiche l'adresse IP.",
         "3": "Ouvrez /on et /off depuis le téléphone : la LED suit et le moniteur note chaque requête.",
-        "4": "Choisissez le réseau HackTX avec le même mot de passe et regardez-le ne jamais se connecter."
+        "4": "Choisissez le réseau HackUTD avec le même mot de passe et regardez-le ne jamais se connecter."
       },
       "hints": {
         "1": "WiFi.h et WebServer.h sont livrés avec le core ESP32 ; rien à installer.",
@@ -770,7 +770,7 @@
         "ssid": {
           "label": "Réseau",
           "bench-lab": "bench-lab",
-          "HackTX": "HackTX",
+          "HackUTD": "HackUTD",
           "note": "Son mot de passe n'est pas robotics : la carte réessaie sans fin"
         }
       },

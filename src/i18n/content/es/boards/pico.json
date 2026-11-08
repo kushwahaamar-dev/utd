@@ -728,7 +728,7 @@
       "lede": "En una Pico W o una Pico 2 W, únete a una red, haz parpadear el LED mientras se conecta y luego descarga una página por HTTP.",
       "steps": {
         "1": "Elige la variante Pico W o Pico 2 W: las placas normales no tienen radio.",
-        "2": "Ejecuta: el LED parpadea rápido mientras la placa se une a la red HackTX.",
+        "2": "Ejecuta: el LED parpadea rápido mientras la placa se une a la red HackUTD.",
         "3": "Una vez conectada, el LED se queda encendido y el monitor serie imprime la dirección IP de la placa.",
         "4": "Después la placa pide la hora a una API web e imprime la respuesta."
       },
@@ -744,7 +744,7 @@
         },
         "2": {
           "label": "Red",
-          "value": "HackTX (WPA2), DHCP"
+          "value": "HackUTD (WPA2), DHCP"
         },
         "3": {
           "label": "Enlace con el MCU",
@@ -762,7 +762,7 @@
         "3": "Usa Pin(\"LED\") y network.WLAN"
       },
       "world": {
-        "net": "Red Wi-Fi HackTX"
+        "net": "Red Wi-Fi HackUTD"
       },
       "pins": {
         "WL_GPIO0": {

@@ -598,7 +598,7 @@ void loop() {
       params: [
         { id: 'ssid', kind: 'choice', label: 'lessons.web-server.params.ssid.label', default: 'bench-lab', options: [
           { value: 'bench-lab', code: 'bench-lab', label: 'lessons.web-server.params.ssid.bench-lab' },
-          { value: 'HackTX', code: 'HackTX', label: 'lessons.web-server.params.ssid.HackTX', note: 'lessons.web-server.params.ssid.note' },
+          { value: 'HackUTD', code: 'HackUTD', label: 'lessons.web-server.params.ssid.HackUTD', note: 'lessons.web-server.params.ssid.note' },
         ] },
       ],
       world: {
