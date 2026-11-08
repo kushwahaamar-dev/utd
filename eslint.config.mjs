@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Per-agent build folders (NEXT_DIST_DIR=.next-<label>).
     ".next-*/**",
+    // The worker bundle (worker/build.mjs).
+    "worker/dist/**",
     // Built figure pages and the vendored Colorfigures core are not app source.
     "public/figures/**",
     "figures/vendor/**",
