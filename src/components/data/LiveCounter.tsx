@@ -17,7 +17,7 @@ type LiveCounterProps = {
 };
 
 /**
- * "Right now at HackTX: N builders, M LEDs blinked, K drones flown", plus a
+ * "Right now at HackUTD: N builders, M LEDs blinked, K drones flown", plus a
  * strip of events per minute, from the activity_1m continuous aggregate.
  * Polls every 15 s while the tab is visible.
  */

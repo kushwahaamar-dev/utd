@@ -22,7 +22,7 @@
     "offBody": "此部署没有数据库，你的圈速只保存在本机上。"
   },
   "live": {
-    "title": "HackTX 此刻",
+    "title": "HackUTD 此刻",
     "window": "过去 60 分钟",
     "live": "实时",
     "builders": {

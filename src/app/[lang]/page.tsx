@@ -1,25 +1,37 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { FigureFrame, FigureStill } from "@/components/figure";
-import { Accent, ArrowLink, CtaLink, SectionHead, Wrap, riseDelay, typeClass } from "@/components/marketing";
-import { HeroActions, LabProgress } from "@/components/shell/dashboard/DashboardProgress";
-import { HeroArt } from "@/components/shell/dashboard/HeroArt";
-import { loadLabs } from "@/components/shell/dashboard/data";
-import { LAB_STILL } from "@/components/shell/dashboard/labs";
-import { cx } from "@/components/ui/cx";
+import {
+  Column,
+  CompactList,
+  FloatingControls,
+  GlyphScene,
+  KeyValueFooter,
+  LiveNow,
+  PcbTraces,
+  ProjectCard,
+  SelectionBox,
+  Section,
+  Stamp,
+  Timeline,
+  riseIndex,
+} from "@/components/editorial";
+import { ArrowLink } from "@/components/marketing";
 import { BOARD_IDS, DRONE_IDS, ROBOTICS_IDS } from "@/content/ids";
-import { LOCALES, LOCALE_NAMES, htmlLang, isLocale } from "@/i18n/config";
+import { isLocale } from "@/i18n/config";
 import { alternatesFor } from "@/i18n/seo";
-import { getMessages, getT } from "@/i18n/server";
+import { getT } from "@/i18n/server";
 
 type Props = PageProps<"/[lang]">;
 
 const counts = { boards: BOARD_IDS.length, benches: ROBOTICS_IDS.length, drones: DRONE_IDS.length };
-// the hero figure is only to look at and turn: no zoom chip, and no notes popping up over it
-const HERO_CHROME = ["zoom", "toast"];
-const SECTION = "mt-[clamp(72px,10vw,160px)]";
+const REPO = "https://github.com/kushwahaamar-dev/utd";
+
+const LEADERS = [
+  { name: "kira_m", points: 2480 },
+  { name: "ada.volt", points: 2215 },
+  { name: "nibble", points: 1960 },
+];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
@@ -33,217 +45,160 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function DashboardPage({ params }: Props) {
+export default function LandingPage({ params }: Props) {
   return (
     <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" />}>
-      <Dashboard params={params} />
+      <Landing params={params} />
     </Suspense>
   );
 }
 
-async function Dashboard({ params }: Pick<Props, "params">) {
+async function Landing({ params }: Pick<Props, "params">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  const [t, together, messages, labs] = await Promise.all([
-    getT(lang, "shell"),
-    getT(lang, "together"),
-    getMessages(lang, "shell"),
-    loadLabs(lang),
-  ]);
-
-  const labNames = { board: t("nav.boards"), robotics: t("nav.robotics"), drone: t("nav.drones") };
-  const labText = {
-    board: { text: t("dashboard.board.text"), unit: t("dashboard.board.unit"), count: counts.boards, progress: t("dashboard.board.progress") },
-    robotics: { text: t("dashboard.robotics.text"), unit: t("dashboard.robotics.unit"), count: counts.benches, progress: t("dashboard.robotics.progress") },
-    drone: { text: t("dashboard.drones.text"), unit: t("dashboard.drones.unit"), count: counts.drones, progress: t("dashboard.drones.progress") },
-  };
-  const progressMessages = { progress: messages.ui.progress, progressLabel: messages.ui.progressLabel };
-  const items = labs.flatMap((lab) => lab.items);
-  const uno = labs[0].items.find((item) => item.id === "uno-r3");
-  const startHref = uno?.entries[0]?.href ?? `/${lang}/boards/uno-r3`;
-  const start = { href: startHref, label: t("dashboard.start") };
-  const browse = { href: `/${lang}/boards`, label: t("dashboard.browse") };
-  const features = (["see", "code", "break", "fly"] as const).map((id) => ({
-    id,
-    title: t(`dashboard.features.${id}.title`),
-    text: t(`dashboard.features.${id}.text`),
-  }));
-  const social = (["rooms", "partner", "languages"] as const).map((id) => ({
-    id,
-    title: t(`dashboard.together.${id}.title`),
-    text: t(`dashboard.together.${id}.text`),
-  }));
-  const ids = { hero: `dash-title-${lang}`, labs: `labs-title-${lang}`, features: `features-title-${lang}`, together: `together-title-${lang}`, end: `end-title-${lang}` };
+  const t = await getT(lang, "shell");
+  const [lead, focus, tail] = t("landing.title").split("*");
 
   return (
-    <div className="pb-[clamp(48px,6vw,96px)]">
-      <section aria-labelledby={ids.hero} className="pt-[clamp(32px,6vw,96px)]">
-        <Wrap className="grid grid-cols-12 gap-x-6 gap-y-10">
-          <div className="col-span-12 flex flex-col lg:col-span-6 lg:pb-16">
-            <p style={riseDelay(0)} className={cx(typeClass.eyebrow, typeClass.rise)}>
-              {t("dashboard.kicker")}
-            </p>
-            <h1 id={ids.hero} style={riseDelay(60)} className={cx(typeClass.display, "mt-5 lg:mt-7", typeClass.rise)}>
-              <Accent text={t("dashboard.title")} />
-            </h1>
-            <div style={riseDelay(140)} className={cx("mt-[clamp(28px,4vw,56px)] max-w-[30rem]", typeClass.rise)}>
-              <p className="text-[17px] leading-[1.55] text-muted">{t("dashboard.lede", counts)}</p>
-              <div className="mt-8">
-                <HeroActions
-                  items={items}
-                  messages={messages.dashboard.continue}
-                  progressMessages={progressMessages}
-                  labNames={labNames}
-                  start={start}
-                  browse={browse}
-                  overallLabel={t("dashboard.overall")}
-                />
-              </div>
-            </div>
-          </div>
-          {/* The Uno running Blink on its breadboard, live: drag it round. The drawing stands in until it's ready. */}
-          <div style={riseDelay(220)} className={cx("col-span-12 flex min-w-0 flex-col lg:col-span-6", typeClass.rise)}>
-            <div className="h-[min(50svh,460px)] lg:h-auto lg:min-h-[min(72vh,700px)] lg:flex-1">
-              <FigureFrame
-                src="/figures/boards/uno-r3.html?bare=1&view=breadboard&circuit=blink"
-                title={t("dashboard.heroFigure")}
-                controls={false}
-                hideChrome={HERO_CHROME}
-                fill
-                className="[&_.ink-plate]:rounded-[6px] [&_.ink-plate]:border-0 [&_.ink-plate]:shadow-none"
-                poster={<HeroArt className="h-full w-auto max-w-full object-contain p-4 sm:p-8" />}
-              />
-            </div>
-            {/* The frame's title already names the figure; this is its caption for the eye. */}
-            <p aria-hidden="true" className="mt-4 flex items-start gap-2.5 font-ui text-[12px] leading-[1.5] text-muted lg:justify-end">
-              <span className="mt-[6px] size-1.5 shrink-0 rounded-full bg-mustard" />
-              {t("dashboard.heroFigure")}
-            </p>
-          </div>
-        </Wrap>
-      </section>
+    <div className="relative pb-[clamp(96px,12vw,160px)]">
+      <PcbTraces />
+      <Column className="relative pt-[clamp(72px,11vw,136px)]">
+        <h1 style={riseIndex(0)} className="rise text-base font-normal leading-[1.6] tracking-[-0.011em] text-muted text-pretty">
+          {lead}
+          <SelectionBox>{focus}</SelectionBox>
+          {tail}
+        </h1>
+        <p style={riseIndex(1)} className="rise mt-4 text-pretty text-muted">
+          {t("landing.p1")}
+        </p>
+        <p style={riseIndex(2)} className="rise mt-4 text-pretty text-muted">
+          {t("landing.p2")}
+        </p>
+      </Column>
 
-      <section aria-labelledby={ids.labs} className={SECTION}>
-        <Wrap>
-          <SectionHead n="01" id={ids.labs} title={t("dashboard.labsTitle")} />
-          <ul className="mt-[clamp(32px,4vw,56px)] grid grid-cols-1 lg:grid-cols-3">
-            {labs.map((lab) => {
-              const copy = labText[lab.lab];
-              const keys = lab.items.flatMap((item) => item.entries.map((entry) => entry.key));
-              return (
-                <li
-                  key={lab.lab}
-                  className="min-w-0 border-t border-rule py-10 first:border-t-0 first:pt-0 last:pb-0 lg:border-t-0 lg:border-l lg:px-[clamp(20px,2.4vw,40px)] lg:py-0 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0"
-                >
-                  <article
-                    aria-labelledby={`lab-${lab.lab}-${lang}`}
-                    className="group relative flex h-full flex-col has-[a:focus-visible]:outline-[2.5px] has-[a:focus-visible]:outline-offset-[6px] has-[a:focus-visible]:outline-(--focus) has-[a:focus-visible]:outline-solid"
-                  >
-                    <FigureStill item={LAB_STILL[lab.lab]} className="h-[clamp(200px,40vw,280px)] w-full aspect-auto! rounded-[6px] dark:bg-plate lg:h-[clamp(200px,17vw,260px)]" />
-                    <p className="mt-8 flex items-baseline gap-3">
-                      <span className="tabular text-[clamp(56px,6vw,88px)] font-medium leading-[0.85] tracking-[-0.045em]">{copy.count}</span>
-                      <span className={typeClass.eyebrow}>{copy.unit}</span>
-                    </p>
-                    <h3 id={`lab-${lab.lab}-${lang}`} className="mt-6 font-body text-[clamp(22px,1.9vw,28px)] font-medium tracking-[-0.015em]">
-                      {/* One link per lab; its ::after makes the whole column the target. */}
-                      <Link
-                        href={`/${lang}/${lab.path}`}
-                        className="no-underline after:absolute after:inset-0 focus-visible:shadow-none focus-visible:outline-none"
-                      >
-                        {labNames[lab.lab]}
-                      </Link>
-                    </h3>
-                    <p className="mt-3 max-w-[46ch] flex-1 text-base leading-[1.55] text-muted">{copy.text}</p>
-                    {keys.length > 0 ? (
-                      <div className="mt-5">
-                        <LabProgress keys={keys} label={copy.progress} messages={progressMessages} always={false} />
-                      </div>
-                    ) : null}
-                    <span aria-hidden="true" className="mt-6 inline-flex items-center gap-2 text-[15px] font-medium">
-                      <span className="underline decoration-rule decoration-1 underline-offset-[6px] transition-[text-decoration-color] duration-200 group-hover:decoration-ink">
-                        {t("dashboard.open", { lab: labNames[lab.lab] })}
-                      </span>
-                      <span className="transition-transform duration-200 ease-out group-hover:translate-x-0.5 motion-reduce:transition-none">→</span>
-                    </span>
-                  </article>
-                </li>
-              );
-            })}
-          </ul>
-        </Wrap>
-      </section>
-
-      <section aria-labelledby={ids.features} className={SECTION}>
-        <Wrap>
-          <SectionHead n="02" id={ids.features} title={t("dashboard.features.title")} />
-          <ol className="mt-[clamp(24px,3vw,40px)]">
-            {features.map((feature, i) => (
-              <li key={feature.id} className="grid grid-cols-12 gap-x-6 gap-y-3 border-b border-rule py-[clamp(24px,3vw,44px)] last:border-b-0">
-                <span aria-hidden="true" className={cx(typeClass.eyebrow, "tabular col-span-2 pt-2 md:pt-3")}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className={cx(typeClass.title, "col-span-10 md:col-span-5")}>{feature.title}</h3>
-                <p className="col-span-10 col-start-3 max-w-[52ch] text-base leading-[1.55] text-muted md:col-span-5 md:col-start-8 md:pt-2">
-                  {feature.text}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </Wrap>
-      </section>
-
-      <section aria-labelledby={ids.together} className={SECTION}>
-        <Wrap>
-          <SectionHead
-            n="03"
-            id={ids.together}
-            title={together("lobby.title")}
-            aside={<ArrowLink href={`/${lang}/together`}>{together("lobby.create.title")}</ArrowLink>}
+      <Column wide className="relative mt-[clamp(32px,5vw,56px)]">
+        <div style={riseIndex(3)} className="rise">
+          <GlyphScene
+            labels={{
+              scene: t("landing.scene.alt"),
+              time: t("landing.scene.time"),
+              dawn: t("landing.scene.dawn"),
+              noon: t("landing.scene.noon"),
+              dusk: t("landing.scene.dusk"),
+              night: t("landing.scene.night"),
+            }}
           />
-          <ul className="mt-[clamp(32px,4vw,56px)] grid gap-y-10 md:grid-cols-3">
-            {social.map((point, i) => (
-              <li key={point.id} className="md:border-l md:border-rule md:px-[clamp(20px,2.4vw,40px)] md:first:border-l-0 md:first:pl-0">
-                <p aria-hidden="true" className={cx(typeClass.eyebrow, "tabular")}>
-                  {String(i + 1).padStart(2, "0")}
-                </p>
-                <h3 className="mt-4 font-body text-[clamp(22px,1.9vw,28px)] font-medium tracking-[-0.015em]">{point.title}</h3>
-                <p className="mt-3 max-w-[42ch] text-base leading-[1.55] text-muted">{point.text}</p>
-              </li>
-            ))}
-          </ul>
-          <ul className="mt-[clamp(40px,5vw,80px)] flex flex-wrap items-baseline gap-x-[clamp(20px,3vw,48px)] gap-y-2 border-t border-rule pt-[clamp(24px,3vw,40px)]">
-            {LOCALES.map((locale) => (
-              <li key={locale}>
-                <Link
-                  href={`/${locale}`}
-                  lang={htmlLang(locale)}
-                  hrefLang={htmlLang(locale)}
-                  aria-current={locale === lang ? "page" : undefined}
-                  className="inline-flex min-h-11 items-center font-body text-[clamp(26px,3.4vw,48px)] font-medium tracking-[-0.02em] text-muted no-underline transition-colors duration-200 hover:text-ink aria-[current=page]:text-ink"
-                >
-                  {LOCALE_NAMES[locale]}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </Wrap>
-      </section>
+        </div>
+      </Column>
 
-      <section aria-labelledby={ids.end} className={SECTION}>
-        <Wrap>
-          <div className="grid grid-cols-12 gap-x-6 gap-y-10 border-t border-rule pt-[clamp(40px,6vw,96px)]">
-            <h2 id={ids.end} className={cx(typeClass.display, "col-span-12 lg:col-span-8")}>
-              <Accent text={t("dashboard.closing.title")} />
-            </h2>
-            <div className="col-span-12 flex flex-col justify-end gap-8 lg:col-span-4">
-              <p className="max-w-[34ch] text-[17px] leading-[1.55] text-muted">{t("dashboard.closing.text")}</p>
-              <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-                <CtaLink href={start.href}>{start.label}</CtaLink>
-              </div>
-            </div>
+      <Column className="relative">
+        <Section id={`labs-${lang}`} n="01" motif="chip" tone="tomato" tilt={-4} title={t("landing.labs.title")}>
+          <div className="grid grid-cols-1 gap-x-5 gap-y-9 min-[480px]:grid-cols-2">
+            <ProjectCard
+              href={`/${lang}/boards`}
+              title={t("landing.labs.board.title")}
+              meta={t("landing.labs.board.meta", { count: counts.boards })}
+              description={t("landing.labs.board.text")}
+              image={{ src: "/thumbs/boards/uno-r3.webp", width: 720, height: 449 }}
+              tone="var(--color-tomato)"
+            />
+            <ProjectCard
+              href={`/${lang}/robotics`}
+              title={t("landing.labs.robotics.title")}
+              meta={t("landing.labs.robotics.meta", { count: counts.benches })}
+              description={t("landing.labs.robotics.text")}
+              image={{ src: "/thumbs/robotics/tb6612fng.webp", width: 720, height: 524 }}
+              tone="var(--color-mint-m)"
+            />
+            <ProjectCard
+              href={`/${lang}/drones`}
+              title={t("landing.labs.drones.title")}
+              meta={t("landing.labs.drones.meta", { count: counts.drones })}
+              description={t("landing.labs.drones.text")}
+              image={{ src: "/thumbs/drones/quad5.webp", width: 720, height: 431 }}
+              tone="var(--color-cobalt)"
+            />
+            <ProjectCard
+              href={`/${lang}/drones/racer/fly`}
+              title={t("landing.labs.flight.title")}
+              meta={t("landing.labs.flight.meta")}
+              description={t("landing.labs.flight.text")}
+              image={{ src: "/thumbs/drones/racer.webp", width: 720, height: 450 }}
+              tone="var(--color-mustard)"
+            />
           </div>
-        </Wrap>
-      </section>
+        </Section>
+
+        <Section id={`mission-${lang}`} n="02" motif="arm" tone="plum" tilt={3} title={t("landing.mission.title")}>
+          <p className="max-w-[44ch] text-pretty text-muted">{t("landing.mission.text")}</p>
+          <ArrowLink href={`/${lang}/mission`} className="mt-3">
+            {t("landing.mission.cta")}
+          </ArrowLink>
+        </Section>
+
+        <Section id={`live-${lang}`} n="03" motif="scope" tone="green" tilt={-3} title={t("landing.live.title")}>
+          <LiveNow
+            locale={lang}
+            lobbyHref={`/${lang}/together`}
+            rooms={[
+              { id: "blink", title: t("landing.live.sample.r1"), players: 3 },
+              { id: "line", title: t("landing.live.sample.r2"), players: 2 },
+              { id: "slalom", title: t("landing.live.sample.r3"), players: 4 },
+            ]}
+            leaders={LEADERS}
+            labels={{
+              rooms: t("landing.live.rooms"),
+              leaderboard: t("landing.live.leaderboard"),
+              lobby: t("landing.live.lobby"),
+              points: t("landing.live.points"),
+              players: (count) => t("landing.live.players", { count }),
+            }}
+          />
+        </Section>
+
+        <Section id={`solana-${lang}`} n="04" motif="chain" tone="copper" tilt={4} title={t("landing.solana.title")}>
+          <CompactList
+            items={[
+              { title: t("landing.solana.pools.title"), description: t("landing.solana.pools.text"), href: `/${lang}/together`, icon: "target" },
+              { title: t("landing.solana.creds.title"), description: t("landing.solana.creds.text"), href: `/${lang}/passport`, icon: "lock" },
+            ]}
+          />
+          <div className="mt-4 flex flex-wrap gap-x-6">
+            <ArrowLink href={`/${lang}/passport`}>{t("landing.solana.passport")}</ArrowLink>
+            <ArrowLink href={`/${lang}/verify`}>{t("landing.solana.verify")}</ArrowLink>
+          </div>
+        </Section>
+
+        <Section id={`built-${lang}`} n="05" motif="gear" tone="cobalt" tilt={-2} title={t("landing.built.title")}>
+          <Timeline
+            items={(["stdb", "agents", "chain", "cloud"] as const).map((id) => ({
+              title: t(`landing.built.${id}.title`),
+              meta: t(`landing.built.${id}.meta`),
+              text: t(`landing.built.${id}.text`),
+            }))}
+          />
+        </Section>
+
+        <footer className="mt-[clamp(88px,11vw,144px)]">
+          <div aria-hidden="true" className="mb-6 flex justify-end gap-1">
+            <Stamp motif="dish" tone="cobalt" value="HU" size={52} tilt={-6} />
+            <Stamp motif="drone" tone="tomato" value="26" size={52} tilt={5} className="-ms-2 mt-3" />
+          </div>
+          <KeyValueFooter
+            rows={[
+              { label: t("landing.footer.builtOn"), value: "Next.js, SpacetimeDB" },
+              { label: t("landing.footer.agents"), value: "NVIDIA Nemotron" },
+              { label: t("landing.footer.chain"), value: "Solana" },
+              { label: t("landing.footer.cloud"), value: "Vultr" },
+              { label: t("landing.footer.source"), value: "kushwahaamar-dev/utd", href: REPO },
+            ]}
+          />
+        </footer>
+      </Column>
+
+      <FloatingControls
+        labels={{ font: t("landing.controls.font"), theme: t("landing.controls.theme"), light: t("landing.controls.light"), dark: t("landing.controls.dark") }}
+      />
     </div>
   );
 }

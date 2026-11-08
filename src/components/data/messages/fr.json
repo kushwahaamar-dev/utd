@@ -23,7 +23,7 @@
     "offBody": "Ce déploiement n'a pas de base de données : vos tours restent sur votre appareil."
   },
   "live": {
-    "title": "En ce moment à HackTX",
+    "title": "En ce moment à HackUTD",
     "window": "60 dernières minutes",
     "live": "En direct",
     "builders": {

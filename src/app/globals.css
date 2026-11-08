@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
 /*
-  iynk look: warm paper, ink lines, the five Colorfigures palettes and a warm
-  technical monochrome, set in Geist and Geist Mono. Light/mid/dark bands match the figure engine
+  iynk look: a quiet editorial page (neutral paper, near-black ink, grey copy, hairlines) with a hardware
+  workshop for ornament: postage stamps inked with parts, PCB traces, glyph art. The five Colorfigures palettes
+  stay for figures and status fills. Light/mid/dark bands match the figure engine
   (figures/vendor/colorfigures/core.js) so host chrome and figures agree.
 
-  Theme: <html data-theme="light|dark"> forces a theme; no attribute (or
-  "system") follows prefers-color-scheme. Figures stay paper plates in both
-  themes (colorfigures-guide 2.3): in dark mode the plate paper is dimmed to
-  #e4ddcf and keeps dark ink, everything around it goes dark.
+  Theme: <html data-theme="light|dark"> forces a theme; no attribute (or "system") follows
+  prefers-color-scheme. Figures stay paper plates in both themes: in dark mode the plate paper is dimmed
+  to #e4ddcf and keeps dark ink, everything around it goes dark.
+  Font: <html data-font="sans|serif|mono"> swaps the reading face (FloatingControls writes it).
 */
 
 @custom-variant dark {
@@ -64,10 +65,10 @@
   --color-ink-fixed: #231e16;
   --color-paper-fixed: #f2efe7;
 
-  --radius-ink: 15px 18px 14px 17px / 17px 14px 18px 15px;
-  --radius-ink-sm: 9px 11px 8px 10px / 10px 8px 11px 9px;
+  --radius-ink: 16px;
+  --radius-ink-sm: 10px;
 
-  --animate-ink-pop: ink-pop 0.7s cubic-bezier(0.3, 1.4, 0.5, 1);
+  --animate-ink-pop: ink-pop 0.5s cubic-bezier(0.3, 1.4, 0.5, 1);
   --animate-ink-fade: ink-fade 0.18s ease-out;
   --animate-ink-rise: ink-rise 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
   --animate-ink-from-start: ink-from-start 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
@@ -75,7 +76,7 @@
 
   @keyframes ink-pop {
     0% { transform: translateY(0) scale(1); }
-    40% { transform: translateY(-5px) scale(1.02); }
+    40% { transform: translateY(-3px) scale(1.015); }
     100% { transform: translateY(0) scale(1); }
   }
   @keyframes ink-fade {
@@ -117,16 +118,23 @@
   --color-console-accent: var(--console-accent);
   --color-console-warn: var(--console-warn);
   --color-console-err: var(--console-err);
+  --color-select: var(--select);
+  --color-stamp: var(--stamp-paper);
+  --color-pcb: var(--pcb);
+  --color-copper: var(--copper);
+  --color-trace: var(--trace);
 
-  --shadow-ink: 3px 3px 0 var(--shadow-c);
-  --shadow-ink-sm: 2px 2px 0 var(--shadow-c);
-  --shadow-ink-lg: 5px 5px 0 var(--shadow-c);
+  --shadow-ink: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 14px -4px var(--shadow-c);
+  --shadow-ink-sm: 0 1px 2px var(--shadow-c);
+  --shadow-ink-lg: 0 2px 4px rgb(0 0 0 / 0.06), 0 14px 36px -10px var(--shadow-c);
 
   --font-body: var(--font-sans, ui-sans-serif), system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-ui: var(--font-mono, ui-monospace), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  /* Geist sets headings too; Instrument Serif (--font-display) is only the italic accent word, via font-accent. */
+  /* The reading face (data-font swaps --font-sans) sets headings too; Instrument Serif (--font-display) is only the italic accent word, via font-accent. */
   --font-head: var(--font-sans, ui-sans-serif), system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-accent: var(--font-display, Georgia), Georgia, "Times New Roman", serif;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Paper plates reuse the light token set, so whatever sits on one (labels,
@@ -134,28 +142,35 @@
 :root,
 .ink-plate {
   color-scheme: light;
-  --paper: #f2efe7;
-  --surface: #faf8f2;
-  --sunken: #e9e4d8;
-  --ink: #231e16;
-  --muted: #625b4f;
-  --rule: #d9d1c1;
-  --line: #231e16;
-  --shadow-c: #231e16;
+  --paper: #fafafa;
+  --surface: #ffffff;
+  --sunken: #f2f2f0;
+  --ink: #050505;
+  --muted: #5a5a5a;
+  --rule: #e4e4e1;
+  --line: #85857f;
+  --shadow-c: rgb(5 5 5 / 0.12);
   --on-color: #231e16;
-  --good: #2e6b52;
+  --good: #1f6b4a;
   --bad: #a8402b;
   --warn: #7a5a00;
-  --info: #2f4f8f;
+  --info: #1d4fd8;
   --good-bg: #93d3b0;
   --bad-bg: #f3a28f;
   --warn-bg: #f4b829;
   --info-bg: #a9c3ec;
-  --focus: #231e16;
-  --halo: rgb(244 184 41 / 0.6);
-  --card-line: var(--line);
-  --card-shadow: 3px 3px 0 var(--shadow-c);
-  --code-bg: #faf8f2;
+  --focus: #1d4fd8;
+  --halo: rgb(37 99 235 / 0.22);
+  --card-line: #0000001f;
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px -8px rgb(0 0 0 / 0.1);
+  --select: #2563eb;
+  --stamp-paper: #fff3da;
+  --stamp-edge: #0000002b;
+  --trace: rgb(5 5 5 / 0.11);
+  --trace-pulse: #1f8a5b;
+  --pcb: #0f6b48;
+  --copper: #b2692f;
+  --code-bg: #fbfbfa;
   --code-fg: #231e16;
   --code-kw: #2a4f9a;
   --code-str: #2e6b52;
@@ -164,6 +179,21 @@
   --code-pp: #7a3a6a;
   --code-cm: #6b6457;
   --code-num: #5a4fa0;
+  --code-line: #ececea;
+}
+
+.ink-plate {
+  --paper: #f2efe7;
+  --surface: #faf8f2;
+  --sunken: #e9e4d8;
+  --ink: #231e16;
+  --muted: #625b4f;
+  --rule: #d9d1c1;
+  --line: #231e16;
+  --focus: #231e16;
+  --halo: rgb(244 184 41 / 0.6);
+  --card-line: #231e16;
+  --code-bg: #faf8f2;
   --code-line: #ece6d8;
   --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .4  0 0 0 0 .36  0 0 0 0 .3  0 0 0 .15 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
 }
@@ -178,6 +208,7 @@
   --console-accent: #8af0ae;
   --console-warn: #f2c230;
   --console-err: #ff8f7a;
+  --grain: none;
 
   /* The one accent: tomato as a mark (the wordmark's dot, a live indicator) and a darker step for text on paper. */
   --accent: #ef6a4c;
@@ -194,6 +225,10 @@
   --rail-w: clamp(22rem, 30vw, 36rem);
   --stage-h: 46svh;
   --footer-gap: 4rem;
+
+  /* The editorial column: one narrow measure, as wide as the type wants to be read. */
+  --column: 35rem;
+  --column-wide: 47.5rem;
 }
 @media (width >= 40rem) {
   :root { --frame-pad: 1.5rem; }
@@ -218,27 +253,34 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --paper: #1b1813;
-    --surface: #26221b;
-    --sunken: #14120e;
+    --paper: #0a0a0a;
+    --surface: #141414;
+    --sunken: #050505;
     --plate-bg: #e4ddcf;
     --plate-frame: #cfc6b4;
-    --card-line: var(--rule);
+    --card-line: #ffffff24;
     --card-shadow: none;
     --console-bg: #17211e;
-    --ink: #ece6d8;
-    --muted: #b3aa98;
-    --rule: #3d372d;
-    --line: #cfc6b4;
-    --shadow-c: #0a0907;
+    --ink: #f4f4f2;
+    --muted: #a3a3a0;
+    --rule: #262626;
+    --line: #7d7d79;
+    --shadow-c: rgb(0 0 0 / 0.5);
     --good: #93d3b0;
     --bad: #f08a70;
     --warn: #f4b829;
     --info: #9dbcef;
-    --focus: #f4b829;
-    --halo: rgb(244 184 41 / 0.35);
+    --focus: #8fb2ff;
+    --halo: rgb(143 178 255 / 0.28);
     --accent-ink: #f08a70;
-    --code-bg: #14120e;
+    --select: #5b8cff;
+    --stamp-paper: #2a2417;
+    --stamp-edge: #ffffff33;
+    --trace: rgb(255 255 255 / 0.1);
+    --trace-pulse: #4be39a;
+    --pcb: #3fbf8a;
+    --copper: #e2955a;
+    --code-bg: #0f0f0f;
     --code-fg: #ece6d8;
     --code-kw: #9dbcef;
     --code-str: #93d3b0;
@@ -247,34 +289,40 @@
     --code-pp: #f3a6bb;
     --code-cm: #a39a88;
     --code-num: #c4b5f4;
-    --code-line: #2b261f;
-    --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .93  0 0 0 0 .9  0 0 0 0 .84  0 0 0 .06 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+    --code-line: #1c1c1c;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper: #1b1813;
-  --surface: #26221b;
-  --sunken: #14120e;
+  --paper: #0a0a0a;
+  --surface: #141414;
+  --sunken: #050505;
   --plate-bg: #e4ddcf;
   --plate-frame: #cfc6b4;
-  --card-line: var(--rule);
+  --card-line: #ffffff24;
   --card-shadow: none;
   --console-bg: #17211e;
-  --ink: #ece6d8;
-  --muted: #b3aa98;
-  --rule: #3d372d;
-  --line: #cfc6b4;
-  --shadow-c: #0a0907;
+  --ink: #f4f4f2;
+  --muted: #a3a3a0;
+  --rule: #262626;
+  --line: #7d7d79;
+  --shadow-c: rgb(0 0 0 / 0.5);
   --good: #93d3b0;
   --bad: #f08a70;
   --warn: #f4b829;
   --info: #9dbcef;
-  --focus: #f4b829;
-  --halo: rgb(244 184 41 / 0.35);
+  --focus: #8fb2ff;
+  --halo: rgb(143 178 255 / 0.28);
   --accent-ink: #f08a70;
-  --code-bg: #14120e;
+  --select: #5b8cff;
+  --stamp-paper: #2a2417;
+  --stamp-edge: #ffffff33;
+  --trace: rgb(255 255 255 / 0.1);
+  --trace-pulse: #4be39a;
+  --pcb: #3fbf8a;
+  --copper: #e2955a;
+  --code-bg: #0f0f0f;
   --code-fg: #ece6d8;
   --code-kw: #9dbcef;
   --code-str: #93d3b0;
@@ -283,8 +331,16 @@
   --code-pp: #f3a6bb;
   --code-cm: #a39a88;
   --code-num: #c4b5f4;
-  --code-line: #2b261f;
-  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .93  0 0 0 0 .9  0 0 0 0 .84  0 0 0 .06 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+  --code-line: #1c1c1c;
+}
+
+/* The reading face. next/font sets --font-sans on <html>; the attribute is more specific, so it wins.
+   Hindi and Chinese rules below come later and keep their own faces. */
+html[data-font="serif"] {
+  --font-sans: var(--font-serif, Georgia), Georgia, "Times New Roman", serif;
+}
+html[data-font="mono"] {
+  --font-sans: var(--font-mono, ui-monospace), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 /* Hindi needs a Devanagari face first (next/font's Latin fallbacks would win
@@ -295,6 +351,10 @@ html:lang(hi) {
 }
 :is(h1, h2, h3, h4, .font-head):lang(hi) {
   font-family: var(--font-devanagari, "Noto Sans Devanagari"), "Kohinoor Devanagari", "Nirmala UI", sans-serif;
+}
+html:lang(hi) body,
+html:lang(zh-Hans) body {
+  letter-spacing: 0;
 }
 html:lang(zh-Hans) {
   --font-cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC";
@@ -330,39 +390,42 @@ html:lang(zh-Hans) body {
     background-image: var(--grain);
     font-family: var(--font-body);
     font-size: 1rem;
-    line-height: 1.55;
+    line-height: 1.6;
+    letter-spacing: -0.011em;
+    -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-head);
     line-height: 1.15;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: -0.022em;
     text-wrap: balance;
   }
   h1 { font-size: clamp(2rem, 1.4rem + 2.6vw, 3.25rem); }
   h2 { font-size: clamp(1.5rem, 1.2rem + 1vw, 1.875rem); }
-  h3 { font-size: 1.125rem; }
-  h4 { font-size: 1rem; }
+  h3 { font-size: 1.125rem; font-weight: 500; }
+  h4 { font-size: 1rem; font-weight: 500; }
   p { text-wrap: pretty; }
 
   a {
     color: inherit;
     text-decoration-line: underline;
-    text-decoration-thickness: 1.5px;
+    text-decoration-thickness: 1px;
     text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
   }
-  a:hover { text-decoration-thickness: 2.5px; }
+  a:hover { text-decoration-color: currentColor; }
 
   code, kbd, samp, pre { font-family: var(--font-ui); }
 
-  ::selection { background: var(--color-mustard-l); color: var(--color-ink-fixed); }
+  ::selection { background: color-mix(in srgb, var(--select) 24%, transparent); color: inherit; }
 
   :focus-visible {
-    outline: 2.5px solid var(--focus);
-    outline-offset: 3px;
-    box-shadow: 0 0 0 7px var(--halo);
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px var(--halo);
     border-radius: 6px;
   }
 
@@ -376,9 +439,14 @@ html:lang(zh-Hans) body {
 
 @layer components {
   /* An ink-bordered card on the page: offset ink shadow, hand-cut corners. */
+  .rise {
+    animation: rise 0.8s var(--ease-out-quint) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+
   .ink-card {
     background: var(--surface);
-    border: 2px solid var(--card-line);
+    border: 1px solid var(--card-line);
     border-radius: var(--radius-ink);
     box-shadow: var(--card-shadow);
   }
@@ -389,9 +457,9 @@ html:lang(zh-Hans) body {
     background-color: var(--plate-bg);
     background-image: var(--grain);
     color: var(--ink);
-    border: 2px solid var(--plate-frame);
+    border: 1px solid var(--plate-frame);
     border-radius: var(--radius-ink);
-    box-shadow: 3px 3px 0 var(--shadow-c);
+    box-shadow: var(--card-shadow);
   }
 
   /* Whatever sits on a pastel status fill (bg-good-bg, bg-bad-bg). The fills keep their colour in both themes, and
@@ -403,9 +471,9 @@ html:lang(zh-Hans) body {
 
   .ink-kicker {
     font-family: var(--font-ui);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -415,7 +483,7 @@ html:lang(zh-Hans) body {
     font-family: var(--font-body);
     font-size: 0.75rem;
     line-height: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--muted);
   }
 
@@ -424,10 +492,10 @@ html:lang(zh-Hans) body {
     font: inherit;
     font-family: var(--font-body);
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--ink);
     background-color: var(--surface);
-    border: 1.5px solid var(--line);
+    border: 1px solid var(--line);
     border-radius: 999px;
     padding: 0 2.25rem 0 0.9rem;
   }
@@ -575,6 +643,87 @@ html:lang(zh-Hans) body {
 
   /* Wobbly ink for inline SVG art: filter: url(#ink-hand) needs <InkFilters/>. */
   .ink-hand { filter: url(#ink-hand); }
+}
+
+/* The hero's time-of-day slider: a track painted with the four skies and a paper thumb. */
+.time-slider {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.time-slider::-webkit-slider-runnable-track {
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #f7a77c, #bfe3ff 33%, #ff8a4c 66%, #1a2a5a);
+  opacity: 0.8;
+}
+.time-slider::-moz-range-track {
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #f7a77c, #bfe3ff 33%, #ff8a4c 66%, #1a2a5a);
+  opacity: 0.8;
+}
+.time-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6.5px;
+  border-radius: 999px;
+  border: 1px solid var(--card-line);
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+.time-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1px solid var(--card-line);
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+}
+.time-slider:focus-visible { border-radius: 999px; }
+
+.trace-pulse {
+  opacity: 0;
+  stroke-dasharray: 7 93;
+  animation: trace-pulse 7s linear infinite;
+}
+.pcb-sweep {
+  transform: translateX(-100%);
+  animation: pcb-sweep 11s linear 2s infinite;
+}
+.pcb[data-paused="true"] :is(.trace-pulse, .pcb-sweep) { animation-play-state: paused; }
+
+.dotted {
+  background-color: color-mix(in srgb, var(--tone) 9%, var(--surface));
+  background-image: radial-gradient(color-mix(in srgb, var(--tone) 28%, transparent) 1px, transparent 1.3px);
+  background-size: 14px 14px;
+}
+
+@keyframes pcb-sweep {
+  to { transform: translateX(100vw); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+
+@keyframes trace-pulse {
+  0% { stroke-dashoffset: 0; opacity: 0; }
+  8% { opacity: 1; }
+  72% { opacity: 1; }
+  100% { stroke-dashoffset: -100; opacity: 0; }
+}
+
+@keyframes led-blink {
+  0%, 46% { opacity: 1; }
+  50%, 96% { opacity: 0.25; }
+  100% { opacity: 1; }
 }
 
 @layer utilities {

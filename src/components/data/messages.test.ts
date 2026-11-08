@@ -20,7 +20,7 @@ describe("data messages", () => {
       for (const key of keys) {
         expect(placeholders(at(messages, key)), `${locale}:${key}`).toEqual(placeholders(at(english, key)));
       }
-      // Brand words ("HackTX", "Live") may stay, but the text as a whole is the language's own.
+      // Brand words ("HackUTD", "Live") may stay, but the text as a whole is the language's own.
       const same = keys.filter((key) => JSON.stringify(at(messages, key)) === JSON.stringify(at(english, key)));
       expect(same.length, `${locale} copies English for ${same.join(", ")}`).toBeLessThanOrEqual(2);
     }

@@ -23,7 +23,7 @@
     "offBody": "Este despliegue no tiene base de datos, así que tus vueltas se quedan en tu dispositivo."
   },
   "live": {
-    "title": "Ahora mismo en HackTX",
+    "title": "Ahora mismo en HackUTD",
     "window": "Últimos 60 minutos",
     "live": "En vivo",
     "builders": {

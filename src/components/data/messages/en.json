@@ -23,7 +23,7 @@
     "offBody": "This deployment has no database, so your laps stay on your device."
   },
   "live": {
-    "title": "Right now at HackTX",
+    "title": "Right now at HackUTD",
     "window": "Last 60 minutes",
     "live": "Live",
     "builders": {

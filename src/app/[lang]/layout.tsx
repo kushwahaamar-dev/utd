@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif, Noto_Sans_Devanagari } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif, Newsreader, Noto_Sans_Devanagari } from "next/font/google";
 import { notFound } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/shell";
 import { SkipLink } from "@/components/ui/SkipLink";
@@ -7,6 +7,7 @@ import { I18nProvider } from "@/i18n/client";
 import { LOCALES, htmlLang, isLocale } from "@/i18n/config";
 import { siteUrl } from "@/i18n/seo";
 import { getMessages, getT } from "@/i18n/server";
+import { FontBootScript } from "@/components/editorial/FontBootScript";
 import { SettingsBootScript, SettingsSync } from "@/lib/settings/theme";
 import "../globals.css";
 
@@ -16,8 +17,10 @@ import "../globals.css";
 const sans = Geist({ subsets: ["latin"], variable: "--font-sans" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" });
 const display = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-display" });
+// The reading face of the font switch: only fetched once someone picks it.
+const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", preload: false });
 const devanagari = Noto_Sans_Devanagari({ subsets: ["devanagari"], variable: "--font-devanagari", preload: false });
-const fontVariables = [sans, mono, display, devanagari].map((font) => font.variable).join(" ");
+const fontVariables = [sans, mono, display, serif, devanagari].map((font) => font.variable).join(" ");
 
 // Every route under this layout is fully static, and an unknown slug is a
 // real 404 from the first request.
@@ -57,6 +60,7 @@ export default async function LangLayout({ children, params }: LayoutProps<"/[la
     <html lang={htmlLang(lang)} dir="ltr" className={fontVariables} suppressHydrationWarning>
       <head>
         <SettingsBootScript />
+        <FontBootScript />
       </head>
       <body className="flex flex-col">
         <I18nProvider locale={lang} messages={common.client}>
