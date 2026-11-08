@@ -7,7 +7,6 @@ ENV NEXT_TELEMETRY_DISABLED=1 NEXT_OUTPUT=standalone \
     NEXT_PUBLIC_STDB_DB=$NEXT_PUBLIC_STDB_DB NEXT_PUBLIC_SOLANA_PROGRAM_ID=$NEXT_PUBLIC_SOLANA_PROGRAM_ID \
     NEXT_PUBLIC_SOLANA_CLUSTER=$NEXT_PUBLIC_SOLANA_CLUSTER
 COPY package.json package-lock.json ./
-COPY scripts/patch-deps.mjs scripts/
 RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
