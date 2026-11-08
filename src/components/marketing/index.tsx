@@ -7,7 +7,7 @@ export const typeClass = { display: "mk-display", title: "mk-title", eyebrow: "m
 
 /** The editorial frame: up to 1440px, with gutters that grow with the screen. */
 export function Wrap({ className, ...rest }: ComponentProps<"div">) {
-  return <div className={cx("mx-auto w-full max-w-[1440px] px-[clamp(16px,4vw,56px)]", className)} {...rest} />;
+  return <div className={cx("mx-auto w-full max-w-(--shell-max) px-(--shell-pad)", className)} {...rest} />;
 }
 
 /** The delay for a `typeClass.rise` element, which fades and lifts in once on load (not under reduced motion). */

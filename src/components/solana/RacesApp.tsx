@@ -150,7 +150,7 @@ function Races() {
           ) : races.length === 0 ? (
             <p className="text-muted">{t("races.empty")}</p>
           ) : (
-            <ul className="grid gap-8 xl:grid-cols-2">
+            <ul className="grid gap-8 xl:grid-cols-2 min-[1800px]:grid-cols-3">
               {races.map((race) => (
                 <RaceRow key={race.id.toString()} race={race} wallet={wallet} linked={linked} />
               ))}

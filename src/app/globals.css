@@ -214,27 +214,25 @@
   --accent: #ef6a4c;
   --accent-ink: #a8402b;
 
-  /* The site shell (header, footer): up to 1440 px with fluid gutters, as the editorial pages. */
-  --shell-max: 1600px;
-  --shell-pad: clamp(20px, 4vw, 64px);
+  /* The site shell (header, footer) and every page span the screen; only the gutter grows with it. */
+  --shell-max: none;
+  --shell-pad: clamp(16px, 3vw, 96px);
 
   /* Page frames (POLISH-SPEC 1.1). The header is 57 px plus its 1 px hairline. */
   --header-h: 58px;
-  --frame-max: 80rem;
-  --frame-pad: 1rem;
+  --frame-max: none;
+  --frame-pad: var(--shell-pad);
   --rail-w: clamp(22rem, 30vw, 36rem);
   --stage-h: 46svh;
   --footer-gap: 4rem;
 }
-@media (width >= 40rem) {
-  :root { --frame-pad: 1.5rem; }
-}
 @media (width >= 48rem) {
   :root { --stage-h: 52svh; }
 }
-/* On a wide screen the reading frame grows too; text inside keeps its own measure. */
-@media (width >= 105rem) {
-  :root { --frame-max: 90rem; }
+/* Big monitors: everything sized in rem grows a little (16 px at 1800 px wide, 20 px at 2800), so a 2560 px screen
+   reads like a laptop instead of a postage stamp. Text keeps its measure in ch. */
+@media (width >= 1800px) {
+  html { font-size: min(20px, calc(16px + (100vw - 1800px) * 0.004)); }
 }
 /* A lab page is a workspace: the header and footer span the screen with the workspace's gutter. Activity keeps
    earlier pages in the DOM under display: none, and those must not count. */

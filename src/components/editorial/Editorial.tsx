@@ -10,7 +10,7 @@ export const enter =
   "transition-[opacity,translate] duration-500 ease-out starting:translate-y-2 starting:opacity-0 motion-reduce:transition-none motion-reduce:starting:translate-y-0 motion-reduce:starting:opacity-100";
 
 /** The page's outer frame: up to 1440px with fluid gutters. */
-export const page = "mx-auto w-full max-w-[1440px] px-[clamp(16px,4vw,56px)]";
+export const page = "mx-auto w-full max-w-(--shell-max) px-(--shell-pad)";
 
 /** Small uppercase mono label. ink-kicker keeps the Devanagari and Han override (no caps, no tracking). */
 export const eyebrow = "ink-kicker text-[11px] font-medium tracking-[0.08em] sm:text-xs";
