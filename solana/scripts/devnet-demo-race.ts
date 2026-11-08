@@ -26,7 +26,7 @@ const { values: flags } = parseArgs({
     entry: { type: "string", default: "0.01" },
     seed: { type: "string", default: "0.02" },
     "closes-in": { type: "string", default: "1440" },
-    course: { type: "string", default: "neon-loop" },
+    course: { type: "string", default: "quad5-race" },
   },
 });
 

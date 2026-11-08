@@ -77,7 +77,7 @@ npm run deploy:devnet         # upgrade the program (extends it if the build gre
 
 ```sh
 node scripts/devnet-setup.ts [--fund-issuer <SOL>] [--set-issuer] [--smoke]
-node scripts/devnet-demo-race.ts [--entry 0.01] [--seed 0.02] [--closes-in 1440] [--course neon-loop]
+node scripts/devnet-demo-race.ts [--entry 0.01] [--seed 0.02] [--closes-in 1440] [--course quad5-race]
 ```
 
 The worker needs `SOLANA_ISSUER_KEYPAIR` (the issuer key, base58 or JSON array), `SOLANA_RPC_URL` and
