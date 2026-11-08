@@ -61,7 +61,9 @@
     "labshell": {
       "resize": "调整{panel}的大小",
       "collapse": "收起{panel}",
-      "expand": "展开{panel}"
+      "expand": "展开{panel}",
+      "guide": "指南",
+      "inspector": "检查器"
     }
   }
 }

@@ -100,7 +100,7 @@ export function LessonInfo({ lesson }: { lesson: Lesson }) {
       label: t("lesson.overview"),
       content: (
         <div className="flex flex-col gap-3">
-          <p className="text-lg leading-relaxed">{tc(lesson.lede)}</p>
+          <p className="text-base leading-relaxed">{tc(lesson.lede)}</p>
           {lesson.features.length > 0 && (
             <ul className="flex flex-col gap-2">
               {lesson.features.map((f) => (

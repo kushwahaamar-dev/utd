@@ -58,7 +58,7 @@ export function WireInPanel({ wireables, all }: Props) {
   return (
     <section aria-labelledby={`${id}-title`} className="flex flex-col gap-2" data-testid="wire-panel">
       {/* On the board page a tab already names it. */}
-      <h2 id={`${id}-title`} className={all ? "font-head text-2xl" : "sr-only"}>
+      <h2 id={`${id}-title`} className={all ? "font-head text-xl" : "sr-only"}>
         {t("wire.title")}
       </h2>
       <p className="text-sm text-muted">{t("wire.lede")}</p>

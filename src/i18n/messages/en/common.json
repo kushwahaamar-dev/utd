@@ -61,7 +61,9 @@
     "labshell": {
       "resize": "Resize {panel}",
       "collapse": "Collapse {panel}",
-      "expand": "Expand {panel}"
+      "expand": "Expand {panel}",
+      "guide": "Guide",
+      "inspector": "Inspector"
     }
   }
 }

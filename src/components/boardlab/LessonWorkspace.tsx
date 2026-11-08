@@ -6,7 +6,9 @@ import { LabDock } from "@/components/dock";
 import { FigureFrame } from "@/components/figure";
 import { SoundToggle } from "@/components/settings";
 import type { FigureEvent, FigureHandle } from "@/components/figure/protocol";
-import { WorkspaceBar, WorkspaceFrame } from "@/components/shell/workspace";
+import { WorkspaceBar } from "@/components/shell/workspace";
+import { LabShell } from "@/components/dock/LabShell";
+import { useCommonT } from "@/i18n/client";
 import { ButtonLink } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
 import { Icon } from "@/components/ui/icons";
@@ -64,6 +66,7 @@ type RailTab = "serial" | "checks" | "failures" | "quiz" | "inputs" | "params";
 
 function Workspace({ lang, model, notice }: { lang: Locale; model: LessonModel; notice?: ReactNode }) {
   const { t, tc } = useText();
+  const shell = useCommonT();
   const router = useRouter();
   const { board, lesson, template, lessons, prev, next } = model;
   const settings = useSettings();
@@ -317,9 +320,12 @@ function Workspace({ lang, model, notice }: { lang: Locale; model: LessonModel; 
   ];
 
   return (
-    <WorkspaceFrame
-      // A wider rail than the default: room for 55-character code lines; Expand gives the code half the screen.
-      className={expanded ? "[--rail-w:clamp(24rem,50vw,56rem)]" : "[--rail-w:clamp(24rem,34vw,38rem)]"}
+    <LabShell
+      storageKey="lesson"
+      leftLabel={shell("labshell.guide")}
+      rightLabel={shell("labshell.inspector")}
+      // A wider inspector than the default: room for 55-character code lines; Expand gives the code half the screen.
+      className={expanded ? "[--lab-r:clamp(26rem,50vw,64rem)]" : "[--lab-r:clamp(26rem,34vw,46rem)]"}
       data-testid="lesson-workspace"
       data-lesson={lesson.id}
       bar={
@@ -372,7 +378,7 @@ function Workspace({ lang, model, notice }: { lang: Locale; model: LessonModel; 
           </ScrollRow>
         </>
       }
-      rail={
+      right={
         <Panel>
           <CodePanel
             store={store}
@@ -396,16 +402,14 @@ function Workspace({ lang, model, notice }: { lang: Locale; model: LessonModel; 
           </div>
         </Panel>
       }
-      below={
-        <div className="flex flex-col gap-10">
-          <div className="grid grid-cols-1 gap-10 xl:grid-cols-[minmax(0,72ch)_minmax(0,1fr)]">
-            <div className="max-w-[72ch]">
-              <LessonInfo lesson={lesson} />
-            </div>
+      left={
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-8">
+            <LessonInfo lesson={lesson} />
             <WireInPanel wireables={wired} all={{ href: `/${lang}/boards/${board.id}`, label: t("wire.allParts", { n: board.wireables.length, board: board.name }) }} />
           </div>
           {/* Lesson titles are long: the links wrap instead of widening a phone page. */}
-          <nav aria-label={t("lesson.strip")} className="flex flex-wrap justify-between gap-3 border-t-[1.5px] border-rule pt-4">
+          <nav aria-label={t("lesson.strip")} className="flex flex-col gap-2 border-t border-rule pt-4 [&>a]:justify-start [&>a]:text-start">
             {prev ? (
               <ButtonLink href={`/${lang}/boards/${board.id}/${prev.id}`} variant="secondary">
                 ‹ {t("lesson.prev")}: {prev.title}

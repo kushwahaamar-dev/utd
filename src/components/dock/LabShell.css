@@ -1,0 +1,141 @@
+/* A lab page as an app: bar over a left guide, the figure stage and a right inspector.
+   Under 64rem it is one stacked flow with the stage pinned under the header. */
+.lab-shell {
+  --sp: 0.625rem;
+  --l-default: var(--lab-l, clamp(17rem, 19vw, 25rem));
+  --r-default: var(--lab-r, clamp(23rem, 28vw, 40rem));
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem var(--frame-pad) 1rem;
+}
+.lab-bar { order: 0; min-width: 0; }
+.lab-stage {
+  order: 1;
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.lab-right { order: 2; min-width: 0; min-height: 0; }
+.lab-left { order: 3; min-width: 0; min-height: 0; }
+.lab-splitter-left, .lab-splitter-right, .lab-header-toggle { display: none; }
+.lab-shell[data-phone-first="left"] > .lab-left { order: 2; }
+.lab-shell[data-phone-first="left"] > .lab-right { order: 3; }
+
+@media (width < 64rem) {
+  .lab-shell[data-phone-stage="sticky"] > .lab-stage {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 10;
+    height: var(--stage-h);
+    padding-block: 0.25rem;
+    background-color: var(--paper);
+    background-image: var(--grain);
+  }
+  .lab-shell[data-phone-stage="full"] > .lab-stage {
+    height: calc(100svh - var(--header-h) - 3.5rem);
+  }
+}
+
+@media (width >= 64rem) {
+  .lab-shell {
+    height: calc(100dvh - var(--header-h));
+    overflow: hidden;
+    display: grid;
+    gap: 0;
+    padding: 0 0.75rem 0.75rem;
+    grid-template-columns: minmax(0, 1fr) var(--sp) var(--r-eff, var(--r-default));
+    grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "bar bar bar" "stage sr left" "stage sr right";
+  }
+  .lab-shell[data-left="none"] {
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "bar bar bar" "stage sr right";
+  }
+  .lab-shell[data-l-open="false"] { grid-template-rows: auto auto minmax(0, 1fr); }
+  .lab-bar { grid-area: bar; padding: 0.25rem 0.25rem 0.5rem; }
+  .lab-stage { grid-area: stage; }
+  .lab-left { grid-area: left; margin-bottom: 0.5rem; }
+  .lab-right { grid-area: right; }
+  .lab-left > *, .lab-right > * { height: 100%; }
+  .lab-left[data-open="false"] > * { height: auto; }
+  .lab-left[data-open="false"] section > :last-child { display: none; }
+  .lab-header-toggle { display: inline-flex; }
+  .lab-splitter-right, .lab-splitter-left { position: relative; }
+  .lab-splitter-right { display: block; grid-area: sr; }
+  .lab-splitter-left { display: none; grid-area: sl; }
+  .lab-grip {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    cursor: col-resize;
+    touch-action: none;
+    outline: none;
+  }
+  .lab-grip::before {
+    content: "";
+    width: 1px;
+    height: 100%;
+    background: var(--rule);
+    transition: background-color 120ms, width 120ms;
+  }
+  .lab-grip:hover::before,
+  .lab-grip:focus-visible::before,
+  .lab-grip[data-drag="true"]::before { width: 3px; border-radius: 2px; background: var(--focus); }
+  .lab-grip:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; border-radius: 4px; }
+  .lab-grip[data-closed="true"] { cursor: default; pointer-events: none; }
+  .lab-grip[data-closed="true"]::before { display: none; }
+  .lab-collapse {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 5;
+    display: none;
+    width: 1.375rem;
+    height: 1.375rem;
+    place-items: center;
+    border: 1px solid var(--card-line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    box-shadow: var(--shadow-ink-sm);
+  }
+  .lab-collapse:hover { color: var(--ink); border-color: var(--line); }
+  .lab-collapse:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+}
+
+@media (width >= 80rem) {
+  .lab-splitter-left { display: block; }
+  .lab-shell {
+    grid-template-columns: var(--l-eff, var(--l-default)) var(--sp) minmax(0, 1fr) var(--sp) var(--r-eff, var(--r-default));
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "bar bar bar bar bar" "left sl stage sr right";
+  }
+  .lab-shell[data-left="none"] {
+    grid-template-columns: minmax(0, 1fr) var(--sp) var(--r-eff, var(--r-default));
+    grid-template-areas: "bar bar bar" "stage sr right";
+  }
+  .lab-shell[data-l-open="false"] { grid-template-rows: auto minmax(0, 1fr); }
+  .lab-shell[data-l-open="false"][data-left="rail"] {
+    grid-template-columns: 0 var(--sp) minmax(0, 1fr) var(--sp) var(--r-eff, var(--r-default));
+  }
+  .lab-shell[data-r-open="false"] > .lab-right { display: none; }
+  .lab-shell[data-r-open="false"][data-left="rail"] {
+    grid-template-columns: var(--l-eff, var(--l-default)) var(--sp) minmax(0, 1fr) var(--sp) 0;
+  }
+  .lab-shell[data-r-open="false"][data-l-open="false"][data-left="rail"] { grid-template-columns: 0 var(--sp) minmax(0, 1fr) var(--sp) 0; }
+  .lab-shell[data-r-open="false"][data-left="none"] { grid-template-columns: minmax(0, 1fr) var(--sp) 0; }
+  .lab-left { margin-bottom: 0; }
+  .lab-left[data-open="false"] { display: none; }
+  .lab-header-toggle { display: none; }
+  .lab-collapse { display: grid; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-splitter-right::before, .lab-splitter-left::before { transition: none; }
+}

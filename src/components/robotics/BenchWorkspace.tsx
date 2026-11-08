@@ -6,7 +6,9 @@ import { flushSync } from "react-dom";
 import { LabDock } from "@/components/dock/LabDock";
 import { FigureFrame, type FigureEvent, type FigureHandle } from "@/components/figure";
 import { SoundToggle } from "@/components/settings";
-import { WorkspaceBar, WorkspaceFrame } from "@/components/shell/workspace";
+import { WorkspaceBar } from "@/components/shell/workspace";
+import { LabShell } from "@/components/dock/LabShell";
+import { useCommonT } from "@/i18n/client";
 import { Button } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
 import { IconButton } from "@/components/ui/IconButton";
@@ -164,6 +166,7 @@ export function BenchWorkspace({ setup, messages, notice: untranslated, walk }: 
   const { bench } = setup;
   const locale = useLocale();
   const t = useBenchT(messages);
+  const shell = useCommonT();
   const tx = useMemo(() => textLookup(setup.texts), [setup.texts]);
   const [store] = useState(() => createBenchStore(setup));
   const state = useBenchState(store);
@@ -514,14 +517,14 @@ export function BenchWorkspace({ setup, messages, notice: untranslated, walk }: 
   const hint = tx(bench.hint);
   const overview = tx(bench.overview);
   const below = (
-    <div className="mx-auto flex max-w-[110rem] flex-col gap-12">
-      <div className="grid grid-cols-1 gap-x-12 gap-y-10 xl:grid-cols-[minmax(0,68ch)_minmax(0,1fr)]">
+    <div className="flex flex-col gap-10">
+      <div className="flex flex-col gap-8">
         <section aria-labelledby={ids.about} className="min-w-0">
           <h2 id={ids.about} className="text-xl">
             {t("bench.overview")}
           </h2>
-          {hint ? <p className="mt-3 text-lg leading-snug first-letter:uppercase">{hint}</p> : null}
-          {overview ? <p className="mt-3 max-w-[68ch] leading-relaxed">{overview}</p> : null}
+          {hint ? <p className="mt-3 text-base font-medium leading-snug first-letter:uppercase">{hint}</p> : null}
+          {overview ? <p className="mt-3 max-w-[68ch] text-sm leading-relaxed">{overview}</p> : null}
           {bench.sources.length > 0 ? (
             <section aria-labelledby={ids.sources} className="mt-6">
               <h3 id={ids.sources} className="ink-kicker">
@@ -561,5 +564,16 @@ export function BenchWorkspace({ setup, messages, notice: untranslated, walk }: 
     </div>
   );
 
-  return <WorkspaceFrame data-bench-workspace={bench.id} bar={bar} stage={stage} rail={rail} below={below} />;
+  return (
+    <LabShell
+      storageKey="bench"
+      data-bench-workspace={bench.id}
+      leftLabel={shell("labshell.guide")}
+      rightLabel={shell("labshell.inspector")}
+      bar={bar}
+      stage={stage}
+      left={below}
+      right={rail}
+    />
+  );
 }

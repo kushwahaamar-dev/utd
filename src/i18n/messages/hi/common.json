@@ -61,7 +61,9 @@
     "labshell": {
       "resize": "{panel} का आकार बदलें",
       "collapse": "{panel} समेटें",
-      "expand": "{panel} फैलाएँ"
+      "expand": "{panel} फैलाएँ",
+      "guide": "मार्गदर्शिका",
+      "inspector": "निरीक्षक"
     }
   }
 }

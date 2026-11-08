@@ -5,7 +5,9 @@ import type { DroneContent } from "@/content/schema";
 import { LabDock } from "@/components/dock/LabDock";
 import { FigureFrame, type FigureEvent, type FigureHandle, type HostCommand } from "@/components/figure";
 import { SoundToggle } from "@/components/settings";
-import { StageDrawer, WorkspaceBar, WorkspaceFrame } from "@/components/shell/workspace";
+import { StageDrawer, WorkspaceBar } from "@/components/shell/workspace";
+import { LabShell } from "@/components/dock/LabShell";
+import { useCommonT } from "@/i18n/client";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Panel } from "@/components/ui/Panel";
@@ -59,6 +61,7 @@ const BENCH_CHROME = ["build", "strip", "explode", "plug", "wiring", "stats"];
 export function DroneWorkspace({ lang, content, text, messages, notice }: Props) {
   const room = useRoom();
   const t = useMemo(() => droneLabT(lang, messages), [lang, messages]);
+  const shell = useCommonT();
   const ct = useMemo(() => contentT(lang, content.id, text), [lang, content.id, text]);
   const [store] = useState(() => createDroneLabStore(content));
   const state = useSyncExternalStore(store.subscribe, store.getState, store.getState);
@@ -344,8 +347,8 @@ export function DroneWorkspace({ lang, content, text, messages, notice }: Props)
   );
 
   const below = (
-    <section className="grid gap-x-12 gap-y-8 lg:grid-cols-2" aria-labelledby={`meet-${id}-${lang}`}>
-      <div className="ink-prose">
+    <section className="flex flex-col gap-8" aria-labelledby={`meet-${id}-${lang}`}>
+      <div className="ink-prose text-sm [&_h2]:mt-0 [&_h2]:text-xl">
         <h2 id={`meet-${id}-${lang}`}>{t("workspace.meet", { noun: ct(content.noun) })}</h2>
         {ct(content.overview)
           .split(/\n{2,}/)
@@ -353,7 +356,7 @@ export function DroneWorkspace({ lang, content, text, messages, notice }: Props)
             <p key={i}>{para}</p>
           ))}
       </div>
-      <div className="ink-prose">
+      <div className="ink-prose text-sm [&_h2]:mt-0 [&_h2]:text-xl">
         <h2>{t("workspace.practice")}</h2>
         <p>{ct(content.practice)}</p>
         <p className="text-muted">{ct(content.hint)}</p>
@@ -362,8 +365,11 @@ export function DroneWorkspace({ lang, content, text, messages, notice }: Props)
   );
 
   return (
-    <WorkspaceFrame
+    <LabShell
+      storageKey="drone"
       className="[--stage-h:56svh]"
+      leftLabel={shell("labshell.guide")}
+      rightLabel={shell("labshell.inspector")}
       bar={
         <WorkspaceBar
           back={{ href: `/${lang}/drones`, label: t("workspace.back") }}
@@ -406,7 +412,7 @@ export function DroneWorkspace({ lang, content, text, messages, notice }: Props)
         />
       }
       stage={stage}
-      rail={
+      right={
         <Panel className="h-full">
           <Tabs
             label={t("workspace.sections")}
@@ -419,7 +425,7 @@ export function DroneWorkspace({ lang, content, text, messages, notice }: Props)
           />
         </Panel>
       }
-      below={below}
+      left={below}
     />
   );
 }

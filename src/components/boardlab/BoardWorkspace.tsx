@@ -6,7 +6,9 @@ import { LabDock } from "@/components/dock";
 import { FigureFrame } from "@/components/figure";
 import { SoundToggle } from "@/components/settings";
 import type { FigureEvent, FigureHandle } from "@/components/figure/protocol";
-import { WorkspaceBar, WorkspaceFrame } from "@/components/shell/workspace";
+import { WorkspaceBar } from "@/components/shell/workspace";
+import { LabShell } from "@/components/dock/LabShell";
+import { useCommonT } from "@/i18n/client";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { cx } from "@/components/ui/cx";
 import { Icon } from "@/components/ui/icons";
@@ -248,6 +250,7 @@ function OnBoard({ board, figure }: { board: BoardOverview["board"]; figure: () 
 
 function Overview({ lang, data, notice }: { lang: Locale; data: BoardOverview; notice?: ReactNode }) {
   const { t, tc } = useText();
+  const shell = useCommonT();
   const { model, board, lessons } = data;
   const uid = useId();
   const saved = useSaved();
@@ -351,6 +354,11 @@ function Overview({ lang, data, notice }: { lang: Locale; data: BoardOverview; n
   ];
 
   const belowTabs = [
+    {
+      id: "overview",
+      label: t("lesson.overview"),
+      content: <p className="ink-prose max-w-[68ch]">{tc(board.overview)}</p>,
+    },
     { id: "pinout", label: t("pinout.title"), content: <PinoutTable board={model.name} rows={pinout} /> },
     ...(model.wireables.length ? [{ id: "wire", label: t("wire.title"), content: <WireInPanel wireables={model.wireables} /> }] : []),
     { id: "power", label: t("board.power"), content: <Power board={board} /> },
@@ -381,7 +389,12 @@ function Overview({ lang, data, notice }: { lang: Locale; data: BoardOverview; n
   ];
 
   return (
-    <WorkspaceFrame
+    <LabShell
+      storageKey="board"
+      phoneFirst="left"
+      leftFlush
+      leftLabel={shell("labshell.guide")}
+      rightLabel={t("board.reference")}
       data-testid="board-workspace"
       data-board={model.id}
       bar={
@@ -408,9 +421,9 @@ function Overview({ lang, data, notice }: { lang: Locale; data: BoardOverview; n
           </ScrollRow>
         </>
       }
-      rail={
-        <Panel>
-          <div className="flex shrink-0 flex-col gap-3 border-b-[1.5px] border-rule p-4">
+      left={
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex shrink-0 flex-col gap-3 border-b border-rule p-4">
             <p className="line-clamp-3 text-sm leading-relaxed">{tc(board.tagline)}</p>
             <BoardProgress
               board={model.id}
@@ -429,14 +442,12 @@ function Overview({ lang, data, notice }: { lang: Locale; data: BoardOverview; n
           <div className="flex min-h-0 flex-1 flex-col">
             <Tabs fill phoneGrid label={model.name} tabs={railTabs} defaultValue="lessons" listClassName="ws-sticky-tabs" />
           </div>
-        </Panel>
-      }
-      below={
-        <div className="flex flex-col gap-8">
-          {/* Wide screens set the overview in two columns at a reading measure, rather than one column and a blank half. */}
-          <p className="ink-prose text-lg xl:max-w-[128ch] xl:columns-2 xl:gap-12">{tc(board.overview)}</p>
-          <Tabs label={t("board.reference")} tabs={belowTabs} defaultValue="pinout" phoneGrid />
         </div>
+      }
+      right={
+        <Panel>
+          <Tabs fill phoneGrid label={t("board.reference")} tabs={belowTabs} defaultValue="overview" />
+        </Panel>
       }
     />
   );
