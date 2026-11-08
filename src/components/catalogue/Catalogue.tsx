@@ -19,7 +19,7 @@ export function CataloguePage({ children }: { children: ReactNode }) {
   return (
     <div
       data-catalogue
-      className="mx-auto w-full max-w-[2000px] px-[clamp(16px,3vw,56px)] pb-[clamp(56px,6vw,112px)] pt-[clamp(24px,3.5vw,56px)] [--cat-pad:clamp(16px,1.6vw,24px)]"
+      className="mx-auto w-full max-w-(--shell-max) px-(--shell-pad) pb-[clamp(56px,6vw,112px)] pt-[clamp(24px,3.5vw,56px)] [--cat-pad:clamp(16px,1.6vw,24px)]"
     >
       {children}
     </div>
