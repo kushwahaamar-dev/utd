@@ -31,7 +31,14 @@ Every item is a hand-inked 3D figure you can turn all the way round, see through
   an LED and it flashes once and burns out (113 mA through a part rated for 20), fit a capacitor backwards and it
   smokes, put a motor on the 5 V pin and the board browns out. Each one explains what happened and how to fix it.
 - **Fly it.** A flight sim with gate races and freestyle courses in angle or acro mode, third person or FPV, against
-  your best lap and other pilots' ghosts.
+  your best lap and other pilots' ghosts. The 5-inch quad also flies a 160 m downtown: a 12-gate race through
+  alleys, a tunnel, under a skybridge and a swinging crane; a precision gauntlet (a 2.2 m window slot, a slalom, an
+  atrium dive past a moving lift); and a stress test where wind builds to a gale, night and fog fall, the pack sags
+  and a motor fades. The report card explains the crash with the numbers from your own build.
+
+![A Board Lab lesson: Blink on the Arduino Uno R3](docs/media/lab.jpg)
+
+![The flight sim on the downtown course](docs/media/fly.jpg)
 
 ### Mission Control: Nemotron agents that build with the real simulators
 
@@ -50,6 +57,8 @@ model, live part prices and datasheet search. The critic checks the tool evidenc
 and sends the executor back with concrete fixes. Every step, tool call and timing streams into the page as it
 happens. The result is a verified design and a priced parts list that loads straight into the lab. Changes to your
 bench arrive as proposals you accept or reject.
+
+![Mission Control: the agent trace and the priced result](docs/media/mission.jpg)
 
 ### Never alone
 
