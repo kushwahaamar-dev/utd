@@ -64,6 +64,6 @@ describe("recorded run", () => {
     expect(end.job?.status).toBe("done");
     expect(end.steps).toHaveLength(14);
     expect(revisionCount(end.steps)).toBe(2);
-    expect(readResult(end.job?.result)?.bom.length).toBe(6);
+    expect(readResult(end.job?.result)?.bom.length).toBe(10);
   });
 });

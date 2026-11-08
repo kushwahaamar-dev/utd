@@ -30,9 +30,13 @@ const droneBom = [
   { part: "5-inch freestyle frame, 220 mm", store: "RaceDayQuads", price: 21.99, qty: 1, url: "https://www.racedayquads.com/" },
   { part: "2306 1900KV motor", store: "GetFPV", price: 13.49, qty: 4, url: "https://www.getfpv.com/" },
   { part: "45A 4-in-1 ESC + F4 flight controller stack", store: "GetFPV", price: 44.5, qty: 1, url: "https://www.getfpv.com/" },
-  { part: "4S 1550 mAh 100C LiPo", store: "Amazon", price: 24.99, qty: 1, url: "https://www.amazon.com/" },
+  { part: "4S 1550 mAh 100C LiPo", store: "Amazon", price: 24.99, qty: 2, url: "https://www.amazon.com/" },
   { part: "5x4x3 tri-blade props (8 pack)", store: "RaceDayQuads", price: 5.99, qty: 1, url: "https://www.racedayquads.com/" },
   { part: "ELRS 2.4 GHz receiver", store: "Happymodel", price: 12.99, qty: 1, url: "https://www.happymodel.cn/" },
+  { part: "1200TVL analog FPV camera", store: "GetFPV", price: 24.99, qty: 1, url: "https://www.getfpv.com/" },
+  { part: "5.8 GHz 800 mW video transmitter", store: "RaceDayQuads", price: 29.99, qty: 1, url: "https://www.racedayquads.com/" },
+  { part: "5.8 GHz RHCP antenna", store: "RaceDayQuads", price: 9.99, qty: 1, url: "https://www.racedayquads.com/" },
+  { part: "XT60 pigtail and battery strap", store: "Amazon", price: 7.98, qty: 1, url: "https://www.amazon.com/" },
 ];
 
 export const droneBuild: Script = {
@@ -155,7 +159,7 @@ export const droneBuild: Script = {
       model: NANO,
       ms: 4200,
       input: { parts: ["frame 5in 220mm", "motor 2306 1900KV x4", "ESC FC stack 45A", "LiPo 4S 1550", "prop 5040 x8", "ELRS receiver"], currency: "USD" },
-      output: { summary: "6 parts found across 4 stores, $164.42 total", total: 164.42, planItem: "p4" },
+      output: { summary: "10 parts found across 4 stores, $262.36 total", total: 262.36, planItem: "p4" },
     },
     {
       role: "executor",
@@ -172,7 +176,7 @@ export const droneBuild: Script = {
       model: SUPER,
       ms: 2600,
       input: { criteria: ["flight >= 8 min", "T:W > 4", "total <= $400", "no faults"] },
-      output: { verdict: "approve", reasons: ["Flight time 8.4 min, thrust-to-weight 4.2", "$164.42 is $15.58 under budget", "Simulator and bench both clean"] },
+      output: { verdict: "approve", reasons: ["Flight time 8.4 min, thrust-to-weight 4.2", "$262.36 is $137.64 under budget", "Simulator and bench both clean"] },
     },
     {
       role: "executor",
@@ -185,7 +189,7 @@ export const droneBuild: Script = {
   ],
   result: {
     summary:
-      "A 5-inch freestyle quad on a 4S 1550 mAh pack: 8.4 minutes of estimated flight at a thrust-to-weight of 4.2, for $164.42. Two revisions got it there: lower-pitch props, then a bigger pack.",
+      "A 5-inch freestyle quad on a 4S 1550 mAh pack: 8.4 minutes of estimated flight at a thrust-to-weight of 4.2, for $262.36 with a spare pack. Two revisions got it there: lower-pitch props, then a bigger pack.",
     verification: [
       { label: "Sim passed", ok: true },
       { label: "T:W 4.2", ok: true },
