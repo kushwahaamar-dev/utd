@@ -51,21 +51,21 @@ function makeActions(conn: DbConnection | null) {
   };
 
   return {
-    setProfile: (p: { name: string; color: string; lang: string }) => need().reducers.setProfile(p),
-    linkWallet: (wallet: string) => need().reducers.linkWallet({ wallet }),
+    setProfile: async (p: { name: string; color: string; lang: string }) => need().reducers.setProfile(p),
+    linkWallet: async (wallet: string) => need().reducers.linkWallet({ wallet }),
 
-    createRoom: (lab: LabKind, itemId: string) => need().reducers.createRoom({ lab, itemId }),
-    joinRoom: (code: string, bind?: { lab: LabKind; itemId: string }) =>
+    createRoom: async (lab: LabKind, itemId: string) => need().reducers.createRoom({ lab, itemId }),
+    joinRoom: async (code: string, bind?: { lab: LabKind; itemId: string }) =>
       need().reducers.joinRoom({ code, lab: bind?.lab, itemId: bind?.itemId }),
-    leaveRoom: (code: string) => need().reducers.leaveRoom({ code }),
+    leaveRoom: async (code: string) => need().reducers.leaveRoom({ code }),
     /** Rejects with "no_baton" or "not_shared" when the module refuses the action. */
-    submitAction: (code: string, action: { type: string; [key: string]: unknown }) =>
+    submitAction: async (code: string, action: { type: string; [key: string]: unknown }) =>
       need().reducers.submitAction({ code, action: JSON.stringify(action) }),
-    postSnapshot: (code: string, seq: number | bigint, state: unknown) =>
+    postSnapshot: async (code: string, seq: number | bigint, state: unknown) =>
       need().reducers.postSnapshot({ code, seq: big(seq), state: JSON.stringify(state) }),
-    sendChat: (code: string, text: string, lang: string, kind: ChatKind = "text") =>
+    sendChat: async (code: string, text: string, lang: string, kind: ChatKind = "text") =>
       need().reducers.sendChat({ code, text, lang, kind }),
-    setPresence: (code: string, update: PresenceUpdate) =>
+    setPresence: async (code: string, update: PresenceUpdate) =>
       need().reducers.setPresence({
         code,
         role: update.role,
@@ -75,8 +75,8 @@ function makeActions(conn: DbConnection | null) {
         done: update.done ? JSON.stringify(update.done) : undefined,
       }),
     /** `to: null` hands the keyboard back to the host. */
-    passBaton: (code: string, to: Identity | null) => need().reducers.passBaton({ code, to: to ?? undefined }),
-    kick: (code: string, target: Identity) => need().reducers.kick({ code, target }),
+    passBaton: async (code: string, to: Identity | null) => need().reducers.passBaton({ code, to: to ?? undefined }),
+    kick: async (code: string, target: Identity) => need().reducers.kick({ code, target }),
     sendCursor: (code: string, x: number, y: number) => quiet((c) => c.reducers.sendCursor({ code, x, y })),
     sendPose: (code: string, pose: { p: number[]; q: number[]; v?: unknown; gate?: unknown }) =>
       quiet((c) =>
@@ -89,12 +89,12 @@ function makeActions(conn: DbConnection | null) {
         }),
       ),
 
-    recordProgress: (key: string) => need().reducers.recordProgress({ key }),
-    trackActivity: (kind: string, count = 1) => need().reducers.trackActivity({ kind, count }),
-    submitLap: (lap: { course: string; timeMs: number; inputs: unknown; name?: string }) =>
+    recordProgress: async (key: string) => need().reducers.recordProgress({ key }),
+    trackActivity: async (kind: string, count = 1) => need().reducers.trackActivity({ kind, count }),
+    submitLap: async (lap: { course: string; timeMs: number; inputs: unknown; name?: string }) =>
       need().reducers.submitLap({ course: lap.course, timeMs: lap.timeMs, inputs: JSON.stringify(lap.inputs), name: lap.name }),
 
-    upsertBuddy: (b: { name: string; lang: string; interests: string[]; built: string[]; wants: string }) =>
+    upsertBuddy: async (b: { name: string; lang: string; interests: string[]; built: string[]; wants: string }) =>
       need().reducers.upsertBuddy({
         name: b.name,
         lang: b.lang,
@@ -102,23 +102,23 @@ function makeActions(conn: DbConnection | null) {
         built: JSON.stringify(b.built),
         wants: b.wants,
       }),
-    deleteBuddy: () => need().reducers.deleteBuddy({}),
+    deleteBuddy: async () => need().reducers.deleteBuddy({}),
 
-    startAgentJob: (job: { kind: AgentKind; goal: string; context?: unknown; roomCode?: string }) =>
+    startAgentJob: async (job: { kind: AgentKind; goal: string; context?: unknown; roomCode?: string }) =>
       need().reducers.startAgentJob({
         kind: job.kind,
         goal: job.goal,
         context: JSON.stringify(job.context ?? {}),
         roomCode: job.roomCode,
       }),
-    cancelAgentJob: (jobId: number | bigint) => need().reducers.cancelAgentJob({ jobId: big(jobId) }),
-    resolveProposal: (proposalId: number | bigint, accept: boolean) =>
+    cancelAgentJob: async (jobId: number | bigint) => need().reducers.cancelAgentJob({ jobId: big(jobId) }),
+    resolveProposal: async (proposalId: number | bigint, accept: boolean) =>
       need().reducers.resolveProposal({ proposalId: big(proposalId), accept }),
 
     /** `enterSig` is the signature of the on-chain entry transaction the wallet just sent. */
-    enterRace: (raceId: number | bigint, enterSig: string) => need().reducers.enterRace({ raceId: big(raceId), enterSig }),
+    enterRace: async (raceId: number | bigint, enterSig: string) => need().reducers.enterRace({ raceId: big(raceId), enterSig }),
     /** `run` is the RunLog object; the module replays it and queues the credential if it passes. */
-    submitRun: (r: { kind: string; itemId: string; sub?: string; run: unknown }) =>
+    submitRun: async (r: { kind: string; itemId: string; sub?: string; run: unknown }) =>
       need().reducers.submitRun({ kind: r.kind, itemId: r.itemId, sub: r.sub, run: JSON.stringify(r.run) }),
 
     translateMessage: async (messageId: number | bigint, lang: string): Promise<ProcedureOutcome<string>> =>

@@ -1,6 +1,7 @@
 // Drives a published module over real WebSockets with several identities.
 // Run it with: STDB_LIVE=1 npm run stdb:test   (needs `npm run stdb:start` and `npm run stdb:publish`)
 import { describe, expect, it } from "vitest";
+import type { Identity } from "spacetimedb";
 import { DbConnection } from "../src/lib/stdb/bindings";
 import { GOOD_EVENTS, runText } from "./src/fixtures";
 
@@ -12,7 +13,7 @@ const WALLET = "4Nd1mYQ7mCF3x9bX8f3Z5r2yTn5pU6hQm9o3Q1vK7w2a";
 type Client = Awaited<ReturnType<typeof connect>>;
 
 function connect() {
-  return new Promise<{ conn: DbConnection; hex: string; identity: DbConnection["identity"] }>((resolve, reject) => {
+  return new Promise<{ conn: DbConnection; hex: string; identity: Identity }>((resolve, reject) => {
     DbConnection.builder()
       .withUri(URI)
       .withDatabaseName(DB)
