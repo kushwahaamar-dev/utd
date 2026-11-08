@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useState, type FormEvent } from "react";
+import { useId, useMemo, useState, type FormEvent } from "react";
 import type { LabKind } from "@/components/dock/types";
 import type { TogetherT } from "@/components/realtime/messages";
 import { Action, Section, eyebrow, sectionTitle, area, field } from "@/components/editorial/Editorial";
@@ -9,10 +9,10 @@ import { Callout, IconButton } from "@/components/ui";
 import { cx } from "@/components/ui/cx";
 import { useLocale } from "@/i18n/client";
 import { LOCALES, type Locale } from "@/i18n/config";
-import { reloadFeatures, useFeatures } from "@/lib/features";
 import { createRoom, useIdentity } from "@/lib/realtime";
 import { track } from "@/lib/telemetry";
-import { FeatureGate, postJson, roomPath } from "./api";
+import { StdbGate, roomPath } from "./api";
+import { useAgentRun } from "./useAgentRun";
 
 type Level = "new" | "some" | "lots";
 type Person = { key: number; name: string; lang: Locale; level: Level; wants: string };
@@ -22,14 +22,39 @@ const LEVELS: Level[] = ["new", "some", "lots"];
 const MAX_PEOPLE = 8;
 const label = cx(eyebrow, "flex min-w-0 flex-col gap-2");
 
-type State = { kind: "idle" } | { kind: "missing" } | { kind: "busy" } | { kind: "error" } | { kind: "unknown" } | { kind: "done"; plan: Plan };
+type State = { kind: "idle" } | { kind: "missing" };
+
+const text = (v: unknown) => (typeof v === "string" ? v : "");
+
+/** The worker's plan result: summary + a free-form design object + roles + bom + load_into_lab. */
+function readPlan(result: unknown, titles: Map<string, string>): Plan | null {
+  const r = result as { summary?: unknown; design?: Record<string, unknown>; roles?: Plan["roles"]; bom?: { name?: unknown }[]; load_into_lab?: { lab?: unknown; itemId?: unknown } | null } | null;
+  if (!r) return null;
+  const design = r.design ?? {};
+  const item = (design.item ?? {}) as { lab?: unknown; id?: unknown };
+  const lab = r.load_into_lab?.lab ?? item.lab;
+  const id = r.load_into_lab?.itemId ?? item.id ?? (typeof design.item === "string" ? design.item : undefined);
+  const key = typeof id === "string" && titles.has(`${lab}:${id}`) ? `${lab}:${id}` : [...titles.keys()].find((k) => k.endsWith(`:${id}`));
+  if (!key) return null;
+  const steps = (Array.isArray(design.steps) ? design.steps : []).map((x) => (typeof x === "string" ? x : text((x as { title?: unknown; goal?: unknown }).title) || text((x as { goal?: unknown }).goal))).filter(Boolean);
+  const parts = (r.bom ?? []).map((b) => text(b.name)).filter(Boolean);
+  const [itemLab, itemId] = key.split(":");
+  return {
+    title: text(design.title) || titles.get(key) || "",
+    item: { lab: itemLab as LabKind, id: itemId! },
+    why: text(r.summary),
+    roles: Array.isArray(r.roles) ? r.roles : [],
+    steps,
+    parts,
+  };
+}
 
 export function Planner({ t, titles, index }: { t: TogetherT; titles: Map<string, string>; index?: string }) {
   const id = useId();
   const router = useRouter();
   const locale = useLocale();
   const identity = useIdentity();
-  const features = useFeatures();
+  const { run, start, reset } = useAgentRun("plan");
   const [people, setPeople] = useState<Person[]>([
     { key: 1, name: "", lang: locale, level: "some", wants: "" },
     { key: 2, name: "", lang: locale, level: "new", wants: "" },
@@ -42,31 +67,29 @@ export function Planner({ t, titles, index }: { t: TogetherT; titles: Map<string
   const update = (key: number, patch: Partial<Person>) =>
     setPeople((list) => list.map((p, i) => (p.key === key ? { ...(i === 0 && !p.name && identity ? { ...p, name: identity.name } : p), ...patch } : p)));
 
+  const plan = useMemo(() => (run.phase === "done" ? readPlan(run.result, titles) : null), [run, titles]);
+  const busy = run.phase === "working";
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     const participants = rows.filter((p) => p.name.trim() || p.wants.trim());
     if (participants.length === 0 || participants.some((p) => !p.name.trim() || !p.wants.trim())) return setState({ kind: "missing" });
-    setState({ kind: "busy" });
+    setState({ kind: "idle" });
     track("ai.call", { kind: "plan" });
-    const result = await postJson<Plan>("/api/ai/plan", {
-      locale,
-      participants: participants.map(({ name, lang, level, wants }) => ({ name: name.trim().slice(0, 24), lang, level, wants: wants.trim().slice(0, 300) })),
-    });
-    if (!result.ok) return setState({ kind: "error" });
-    if (!titles.has(`${result.data.item.lab}:${result.data.item.id}`)) return setState({ kind: "unknown" });
-    setState({ kind: "done", plan: result.data });
+    const people = participants.map(({ name, lang, level, wants }) => ({ name: name.trim().slice(0, 24), lang, level, wants: wants.trim().slice(0, 300) }));
+    await start(`Plan a build night for ${people.map((p) => p.name).join(", ")}`, { locale, participants: people });
   };
 
   return (
     <Section id={`${id}-title`} index={index} title={t("lobby.plan.title")} lede={t("lobby.plan.lede")}>
-      <FeatureGate t={t} state={features} needs={["ai"]} notSetUp={t("lobby.plan.notSetUp")} onRetry={reloadFeatures}>
-        {state.kind === "done" ? (
+      <StdbGate t={t} notSetUp={t("lobby.plan.notSetUp")}>
+        {plan ? (
           <PlanCard
-            plan={state.plan}
-            item={titles.get(`${state.plan.item.lab}:${state.plan.item.id}`) ?? ""}
+            plan={plan}
+            item={titles.get(`${plan.item.lab}:${plan.item.id}`) ?? ""}
             t={t}
-            onStart={() => router.push(roomPath(createRoom(state.plan.item.lab, state.plan.item.id, locale)))}
-            onAgain={() => setState({ kind: "idle" })}
+            onStart={() => router.push(roomPath(createRoom(plan.item.lab, plan.item.id, locale)))}
+            onAgain={reset}
           />
         ) : (
           <form onSubmit={submit} className="flex flex-col gap-6" noValidate>
@@ -135,18 +158,18 @@ export function Planner({ t, titles, index }: { t: TogetherT; titles: Map<string
               >
                 {t("lobby.plan.add")}
               </Action>
-              <Action type="submit" kind="primary" size="lg" disabled={state.kind === "busy"}>
-                {state.kind === "busy" ? t("lobby.plan.planning") : t("lobby.plan.submit")}
+              <Action type="submit" kind="primary" size="lg" disabled={busy}>
+                {busy ? t("lobby.plan.planning") : t("lobby.plan.submit")}
               </Action>
             </div>
             <div aria-live="polite" className="empty:hidden">
               {state.kind === "missing" ? <Callout tone="warn">{t("lobby.plan.missing")}</Callout> : null}
-              {state.kind === "error" ? <Callout tone="danger">{t("lobby.plan.failed")}</Callout> : null}
-              {state.kind === "unknown" ? <Callout tone="warn">{t("lobby.plan.unknownItem")}</Callout> : null}
+              {run.phase === "failed" ? <Callout tone="danger">{t("lobby.plan.failed")}</Callout> : null}
+              {run.phase === "done" && !plan ? <Callout tone="warn">{t("lobby.plan.unknownItem")}</Callout> : null}
             </div>
           </form>
         )}
-      </FeatureGate>
+      </StdbGate>
     </Section>
   );
 }

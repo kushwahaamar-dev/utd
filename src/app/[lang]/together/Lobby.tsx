@@ -144,8 +144,6 @@ export function LobbyLede({ className }: { className?: string }) {
 export function Lobby({ items }: { items: LobbyItem[] }) {
   const t = useTogetherT()!;
   const titles = useMemo(() => new Map(items.map((item) => [`${item.lab}:${item.id}`, item.title])), [items]);
-  // Both tools below need the AI service: without it they are one line, not two cards that say "not set up".
-  const aiOff = useAiOff();
 
   return (
     <>
@@ -163,16 +161,8 @@ export function Lobby({ items }: { items: LobbyItem[] }) {
           <JoinRoom t={t} />
         </section>
       </div>
-      {aiOff ? (
-        <div className="mt-10">
-          <Note>{t("lobby.aiOff")}</Note>
-        </div>
-      ) : (
-        <>
-          <Buddies t={t} titles={titles} index="03" />
-          <Planner t={t} titles={titles} index="04" />
-        </>
-      )}
+      <Buddies t={t} titles={titles} index="03" />
+      <Planner t={t} titles={titles} index="04" />
     </>
   );
 }
