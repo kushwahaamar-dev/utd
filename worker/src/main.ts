@@ -3,7 +3,7 @@ import { config } from "./config";
 import { startWorker, type WorkerOptions } from "./stdb";
 
 if (!config.workerSecret) {
-  console.error("WORKER_SECRET is not set; the module only accepts a registered worker.");
+  console.error("STDB_WORKER_SECRET is not set; the module only accepts a registered worker.");
   process.exit(1);
 }
 

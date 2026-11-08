@@ -16,7 +16,8 @@ await build({
   conditions: ["react-server"],
   alias: { "@": here("../src") },
   banner: { js: 'import { createRequire as __cr } from "node:module"; const require = __cr(import.meta.url);' },
-  sourcemap: "inline",
+  splitting: true,
+  sourcemap: process.env.WORKER_SOURCEMAP === "1" ? "inline" : false,
   logLevel: "warning",
   loader: { ".json": "json" },
 });
