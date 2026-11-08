@@ -1,7 +1,7 @@
 import { ScheduleAt } from "spacetimedb";
 import spacetimedb, { sweepTimer } from "./schema";
 import { destroyRoom } from "./rooms";
-import { micros, type Ctx } from "./util";
+import { micros, requireScheduler, type Ctx } from "./util";
 
 const MINUTE = 60_000_000n;
 const JOBS: Record<string, bigint> = { rooms: 5n * MINUTE, buddies: 10n * MINUTE, activity: 10n * MINUTE };
@@ -25,6 +25,7 @@ export const sweep = spacetimedb.reducer(
   { onSchedule: sweepTimer },
   { timer: sweepTimer.rowType },
   (ctx, { timer }) => {
+    requireScheduler(ctx);
     const now = micros(ctx);
     if (timer.job === "rooms") {
       for (const room of [...ctx.db.room.iter()]) {

@@ -192,12 +192,20 @@ describe("schedules", () => {
     s.call(s.alice, (ctx) => mod.leaveRoom(ctx, { code }));
     s.call(s.bob, (ctx) => mod.leaveRoom(ctx, { code }));
     s.test.clock.set(at(20));
-    s.call(s.alice, (ctx) => mod.sweep(ctx, { timer: timer("rooms") }));
+    s.call(TestAuth.internal(), (ctx) => mod.sweep(ctx, { timer: timer("rooms") }));
     expect(s.test.db.room.count()).toBe(1n);
     s.test.clock.set(at(31));
-    s.call(s.alice, (ctx) => mod.sweep(ctx, { timer: timer("rooms") }));
+    s.call(TestAuth.internal(), (ctx) => mod.sweep(ctx, { timer: timer("rooms") }));
     expect(s.test.db.room.count()).toBe(0n);
     expect(s.test.db.roomAction.count()).toBe(0n);
+  });
+
+  it("lets only the scheduler run a sweep or close a race", () => {
+    const s = setup();
+    expect(() => s.call(s.alice, (ctx) => mod.sweep(ctx, { timer: timer("rooms") }))).toThrow("scheduler only");
+    expect(() =>
+      s.call(s.alice, (ctx) => mod.closeRace(ctx, { timer: { scheduledId: 0n, scheduledAt: ScheduleAt.interval(1n), raceId: 1n } })),
+    ).toThrow("scheduler only");
   });
 
   it("expires buddies after 24 hours", () => {
@@ -208,10 +216,10 @@ describe("schedules", () => {
     );
     expect(s.test.db.buddyProfile.count()).toBe(1n);
     s.test.clock.set(at(23 * 60));
-    s.call(s.alice, (ctx) => mod.sweep(ctx, { timer: timer("buddies") }));
+    s.call(TestAuth.internal(), (ctx) => mod.sweep(ctx, { timer: timer("buddies") }));
     expect(s.test.db.buddyProfile.count()).toBe(1n);
     s.test.clock.set(at(25 * 60));
-    s.call(s.alice, (ctx) => mod.sweep(ctx, { timer: timer("buddies") }));
+    s.call(TestAuth.internal(), (ctx) => mod.sweep(ctx, { timer: timer("buddies") }));
     expect(s.test.db.buddyProfile.count()).toBe(0n);
   });
 

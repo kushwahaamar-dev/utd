@@ -133,3 +133,8 @@ export function requireWorker(ctx: Ctx) {
   const row = ctx.db.config.key.find("worker");
   if (!row?.identity || !row.identity.equals(ctx.sender)) fail("worker only");
 }
+
+/** Scheduled reducers are also callable by clients; only the scheduler (the database itself) may run them. */
+export function requireScheduler(ctx: Ctx) {
+  if (!ctx.sender.equals(ctx.databaseIdentity)) fail("scheduler only");
+}

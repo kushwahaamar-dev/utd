@@ -4,7 +4,7 @@ import spacetimedb, { raceCloseTimer } from "./schema";
 import { walletOf } from "./profile";
 import { parseRun, verifyRun } from "./verify";
 import { RUN_KINDS, type RunKind } from "../../src/lib/verify/runlog";
-import { bumpActivity, fail, limit, micros, requireJson, requireWorker, type Ctx } from "./util";
+import { bumpActivity, fail, limit, micros, requireJson, requireScheduler, requireWorker, type Ctx } from "./util";
 
 const SIGNATURE = /^[1-9A-HJ-NP-Za-km-z]{64,100}$/;
 const CHAIN_KINDS = ["issue_credential", "submit_result", "settle_race", "create_race"];
@@ -101,6 +101,7 @@ export const closeRace = spacetimedb.reducer(
   { onSchedule: raceCloseTimer },
   { timer: raceCloseTimer.rowType },
   (ctx, { timer }) => {
+    requireScheduler(ctx);
     const race = ctx.db.race.id.find(timer.raceId);
     if (!race || race.status !== "open") return;
     ctx.db.race.id.update({ ...race, status: "closed" });
