@@ -41,7 +41,7 @@ export function JobHeader({ job, steps, watchers, onCancel, demo }: { job: Job; 
   ];
 
   return (
-    <section aria-label={job.goal} className="rounded-2xl border border-rule bg-surface p-4 sm:p-6">
+    <section aria-label={job.goal} className="rounded-2xl border border-(--card-line) bg-surface p-4 sm:p-6">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <span className="inline-flex items-center gap-2 rounded-full border border-muted/50 px-3 py-1 text-sm font-medium">
           <Diamond tone={STATUS_TONE[job.status]} live={active} />

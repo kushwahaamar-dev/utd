@@ -45,7 +45,7 @@ export function Composer({ roomCode, disabled, onStart }: Props) {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-2xl border border-rule bg-surface p-4 sm:p-6" aria-busy={busy}>
+    <form onSubmit={submit} className="rounded-2xl border border-(--card-line) bg-surface p-4 sm:p-6" aria-busy={busy}>
       <label htmlFor={goalId} className={cx(eyebrow, "block")}>
         {t("composer.label")}
       </label>

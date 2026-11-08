@@ -1,6 +1,7 @@
 "use client";
 
-import { Action, ActionLink, eyebrow } from "@/components/editorial/Editorial";
+import { Section } from "@/components/editorial";
+import { Action, ActionLink } from "@/components/editorial/Editorial";
 import { cx } from "@/components/ui/cx";
 import { useMissionText } from "./text";
 import type { Proposal } from "./types";
@@ -19,12 +20,9 @@ export function ResultPanel({ result: raw, lang, planBudget }: { result: unknown
   const result = readResult(raw);
   if (!result) {
     return (
-      <section aria-labelledby="result-title" className="rounded-2xl border border-rule bg-surface p-5 sm:p-8">
-        <h2 id="result-title" className={eyebrow}>
-          {t("result.title")}
-        </h2>
-        <p className="mt-4 text-muted">{t("result.none")}</p>
-      </section>
+      <Section id="result-title" n="02" motif="chip" tone="green" tilt={3} title={t("result.title")}>
+        <p className="text-muted">{t("result.none")}</p>
+      </Section>
     );
   }
 
@@ -33,11 +31,8 @@ export function ResultPanel({ result: raw, lang, planBudget }: { result: unknown
   const paths = labPath(result);
 
   return (
-    <section aria-labelledby="result-title" className="rounded-2xl border border-rule bg-surface p-5 motion-safe:animate-ink-rise sm:p-8">
-      <h2 id="result-title" className={eyebrow}>
-        {t("result.title")}
-      </h2>
-      {result.summary ? <p className="mt-4 max-w-[62ch] text-lg leading-[1.55] text-balance">{result.summary}</p> : null}
+    <Section id="result-title" n="02" motif="chip" tone="green" tilt={3} title={t("result.title")} className="motion-safe:animate-ink-rise">
+      {result.summary ? <p className="max-w-[62ch] text-[17px] leading-[1.55] text-balance">{result.summary}</p> : null}
 
       {result.verification.length ? (
         <div className="mt-6">
@@ -116,7 +111,7 @@ export function ResultPanel({ result: raw, lang, planBudget }: { result: unknown
           <ActionLink href={`/${lang}/passport`}>{t("result.credential")}</ActionLink>
         </div>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -157,16 +152,13 @@ export function Proposals({ proposals, onResolve }: { proposals: Proposal[]; onR
   const { t } = useMissionText();
   if (proposals.length === 0) return null;
   return (
-    <section aria-labelledby="proposals-title" className="min-w-0">
-      <h2 id="proposals-title" className={eyebrow}>
-        {t("proposals.title")}
-      </h2>
-      <p className="mt-2 max-w-[52ch] text-muted">{t("proposals.lede")}</p>
+    <Section id="proposals-title" n="03" motif="gear" tone="copper" tilt={-2} title={t("proposals.title")}>
+      <p className="max-w-[52ch] text-muted">{t("proposals.lede")}</p>
       <ul className="mt-5 grid list-none gap-4 p-0 sm:grid-cols-2">
         {proposals.map((p) => {
           const view = readProposal(p.kind, p.payload);
           return (
-            <li key={p.id} className="flex flex-col rounded-2xl border border-rule bg-surface p-5">
+            <li key={p.id} className="flex flex-col rounded-2xl border border-(--card-line) bg-surface p-5">
               <p className="text-[17px] font-medium leading-snug">{view.title}</p>
               {view.detail ? <p className="mt-2 text-[15px] leading-[1.5] text-muted">{view.detail}</p> : null}
               {view.delta ? <p className="tabular mt-3 font-ui text-sm">{view.delta}</p> : null}
@@ -191,6 +183,6 @@ export function Proposals({ proposals, onResolve }: { proposals: Proposal[]; onR
           );
         })}
       </ul>
-    </section>
+    </Section>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { Section } from "@/components/editorial";
 import { eyebrow } from "@/components/editorial/Editorial";
 import { cx } from "@/components/ui/cx";
 import { Chevron, Diamond, ToolStamp, type DiamondTone } from "./glyphs";
@@ -14,17 +15,14 @@ export function Trace({ job, steps }: { job: Job; steps: Step[] }) {
   const planDone = donePlanItems(steps);
 
   return (
-    <section aria-labelledby="trace-title" className="min-w-0">
-      <h2 id="trace-title" className={eyebrow}>
-        {t("trace.title")}
-      </h2>
+    <Section id="trace-title" n="01" motif="scope" tone="cobalt" tilt={-3} title={t("trace.title")} className="mt-0">
       {steps.length === 0 ? (
-        <p className="mt-6 flex items-center gap-3 text-muted">
+        <p className="flex items-center gap-3 text-muted">
           {active ? <Diamond tone="idle" live /> : null}
           {t("trace.waiting")}
         </p>
       ) : (
-        <ol className="relative mt-6 list-none p-0">
+        <ol className="relative list-none p-0">
           {steps.map((step, i) => (
             <li key={step.id} className="relative flex gap-3 pb-7 last:pb-0 sm:gap-5">
               <span aria-hidden="true" className={cx("absolute start-[7px] top-5 bottom-0 border-s border-dotted border-muted/60", i === steps.length - 1 && !active && "hidden")} />
@@ -34,7 +32,7 @@ export function Trace({ job, steps }: { job: Job; steps: Step[] }) {
           ))}
         </ol>
       )}
-    </section>
+    </Section>
   );
 }
 
@@ -62,7 +60,7 @@ function StepCard({ step, planDone, finished }: { step: Step; planDone: Set<stri
       aria-label={step.title}
       className={cx(
         "min-w-0 flex-1 rounded-2xl border bg-surface p-4 sm:p-5",
-        running ? "border-[var(--accent)]/60" : "border-rule",
+        running ? "border-[var(--accent)]/60" : "border-(--card-line)",
         revision && "border-s-2 border-s-warn",
         "motion-safe:animate-ink-fade",
       )}

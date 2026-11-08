@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { PageHead, page } from "@/components/editorial/Editorial";
+import { Stamp } from "@/components/editorial";
+import { eyebrow } from "@/components/editorial/Editorial";
 import { MissionApp } from "@/components/mission/MissionApp";
-import { cx } from "@/components/ui/cx";
 import { isLocale } from "@/i18n/config";
 import { alternatesFor } from "@/i18n/seo";
 import { getMessages, getT } from "@/i18n/server";
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default function MissionPage({ params }: Props) {
   return (
-    <Suspense fallback={<div className={cx(page, "min-h-[70vh]")} aria-busy="true" />}>
+    <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" />}>
       <Mission params={params} />
     </Suspense>
   );
@@ -32,6 +32,15 @@ async function Mission({ params }: Props) {
   const t = await getT(lang, "mission");
 
   return (
-    <MissionApp lang={lang} messages={messages} head={<PageHead label={t("head.kicker")} title={t("head.title")} lede={<p>{t("head.lede")}</p>} />} />
+    <MissionApp lang={lang} messages={messages} head={
+        <header className="pt-[clamp(72px,11vw,136px)]">
+          <div className="flex items-center gap-3.5">
+            <Stamp motif="arm" tone="plum" value="MC" size={46} tilt={-3} />
+            <p className={eyebrow}>{t("head.kicker")}</p>
+          </div>
+          <h1 className="mt-7 text-balance text-[clamp(24px,3.2vw,32px)] font-medium leading-[1.2] tracking-[-0.022em]">{t("head.title")}</h1>
+          <p className="mt-4 max-w-[46ch] text-pretty text-muted">{t("head.lede")}</p>
+        </header>
+      } />
   );
 }

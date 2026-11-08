@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, type ReactNode } from "react";
-import { ActionLink, Note, eyebrow, page } from "@/components/editorial/Editorial";
+import { Column } from "@/components/editorial";
+import { ActionLink, Note, eyebrow } from "@/components/editorial/Editorial";
 import { cx } from "@/components/ui/cx";
 import type { Locale } from "@/i18n/config";
 import { Composer } from "./Composer";
@@ -16,13 +17,11 @@ import { Trace } from "./Trace";
 import { isActive, type JobKind, type Step } from "./types";
 import { planBudget, readCritic } from "./view";
 
-const column = "mx-auto w-full max-w-[880px]";
-
 /** The page body for /mission, where ?job= picks a mission (the static layout cannot take a path segment for it). The live backend plugs in through `live`; without it only the recorded demo runs. */
 export function MissionApp({ lang, messages, head }: { lang: Locale; messages: MissionMessages; head?: ReactNode }) {
   return (
     <MissionTextProvider locale={lang} messages={messages}>
-      <Suspense fallback={<div className={cx(page, "min-h-[50vh]")} aria-busy="true" />}>
+      <Suspense fallback={<div className="min-h-[50vh]" aria-busy="true" />}>
         <Frame lang={lang} head={head} />
       </Suspense>
     </MissionTextProvider>
@@ -40,10 +39,9 @@ function Frame({ lang, head }: { lang: Locale; head?: ReactNode }) {
   // The language layout already mounts the one StdbProvider the live adapter reads.
   return (
     <MissionDataProvider adapter={adapter}>
-      {jobId ? null : <div className={page}>{head}</div>}
-      <div className={cx(page, "pb-[clamp(72px,10vw,160px)]")}>
-        {jobId ? <JobView lang={lang} jobId={jobId} /> : <Home lang={lang} roomCode={roomCode} />}
-      </div>
+      <Column wide className="pb-[clamp(72px,10vw,160px)]">
+        {jobId ? <JobView lang={lang} jobId={jobId} /> : <Home lang={lang} roomCode={roomCode} head={head} />}
+      </Column>
     </MissionDataProvider>
   );
 }
@@ -76,7 +74,7 @@ function OfflineNote({ lang }: { lang: Locale }) {
   );
 }
 
-function Home({ lang, roomCode }: { lang: Locale; roomCode?: string }) {
+function Home({ lang, roomCode, head }: { lang: Locale; roomCode?: string; head?: ReactNode }) {
   const router = useRouter();
   const search = useSearchParams();
   const start = useStartMission();
@@ -91,7 +89,9 @@ function Home({ lang, roomCode }: { lang: Locale; roomCode?: string }) {
   }
 
   return (
-    <div className={cx(column, "mt-10 sm:mt-14")}>
+    <div>
+      {head}
+      <div className="mt-10 sm:mt-12">
       {online ? null : <OfflineNote lang={lang} />}
       <Composer roomCode={roomCode} disabled={!online} onStart={onStart} />
       {missions.length ? (
@@ -111,6 +111,7 @@ function Home({ lang, roomCode }: { lang: Locale; roomCode?: string }) {
           </ul>
         </section>
       ) : null}
+      </div>
     </div>
   );
 }
@@ -124,7 +125,7 @@ function JobView({ lang, jobId }: { lang: Locale; jobId: string }) {
   const home = `/${lang}/mission${demoQuery(search, ["demo", "room"])}`;
 
   return (
-    <div className={cx(column, "mt-8 sm:mt-12")}>
+    <div className="pt-[clamp(32px,6vw,72px)]">
       <Link href={home} className="inline-flex min-h-10 items-center text-sm text-muted no-underline hover:text-ink">
         {`← ${t("job.newMission")}`}
       </Link>
@@ -142,7 +143,7 @@ function JobView({ lang, jobId }: { lang: Locale; jobId: string }) {
           {t(mission.state === "offline" ? "state.offline.body" : "state.error.body")}
         </Note>
       ) : (
-        <div className="mt-4 space-y-10 sm:space-y-14">
+        <div className="mt-4 flex flex-col gap-10">
           <JobHeader job={job} steps={steps} watchers={watchers} onCancel={mission.cancel} demo={mode === "demo"} />
           <Announcer status={job.status} steps={steps} />
           <Trace job={job} steps={steps} />
