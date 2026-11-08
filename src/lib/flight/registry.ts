@@ -223,11 +223,14 @@ export function flightCourse(content: DroneContent, c: ContentCourse, craft: Fli
     ground: c.ground ?? DEFAULT_GROUND,
     wind: c.wind ?? DEFAULT_WIND,
     prims: c.prims satisfies Prim[],
-    gates: c.gates.map(([x, y, heading], i) => ({ x, y, heading, w: gw, h: gh, col: GATE_COLS[i % GATE_COLS.length] })),
+    gates: c.gates.map(([x, y, heading, z, h], i) => ({ x, y, heading, w: gw, h: h ?? gh, ...(z ? { z } : {}), col: GATE_COLS[i % GATE_COLS.length] })),
     // the goals are the course: on a gate course they are only drawn when it has none of its own
     checkpoints: c.kind === "gates" ? [] : c.goals.map((g) => ({ label: g.label, x: g.x, y: g.y, z: g.z, r: g.r, ...(g.heading !== undefined ? { heading: g.heading } : {}), ...(g.land ? { land: true } : {}), ...(g.action === "drop" ? { action: "drop" as const } : {}) })),
   };
   if (c.ceiling !== undefined) course.ceiling = c.ceiling;
+  if (c.zoom !== undefined) course.zoom = c.zoom;
+  if (c.sky) course.sky = c.sky;
+  if (c.stress) course.stress = c.stress;
   const missions: Mission[] = [];
   if (c.kind === "mission") {
     missions.push({
@@ -244,7 +247,8 @@ export function flightCourse(content: DroneContent, c: ContentCourse, craft: Fli
       })),
     });
   }
-  const demo = demoRoute(course, craft);
+  // a stress test is flown, never watched: the autopilot would only fly it in calm air
+  const demo = c.stress ? null : demoRoute(course, craft);
   if (demo) missions.push(demo);
   if (missions.length) course.missions = missions;
   return course;

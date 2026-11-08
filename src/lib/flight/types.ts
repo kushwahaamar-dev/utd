@@ -137,6 +137,10 @@ export type HitKind =
   | "pillar"
   | "tower"
   | "barrel"
+  | "crane"
+  | "blade"
+  | "wire"
+  | "door"
   | "obstacle";
 
 interface PrimBase {
@@ -147,9 +151,21 @@ interface PrimBase {
   solid?: boolean; // false: drawn, but the craft flies through it
 }
 
+/**
+ * How a moving obstacle moves. Both parts are pure functions of the flight clock (seconds since arming), so a
+ * replay, a ghost and the server's re-run all see the obstacle in the same place at the same step.
+ */
+export interface Motion {
+  /** Offset from the rest pose and back: 0 → `to` → 0 over `period` s, smooth at both ends. */
+  slide?: { to: [number, number, number]; period: number; phase?: number };
+  /** Turns about an axis through `pivot` (a crane boom: axis z; a turbine blade: a horizontal axis). */
+  spin?: { pivot: [number, number, number]; axis: [number, number, number]; period: number; phase?: number; sweep?: number };
+}
+
 export type Prim =
-  | (PrimBase & { type: "box"; z?: number; w: number; d: number; h: number; yaw?: number })
-  | (PrimBase & { type: "house"; w: number; d: number; h: number; yaw?: number; roof?: number; roofCol?: string })
+  | (PrimBase & { type: "box"; z?: number; w: number; d: number; h: number; yaw?: number; win?: number; lit?: boolean })
+  | (PrimBase & { type: "house"; w: number; d: number; h: number; yaw?: number; roof?: number; roofCol?: string; win?: number; lit?: boolean })
+  | (PrimBase & { type: "mover"; z?: number; w: number; d: number; h: number; yaw?: number; motion: Motion })
   | (PrimBase & { type: "cyl"; z?: number; r: number; h: number; r1?: number; n?: number; rot?: number })
   | (PrimBase & { type: "tree"; h?: number })
   | (PrimBase & { type: "pole"; h: number; r?: number })
@@ -221,12 +237,35 @@ export interface Course {
   ground: string;
   ceiling?: number; // m, overrides the craft
   camTilt?: number;
+  zoom?: number; // m across the chase view when it opens (default 14)
+  sky?: [string, string]; // top and horizon colours behind the field
   wind: WindSpec;
   prims: Prim[];
   gates: Gate[];
   checkpoints: Checkpoint[];
   missions?: Mission[];
+  stress?: StressSpec;
 }
+
+export type StressKind = "gusts" | "degrade" | "sag" | "night" | "fog" | "downdraft" | "gps";
+
+/** One scheduled trouble: on from `at` to `until` seconds after arming, `level` its strength. */
+export interface StressEvent {
+  kind: StressKind;
+  at: number;
+  until: number;
+  /** gusts: peak extra wind, m/s. degrade: share of one motor's thrust lost, 0..1. sag: extra pack resistance, 0..3.
+   *  night, fog: 0..1. downdraft: m/s^2 pushing down. gps: m/s of drift. */
+  level: number;
+}
+
+/** A stress test: the course is flown while the schedule runs, and the test ends at `limit` s, a crash or a landing. */
+export interface StressSpec {
+  limit: number;
+  events: StressEvent[];
+}
+
+export type StressOutcome = "crashed" | "landed" | "complete" | "timeout";
 
 /** Translations of the course's own words, passed in by the host page. */
 export interface CourseText {
@@ -282,6 +321,8 @@ export type FlightEvent = { t: number } & (
   | { type: "launch" }
   | { type: "transition"; to: "cruise" | "hover" }
   | { type: "mode"; mode: string }
+  | { type: "stress"; kind: StressKind; on: boolean; level: number }
+  | { type: "stressEnd"; outcome: StressOutcome }
 );
 
 /** What the range page draws each frame. Small and flat: it is posted to the iframe. */
@@ -314,6 +355,8 @@ export interface FlightFrame {
   checkpoint: number; // index of the next checkpoint
   servo: number; // deg, tricopter tail / VTOL tilt (0 = up, 90 = forward)
   motorsOut: number[];
+  mt: number; // s, the clock the moving obstacles run on (since arming; holds while the craft is down and disarmed)
+  env: [number, number]; // stress phases: night 0..1, fog 0..1
   followers: Array<[number, number, number, number]>; // swarm: x, y, z, yaw
   spray: boolean;
   cargo: boolean; // the payload hangs under the craft (until the drop)

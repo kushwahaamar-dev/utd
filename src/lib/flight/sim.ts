@@ -13,8 +13,10 @@ import type {
   FlightMode,
   Mission,
   Sticks,
+  StressOutcome,
   Waypoint,
 } from "./types";
+import { calmFx, stressFx, type StressFx } from "./stress";
 
 /** Fixed physics step. Every result is a pure function of the inputs per step. */
 export const STEP = 0.01;
@@ -88,7 +90,24 @@ export interface SimState {
   farOut: boolean;
   ceilingWarned: boolean;
   events: FlightEvent[];
+  // moving obstacles and stress tests
+  clock: number; // s on the moving obstacles' clock: since arming, held while the craft is down and disarmed
+  fx: StressFx;
+  stressOn: boolean[]; // which of the course's scheduled events are running
+  stressEnd: StressOutcome | null;
+  stats: FlightStats;
 }
+
+/** What a flight did, for the stress report: reset when the craft arms. */
+export interface FlightStats {
+  maxTilt: number; // deg
+  maxSpeed: number; // m/s
+  minCell: number; // lowest volts per cell seen under load
+  peakAmps: number;
+  hits: number; // gates and checkpoints passed
+}
+
+const freshStats = (s: SimState): FlightStats => ({ maxTilt: 0, maxSpeed: 0, minCell: s.battery.volt / s.calc.cells, peakAmps: 0, hits: 0 });
 
 const ZERO_STICKS: Sticks = { throttle: 0, yaw: 0, pitch: 0, roll: 0 };
 
@@ -175,6 +194,11 @@ export function resetFlight(s: SimState) {
   s.outside = false;
   s.farOut = false;
   s.ceilingWarned = false;
+  s.clock = 0;
+  s.fx = calmFx();
+  s.stressOn = (s.course.stress?.events ?? []).map(() => false);
+  s.stressEnd = null;
+  s.stats = freshStats(s);
   const sw = s.craft.swarm;
   s.followers = [];
   if (sw) for (let i = 1; i < sw.count; i++) s.followers.push({ p: [px + formation(i, sw.spacing)[0], py + formation(i, sw.spacing)[1], 0], v: [0, 0, 0], yaw: 90 });
@@ -282,20 +306,28 @@ function tryArm(s: SimState) {
   if (s.mode.throttle === "manual" && s.sticks.throttle > 0.08 && s.craft.class !== "wing") return emit(s, { type: "blocked", why: "throttle" });
   s.armed = true;
   s.t = 0;
+  s.clock = 0;
   s.hold = null;
   s.phase = "climb";
+  s.stressOn = s.stressOn.map(() => false);
+  s.stressEnd = null;
+  s.stats = freshStats(s);
+  s.fx = calmFx();
   emit(s, { type: "armed", mode: s.mode.id });
 }
 
 function windAt(s: SimState): [number, number] {
-  if (!s.windOn) return [0, 0];
+  const extra = s.fx.wind;
+  if (!s.windOn && extra <= 0) return [0, 0];
   const w = s.course.wind;
   const T = s.step * STEP;
-  const gust = w.gust * (0.6 * wave(T, 0.7, 1.3) + 0.4 * wave(T, 1.9, 0.2));
-  const cross = 0.5 * w.gust * wave(T, 0.37, 2.1);
+  // a stress test's gusts come on top of the course wind (and without it when the Wind button is off)
+  const amp = (s.windOn ? w.gust : 0) + 0.55 * extra;
+  const gust = amp * (0.6 * wave(T, 0.7, 1.3) + 0.4 * wave(T, 1.9, 0.2));
+  const cross = 0.5 * amp * wave(T, 0.37, 2.1);
   // `from` is where it blows from, so the air moves the other way
   const c = -Math.cos(w.from * DEG), sn = -Math.sin(w.from * DEG);
-  const along = w.speed + gust;
+  const along = (s.windOn ? w.speed : 0) + extra + gust;
   return [c * along - sn * cross, sn * along + c * cross];
 }
 
@@ -308,6 +340,7 @@ export function hoverCommand(calc: CalcOutputs, volt: number) {
 export function stepSim(s: SimState) {
   const dt = STEP;
   const cls = s.craft.class;
+  if (s.course.stress) stressStep(s);
   if (cls === "wing" || (cls === "vtol" && s.cruise)) wingStep(s, dt);
   else multirotorStep(s, dt);
   if (s.craft.swarm) followersStep(s, dt);
@@ -320,7 +353,30 @@ export function stepSim(s: SimState) {
   if (s.armed) s.spin += dt * (6 + 60 * s.u * s.u);
   if (s.armed && s.mode.task === "demo") s.assisted = true;
   s.t += dt;
+  if (s.armed || s.crashed) s.clock += dt;
   s.step++;
+}
+
+/** Runs the course's stress schedule against the flight time: sets what is in force and says when it turns on or off. */
+function stressStep(s: SimState) {
+  const spec = s.course.stress!;
+  const live = s.armed && !s.crashed;
+  s.fx = live ? stressFx(spec, s.t) : s.fx;
+  if (!live) return;
+  spec.events.forEach((e, i) => {
+    const on = s.t >= e.at && s.t < e.until;
+    if (on !== s.stressOn[i]) {
+      s.stressOn[i] = on;
+      emit(s, { type: "stress", kind: e.kind, on, level: e.level });
+    }
+  });
+  if (s.stressEnd === null && s.t >= spec.limit) endStress(s, "timeout");
+}
+
+function endStress(s: SimState, outcome: StressOutcome) {
+  if (!s.course.stress || s.stressEnd !== null) return;
+  s.stressEnd = outcome;
+  emit(s, { type: "stressEnd", outcome });
 }
 
 /** Steps the sim through `seconds` of wall time in fixed steps (clamped). Returns the steps taken. */
@@ -503,7 +559,9 @@ function multirotorStep(s: SimState, dt: number) {
   const mass = (calc.auw - s.dropped) / 1000;
   const n = calc.motors;
   const lost = s.motorsOut.length + (s.desyncT > 0 ? 1 : 0);
-  const tmax = ((n * calc.thrustPerMotor) / 1000) * G * Math.max(0, (n - lost) / n);
+  // a failing motor fades faster the harder it works: a build that hovers at high throttle loses more of it
+  const lossShare = s.fx.degrade * (0.7 + s.u);
+  const tmax = ((n * calc.thrustPerMotor) / 1000) * G * Math.max(0, (n - lost - lossShare) / n);
   const kV = s.battery.empty ? 0 : voltageFactor(calc, s.battery.volt);
   const live = s.armed && !s.crashed;
   const auto = live ? autopilot(s) : { pitch: null, roll: null, yawRate: null, climb: null };
@@ -599,6 +657,11 @@ function multirotorStep(s: SimState, dt: number) {
     s.yaw += 120 * dt;
   }
   if (s.motorsOut.length && live && n > 4) s.yaw += (6 * dt * 4) / n; // less yaw authority: a slow drift
+  if (s.fx.degrade > 0 && live) {
+    // a weak motor pulls the frame round on its arm and tips it toward the strong side; angle mode leans against it
+    s.yaw += 70 * lossShare * dt;
+    s.roll += 45 * lossShare * dt;
+  }
 
   // forces
   const ceil = ceilingOf(s);
@@ -617,7 +680,7 @@ function multirotorStep(s: SimState, dt: number) {
   const a: Vec3 = [
     (up[0] * s.thrust) / mass - c.drag * rx * (rel + 1),
     (up[1] * s.thrust) / mass - c.drag * ry * (rel + 1),
-    (up[2] * s.thrust) / mass - c.drag * rz * (rel + 1) - G,
+    (up[2] * s.thrust) / mass - c.drag * rz * (rel + 1) - G - s.fx.down,
   ];
   if (c.vtol) vtolTransition(s, a, dt);
   if (c.tailServo && s.thrust > 0) {
@@ -816,6 +879,7 @@ function crash(s: SimState, why: Extract<FlightEvent, { type: "crash" }>["why"])
   s.armed = false;
   s.crashes++;
   emit(s, { type: "crash", why });
+  endStress(s, "crashed");
 }
 
 function worldChecks(s: SimState) {
@@ -829,9 +893,14 @@ function worldChecks(s: SimState) {
     emit(s, { type: "takeoff" });
   }
   if (s.p[2] > 0.5) s.climbedOut = true;
+  if (s.armed) {
+    s.stats.maxSpeed = Math.max(s.stats.maxSpeed, speed);
+    if (s.airborne) s.stats.maxTilt = Math.max(s.stats.maxTilt, Math.acos(clamp(bodyAxes(s.yaw, s.pitch, s.roll).up[2], -1, 1)) / DEG);
+  }
   if (s.airborne && s.p[2] <= 0.02 && speed < 1 && !s.crashed) {
     s.airborne = false;
     if (s.climbedOut && c.class !== "wing") emit(s, { type: "landed", mah: Math.round(s.battery.used) });
+    if (s.climbedOut && s.armed) endStress(s, "landed");
     s.climbedOut = false;
     if ((s.mode.task === "rtl" || s.mode.task === "qrtl" || (s.mode.task === "mission" && s.phase === "descend")) && s.armed) {
       s.armed = false;
@@ -840,7 +909,7 @@ function worldChecks(s: SimState) {
     }
   }
   if (!s.crashed) {
-    const hit = collide(s.solids, s.p[0], s.p[1], s.p[2], c.hitRadius);
+    const hit = collide(s.solids, s.p[0], s.p[1], s.p[2], c.hitRadius, s.clock);
     if (hit) {
       crash(s, hit.kind);
       s.v = [s.v[0] * -0.2, s.v[1] * -0.2, Math.min(0, s.v[2])];
@@ -870,6 +939,7 @@ function worldChecks(s: SimState) {
         s.splits.push(split);
       }
       s.lastGateT = now;
+      s.stats.hits++;
       emit(s, { type: "gate", index: s.gate + 1, total: n, split });
       s.gate = (s.gate + 1) % n;
     }
@@ -879,6 +949,7 @@ function worldChecks(s: SimState) {
     const cp = course.checkpoints[s.checkpoint];
     if (passCheckpoint(cp, prev, s.p, speed)) {
       const n = course.checkpoints.length;
+      s.stats.hits++;
       emit(s, { type: "checkpoint", index: s.checkpoint + 1, total: n, label: cp.label });
       if (cp.action === "drop") release(s);
       s.checkpoint++;
@@ -890,6 +961,7 @@ function worldChecks(s: SimState) {
         s.laps++;
         if (course.kind === "mission") emit(s, { type: "missionDone", time, best, ...demoFlag(s) });
         else emit(s, { type: "run", time, best, ...demoFlag(s) });
+        endStress(s, "complete");
         s.checkpoint = 0;
         if (s.airborne) startRun(s);
         else s.runStart = null;
@@ -925,9 +997,13 @@ function batteryStep(s: SimState, dt: number) {
   const live = s.armed && !s.crashed;
   const weight = (calc.auw / 1000) * G;
   const amps = live ? currentFor(calc, s.thrust / weight, s.battery.volt) + IDLE_AMPS : 0;
-  const news = stepBattery(s.battery, calc, amps, dt);
+  const news = stepBattery(s.battery, calc, amps, dt, 1 + s.fx.sag);
   const chemistry = calc.chemistry ?? "lipo";
   const perCell = s.battery.volt / calc.cells;
+  if (live) {
+    s.stats.minCell = Math.min(s.stats.minCell, perCell);
+    s.stats.peakAmps = Math.max(s.stats.peakAmps, amps);
+  }
   if (news === "low" && live) emit(s, { type: "battery", level: "low", chemistry, perCell: LIMITS[chemistry].low });
   if (news === "empty" && live) {
     emit(s, { type: "battery", level: "empty", chemistry, perCell });
@@ -987,6 +1063,8 @@ export function frameOf(s: SimState): FlightFrame {
     low: s.battery.low,
     timer: r2(s.t),
     mode: s.mode.id,
+    mt: r2(s.clock),
+    env: [r2(s.fx.night), r2(s.fx.fog)],
     wind: [r2(w[0]), r2(w[1])],
     windOn: s.windOn,
     next: nextTarget(s),

@@ -726,16 +726,31 @@ export interface FlightConfig {
 
 /** What a crash into a range solid is called (the flight namespace's `hit.<kind>` line). */
 export type RangeHitKind =
-  | 'tree' | 'roof' | 'wall' | 'pole' | 'gate' | 'building' | 'pillar' | 'tower' | 'barrel' | 'obstacle';
+  | 'tree' | 'roof' | 'wall' | 'pole' | 'gate' | 'building' | 'pillar' | 'tower' | 'barrel' | 'crane' | 'blade' | 'wire' | 'door' | 'obstacle';
+
+/** A moving obstacle's motion, a pure function of the flight clock (src/lib/flight/types.ts `Motion`). */
+export interface RangeMotion {
+  slide?: { to: [number, number, number]; period: number; phase?: number };
+  spin?: { pivot: [number, number, number]; axis: [number, number, number]; period: number; phase?: number; sweep?: number };
+}
+
+/** One scheduled stress event, seconds after arming (src/lib/flight/types.ts `StressEvent`). */
+export interface RangeStressEvent {
+  kind: 'gusts' | 'degrade' | 'sag' | 'night' | 'fog' | 'downdraft' | 'gps';
+  at: number;
+  until: number;
+  level: number;
+}
 
 /** Range primitives in metres, yaw in degrees (drone-lab-a §7.6). `solid: false` is drawn but flown through. */
 export type RangePrim =
-  | { type: 'box'; x: number; y: number; z?: number; w: number; d: number; h: number; yaw?: number; col: string; solid?: boolean; name?: TextKey; kind?: RangeHitKind }
-  | { type: 'house'; x: number; y: number; w: number; d: number; h: number; yaw?: number; col: string; roof?: number; roofCol?: string; kind?: RangeHitKind }
+  | { type: 'box'; x: number; y: number; z?: number; w: number; d: number; h: number; yaw?: number; col: string; solid?: boolean; name?: TextKey; kind?: RangeHitKind; win?: number; lit?: boolean }
+  | { type: 'house'; x: number; y: number; w: number; d: number; h: number; yaw?: number; col: string; roof?: number; roofCol?: string; kind?: RangeHitKind; win?: number; lit?: boolean }
+  | { type: 'mover'; x: number; y: number; z?: number; w: number; d: number; h: number; yaw?: number; col: string; kind?: RangeHitKind; motion: RangeMotion }
   | { type: 'cyl'; x: number; y: number; z?: number; r: number; h: number; r1?: number; n?: number; col: string; solid?: boolean; name?: TextKey; kind?: RangeHitKind }
   | { type: 'tree'; x: number; y: number; h?: number }
   | { type: 'pole'; x: number; y: number; h: number; r?: number; col?: string; kind?: RangeHitKind }
-  | { type: 'flat'; x: number; y: number; w: number; d: number; yaw?: number; col: string; label?: string }
+  | { type: 'flat'; x: number; y: number; w: number; d: number; yaw?: number; col: string; label?: string; ink?: boolean }
   | { type: 'disc'; x: number; y: number; r: number; col: string; label?: string };
 
 /** A gate (heading set: crossed through a plane) or a checkpoint sphere (no heading). */
@@ -770,8 +785,8 @@ export interface Course {
   field: { w: number; d: number };
   pad: [number, number];
   prims: RangePrim[];
-  /** Race gates [x, y, headingDeg], 1.6 x 1.6 m unless gateSize says otherwise. */
-  gates: [number, number, number][];
+  /** Race gates [x, y, headingDeg, bottomZ?, height?], 1.6 x 1.6 m on the ground unless gateSize or the gate says otherwise. */
+  gates: ([number, number, number] | [number, number, number, number] | [number, number, number, number, number])[];
   gateSize?: [number, number];
   goals: Goal[];
   /** Mission flight-mode id that flies it (autopilot crafts). */
@@ -782,6 +797,11 @@ export interface Course {
   par?: ParTimes;
   /** Height limit of this field in metres (overrides the craft's `ceiling` param). */
   ceiling?: number;
+  /** Metres across the chase view when the course opens (default 14), and the sky behind the field (top, horizon). */
+  zoom?: number;
+  sky?: [string, string];
+  /** A stress test: the schedule of trouble that runs while the course is flown, and how long the test lasts. */
+  stress?: { limit: number; events: RangeStressEvent[] };
   /** Ground colour of the field, and its wind when the Wind button is on (m/s, from = degrees, 0 = from the east). */
   ground?: string;
   wind?: { speed: number; from: number; gust: number };

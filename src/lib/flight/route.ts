@@ -1,5 +1,5 @@
 import { DEG, type Vec3 } from "./math";
-import { buildSolids, collide, type Solid } from "./world";
+import { buildSolids, collide, sweptBox, type Solid } from "./world";
 import type { Course, FlightCraft, Mission, Waypoint } from "./types";
 
 // The autopilot demo's route: the course's own targets in order (the gates looping, or the checkpoints once), with
@@ -13,7 +13,7 @@ export const DEMO_MISSION = "demo";
 export function clearPath(solids: Solid[], a: Vec3, b: Vec3, m: number): boolean {
   const near = solids.filter((o) => {
     if (o.pass) return false;
-    const reach = (o.k === "box" ? Math.hypot(o.hw, o.hd) : Math.max(o.r0, o.r1)) + m;
+    const reach = (o.k === "cyl" ? Math.max(o.r0, o.r1) : Math.hypot(o.hw, o.hd)) + m;
     return (
       Math.max(a[0], b[0]) > o.x - reach &&
       Math.min(a[0], b[0]) < o.x + reach &&
@@ -120,7 +120,8 @@ function targets(course: Course): Target[] {
 
 /** The demo route for a craft on a course, or null when the planner finds no clear way through it. */
 export function demoRoute(course: Course, craft: FlightCraft): Mission | null {
-  const solids = buildSolids(course);
+  // the planner cannot time a crossing, so a moving obstacle counts as everything it sweeps through
+  const solids = buildSolids(course).map((o) => (o.k === "mov" ? sweptBox(o) : o));
   if (craft.class === "wing") {
     // a wing cannot hover or climb straight up: it steers for each target's middle and is drawn round by its turns
     const pts = course.checkpoints.map((cp, i) => ({ x: cp.x, y: cp.y, z: cp.land ? 0 : cp.z, label: cp.label, r: Math.max(2, cp.r * 0.7), leg: i }));

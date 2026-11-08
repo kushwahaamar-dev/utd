@@ -9,7 +9,7 @@ html.cf-dark { --paper: #e4ddcf; --rule: #cbc2b1; --muted: #6a6357; }
 html, body { margin: 0; height: 100%; overflow: hidden; }
 body {
   background-color: var(--paper);
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42  0 0 0 0 .39  0 0 0 0 .33  .16 0 0 0 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42  0 0 0 0 .39  0 0 0 0 .33  .16 0 0 0 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>"), linear-gradient(180deg, var(--sky1, var(--paper)), var(--sky2, var(--paper)) 70%);
   color: var(--ink);
   font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
 }
@@ -17,16 +17,37 @@ body {
 #stage:focus-visible { box-shadow: inset 0 0 0 2px var(--ink); }
 #stage.fpv { cursor: default; }
 #iso, #overlay, #fpv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#tint, #haze { position: absolute; inset: 0; pointer-events: none; opacity: 0; }
+#tint { background: #1b2a52; mix-blend-mode: multiply; }
+#haze { background: radial-gradient(ellipse at 50% 55%, rgba(236, 238, 238, .35), rgba(236, 238, 238, .96) 78%); }
+#mini { position: absolute; right: 12px; bottom: 12px; width: 168px; height: 168px; display: none; border: 1.5px solid var(--ink); border-radius: 10px; background: rgba(242, 239, 231, .92); box-shadow: 2px 2px 0 var(--ink); pointer-events: none; overflow: hidden; }
+#mini.on { display: block; }
+#mini .mb { fill: #cfc8b8; stroke: rgba(35, 30, 22, .5); stroke-width: .5; vector-effect: non-scaling-stroke; }
+#mini .mr { fill: #dcd6c8; }
+#mini .mg { fill: none; stroke: #231e16; stroke-width: 1.4; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+#mini .mg.next { stroke: #ef6a4c; stroke-width: 2.6; }
+#mini .mc { fill: rgba(244, 241, 230, .6); stroke: #231e16; stroke-width: 1; vector-effect: non-scaling-stroke; }
+#mini .mc.next { fill: rgba(239, 106, 76, .55); }
+#mini .mm { fill: #cf5038; opacity: .75; }
+#mini .me { fill: #231e16; stroke: #f2efe7; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+#mini .mt { fill: none; stroke: #ef6a4c; stroke-width: 1.4; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+@media (max-width: 700px) { #mini { width: 112px; height: 112px; right: 8px; bottom: auto; top: 54px; } }
 #overlay { pointer-events: none; }
 #fpv { display: none; background: #cfe2ea; }
 #stage.fpv #fpv { display: block; }
-#stage.fpv #iso, #stage.fpv #overlay { display: none; }
+#stage.fpv #iso, #stage.fpv #overlay, #stage.fpv #tint, #stage.fpv #haze { display: none; }
 #iso path { stroke: var(--ink); stroke-width: 1.15; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 #iso .grid { fill: none; stroke: rgba(35, 30, 22, .13); stroke-width: .8; }
 #iso .cast path { fill: #41538f; stroke: none; opacity: .18; }
 #iso .solid { transition: opacity .25s; }
 #iso .solid.cut { opacity: .26; }
-#iso .gate.next path { fill: #f4b829; stroke-width: 2.2; }
+#iso .gate path { stroke-width: 1.6; }
+#iso .gate.next path { fill: #f4b829; stroke-width: 2.4; }
+#iso .opening { fill: rgba(244, 184, 41, .26); stroke: #f4b829; stroke-width: 2; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
+#iso path.win { fill: var(--win, #3b4d66); stroke: none; }
+#iso path.winlit { fill: #ffd25e; stroke: none; opacity: var(--litop, 0); }
+#iso .mover path { stroke-width: 1.15; }
+#iso .moveshadow { fill: #41538f; stroke: none; opacity: .18; }
 #iso .cpi { fill: none; stroke-width: 6.5; }
 #iso .cp { fill: none; stroke: #ece6d6; stroke-width: 3.5; }
 #iso .cp.next { stroke: #ef6a4c; }
@@ -86,8 +107,11 @@ body {
 <body>
 <main id="stage" tabindex="0" aria-label="Flying range. Drag to turn the chase view, scroll or pinch to zoom, [ and ] turn, + and - zoom, 0 resets the view.">
 <svg id="iso" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chase view of the craft over the field"></svg>
+<div id="tint"></div>
+<div id="haze"></div>
 <svg id="overlay" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
 <svg id="fpv" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" preserveAspectRatio="xMidYMid slice" role="img" aria-label="FPV goggles with the on-screen display" aria-hidden="true"></svg>
+<svg id="mini" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="badge" aria-hidden="true"></div>
 </main>
@@ -236,6 +260,76 @@ function facesOf(o) {
   return faces;
 }
 
+/** A moving box's pose at flight-clock time t (same maths as src/lib/flight/world.ts moverPose). */
+function axisAngle(a, th) {
+  const n = Math.hypot(a[0], a[1], a[2]) || 1;
+  const x = a[0] / n, y = a[1] / n, z = a[2] / n;
+  const c = Math.cos(th), s = Math.sin(th), k = 1 - c;
+  return [c + x * x * k, x * y * k - z * s, x * z * k + y * s, y * x * k + z * s, c + y * y * k, y * z * k - x * s, z * x * k - y * s, z * y * k + x * s, c + z * z * k];
+}
+const turnOf = (t, period, phase) => 2 * Math.PI * (t / period + (phase || 0));
+function moverPose(o, t) {
+  const rest = [o.c, -o.s, 0, o.s, o.c, 0, 0, 0, 1];
+  let cx = o.x, cy = o.y, cz = (o.z0 + o.z1) / 2, r = rest;
+  const sp = o.motion && o.motion.spin;
+  if (sp) {
+    const th = typeof sp.sweep === 'number' ? sp.sweep * DEG * Math.sin(turnOf(t, sp.period, sp.phase)) : turnOf(t, sp.period, sp.phase);
+    const q = axisAngle(sp.axis, th);
+    const dx = cx - sp.pivot[0], dy = cy - sp.pivot[1], dz = cz - sp.pivot[2];
+    cx = sp.pivot[0] + q[0] * dx + q[1] * dy + q[2] * dz;
+    cy = sp.pivot[1] + q[3] * dx + q[4] * dy + q[5] * dz;
+    cz = sp.pivot[2] + q[6] * dx + q[7] * dy + q[8] * dz;
+    r = [];
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) r.push(q[i * 3] * rest[j] + q[i * 3 + 1] * rest[3 + j] + q[i * 3 + 2] * rest[6 + j]);
+  }
+  const sl = o.motion && o.motion.slide;
+  if (sl) {
+    const k = 0.5 - 0.5 * Math.cos(turnOf(t, sl.period, sl.phase));
+    cx += sl.to[0] * k; cy += sl.to[1] * k; cz += sl.to[2] * k;
+  }
+  return { c: [cx, cy, cz], r };
+}
+/** The six faces of a moving box at time t. */
+function moverFaces(o, t) {
+  const { c, r } = moverPose(o, t);
+  const ax = [r[0], r[3], r[6]], ay = [r[1], r[4], r[7]], az = [r[2], r[5], r[8]];
+  const pt = (i, j, k) => [0, 1, 2].map((d) => c[d] + ax[d] * o.hw * i + ay[d] * o.hd * j + az[d] * o.hh * k);
+  const faces = [];
+  for (const s of [-1, 1]) {
+    faces.push({ pts: [pt(s, 1, 1), pt(s, -1, 1), pt(s, -1, -1), pt(s, 1, -1)], n: ax.map((v) => v * s) });
+    faces.push({ pts: [pt(1, s, 1), pt(-1, s, 1), pt(-1, s, -1), pt(1, s, -1)], n: ay.map((v) => v * s) });
+    faces.push({ pts: [pt(1, 1, s), pt(-1, 1, s), pt(-1, -1, s), pt(1, -1, s)], n: az.map((v) => v * s) });
+  }
+  return { faces, c };
+}
+
+/** Ribbon windows on a side face of a box: bands one floor apart as quads on the face. Cells pick lit panes. */
+function bandsOf(face, o) {
+  if (!o.win || face.n[2] > 0.5 || face.n[2] < -0.5) return null;
+  const [a, b, t1, t0] = face.pts; // b[i], b[j], t[j], t[i]
+  const fh = o.win.fh, h = o.z1 - o.z0;
+  const floors = Math.floor(h / fh);
+  if (floors < 1) return null;
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  if (len < 1.2) return null;
+  const u0 = Math.min(0.1, 0.6 / len), u1 = 1 - u0;
+  const lerp3 = (p, q, u, z) => [p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u, z];
+  const quads = [], lit = [];
+  for (let k = 0; k < floors; k++) {
+    const z0 = o.z0 + k * fh + fh * 0.3, z1 = o.z0 + k * fh + fh * 0.78;
+    quads.push([lerp3(a, b, u0, z0), lerp3(a, b, u1, z0), lerp3(a, b, u1, z1), lerp3(a, b, u0, z1)]);
+    if (o.win.lit) {
+      const cells = Math.max(1, Math.round(len / 2.6));
+      for (let ci = 0; ci < cells; ci++) {
+        if (hash(Math.round(o.x * 13) + k * 31 + ci * 7, Math.round(o.y * 17) + Math.round(face.n[0] * 5 + face.n[1] * 3)) > 0.4) continue;
+        const ua = u0 + ((u1 - u0) * (ci + 0.12)) / cells, ub = u0 + ((u1 - u0) * (ci + 0.88)) / cells;
+        lit.push([lerp3(a, b, ua, z0), lerp3(a, b, ub, z0), lerp3(a, b, ub, z1), lerp3(a, b, ua, z1)]);
+      }
+    }
+  }
+  return { quads, lit };
+}
+
 /** Decals (flat ground marks) from the course prims, as polygons at z = 0. */
 function decalsOf(course) {
   const out = [];
@@ -327,6 +421,7 @@ function createIso(svg, overlay) {
     boxes: [],
     cut: new Set(),
     craftIndex: -1,
+    movers: [],
   };
   const layer = (id) => {
     const g = document.createElementNS(SVGNS, 'g');
@@ -334,10 +429,12 @@ function createIso(svg, overlay) {
     svg.appendChild(g);
     return g;
   };
-  const gGround = layer('ground'), gShadow = layer('shadows'), gParcel = layer('parcel'), gSolids = layer('solids'), gRings = layer('rings'), gGhosts = layer('ghosts'), gXray = layer('xray');
+  const gGround = layer('ground'), gShadow = layer('shadows'), gParcel = layer('parcel'), gSolids = layer('solids'), gRings = layer('rings'), gOpen = layer('opening'), gGhosts = layer('ghosts'), gXray = layer('xray');
   const craftG = document.createElementNS(SVGNS, 'g');
   craftG.setAttribute('id', 'craft');
   const craftShadow = document.createElementNS(SVGNS, 'g');
+  const moveShadow = document.createElementNS(SVGNS, 'g');
+  const quadsPath = (quads, fn) => quads.map((q) => 'M' + q.map((p) => { const u = fn(p); return u[0].toFixed(2) + ' ' + u[1].toFixed(2); }).join('L') + 'Z').join('');
 
   let R, U, D, L, SH;
   function basis() {
@@ -367,8 +464,26 @@ function createIso(svg, overlay) {
       if (dot3(f.n, D) > -0.01) continue; // facing away
       const pts = f.pts.map(proj);
       s += '<path d="' + wobblePath(pts, AMP) + '" fill="' + tone(f.n, o.col) + '"/>';
+      const bd = o.win ? bandsOf(f, o) : null;
+      if (bd) {
+        s += '<path class="win" d="' + quadsPath(bd.quads, proj) + '"/>';
+        if (bd.lit.length) s += '<path class="winlit" d="' + quadsPath(bd.lit, proj) + '"/>';
+      }
     }
     return s;
+  }
+
+  /** A moving box at its pose now: flat-shaded faces, no wobble (a baked wobble would shimmer as it moves). */
+  function moverSvg(o, t) {
+    const { faces, c } = moverFaces(o, t);
+    let s = '', all = [];
+    for (const f of faces) {
+      for (const p of f.pts) all.push(p);
+      if (dot3(f.n, D) > -0.01) continue;
+      s += '<path d="' + 'M' + f.pts.map((p) => { const q = proj(p); return q[0].toFixed(3) + ' ' + q[1].toFixed(3); }).join('L') + 'Z' + '" fill="' + tone(f.n, o.col) + '"/>';
+    }
+    const hull = hull2(all.map((p) => proj([p[0] + p[2] * SH[0], p[1] + p[2] * SH[1], 0])));
+    return { s, c, shadow: hull.length > 2 ? 'M' + hull.map((q) => q[0].toFixed(3) + ' ' + q[1].toFixed(3)).join('L') + 'Z' : '' };
   }
 
   /** A small box drawn on its own (the delivery parcel), shaded like the field's solids. */
@@ -420,7 +535,7 @@ function createIso(svg, overlay) {
     gGround.innerHTML = g;
     // shadows and solids, far to near
     let sh = '';
-    const items = st.solids.map((o, i) => ({ o, i, d: depthOf([o.x, o.y, (o.z0 + o.z1) / 2]) }));
+    const items = st.solids.filter((o) => o.k !== 'mov').map((o, i) => ({ o, i, d: depthOf([o.x, o.y, (o.z0 + o.z1) / 2]) }));
     items.sort((a, b) => b.d - a.d);
     gSolids.textContent = '';
     st.groups = [];
@@ -444,7 +559,14 @@ function createIso(svg, overlay) {
       st.boxes.push([x0, y0, x1, y1]);
     }
     gShadow.innerHTML = '<g class="cast">' + sh + '</g>';
+    gShadow.appendChild(moveShadow);
     gShadow.appendChild(craftShadow);
+    st.movers = st.solids.filter((o) => o.k === 'mov').map((o) => {
+      const g = document.createElementNS(SVGNS, 'g');
+      g.setAttribute('class', 'solid mover');
+      return { o, g, idx: -2 };
+    });
+    moveShadow.setAttribute('class', 'moveshadow');
     // checkpoint rings and spheres
     let r = '';
     (course.checkpoints || []).forEach((cp, i) => {
@@ -527,6 +649,27 @@ function createIso(svg, overlay) {
     return s;
   }
 
+  function drawMovers(t) {
+    let ms = '';
+    for (const m of st.movers) {
+      const r = moverSvg(m.o, t);
+      m.g.innerHTML = r.s;
+      let lo = 0, hi = st.depths.length;
+      const d = depthOf(r.c);
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (st.depths[mid] > d) lo = mid + 1;
+        else hi = mid;
+      }
+      if (lo !== m.idx || m.g.parentNode !== gSolids) {
+        gSolids.insertBefore(m.g, st.groups[lo] || null);
+        m.idx = lo;
+      }
+      if (r.shadow) ms += '<path d="' + r.shadow + '"/>';
+    }
+    moveShadow.innerHTML = ms;
+  }
+
   let lastAz = st.az;
   /** Draws one frame. `vw`, `vh` are the view's pixel size. */
   function draw(f, look, followers, dt, vw, vh, ghosts) {
@@ -562,6 +705,7 @@ function createIso(svg, overlay) {
       html = '<path class="cable" d="M' + from[0].toFixed(3) + ' ' + from[1].toFixed(3) + 'L' + knot[0].toFixed(3) + ' ' + knot[1].toFixed(3) + '"/>' + boxSvg(f.x, f.y, z0, side, PARCEL_COL) + html;
     }
     craftG.innerHTML = html;
+    drawMovers(f.mt || 0);
     gParcel.innerHTML = f.parcel ? boxSvg(f.parcel[0], f.parcel[1], 0, 0.3 * scale, PARCEL_COL) : '';
     const ground = proj([f.x, f.y, 0]);
     const cast = proj([f.x + f.z * SH[0], f.y + f.z * SH[1], 0]);
@@ -609,6 +753,16 @@ function createIso(svg, overlay) {
     svg.querySelectorAll('.next').forEach((el) => el.classList.remove('next'));
     if (f.next && f.next.kind === 'gate') svg.querySelectorAll('.g' + (f.next.n - 1)).forEach((el) => el.classList.add('next'));
     if (f.next && f.next.kind === 'checkpoint') svg.querySelectorAll('.c' + (f.next.n - 1)).forEach((el) => el.classList.add('next'));
+    // the next gate's opening glows, so the line through it reads from across a city
+    const ng = f.next && f.next.kind === 'gate' ? (st.course.gates || [])[f.next.n - 1] : null;
+    let open = '';
+    if (ng && ng.w) {
+      const c = Math.cos(ng.heading * DEG), s2 = Math.sin(ng.heading * DEG), hw = ng.w / 2, z0 = ng.z || 0;
+      const at = (l, z) => proj([ng.x - s2 * l, ng.y + c * l, z]);
+      const q = [at(-hw, z0), at(hw, z0), at(hw, z0 + ng.h), at(-hw, z0 + ng.h)];
+      open = '<path class="opening" d="M' + q.map((p) => p[0].toFixed(3) + ' ' + p[1].toFixed(3)).join('L') + 'Z"/>';
+    }
+    gOpen.innerHTML = open;
     drawOverlay(f, vb, vw, vh, ghosts, scale * (look.span ? look.span / 2 : look.armLen + look.propR));
   }
 
@@ -663,10 +817,72 @@ function createIso(svg, overlay) {
       st.az = ((st.az + deg) % 360 + 360) % 360;
     },
     zoom(k) {
-      st.width = Math.max(3, Math.min(80, st.width * k));
+      st.width = Math.max(3, Math.min(st.course && st.course.field > 80 ? 170 : 80, st.width * k));
     },
     proj,
   };
+}
+
+// The minimap: the field from above, north up. The plan (roads, buildings, gates, rings) is drawn once per course;
+// the craft, the next target and the moving obstacles are redrawn each frame.
+function createMini(svg) {
+  const st = { course: null, solids: [], F: 0, gates: null, dyn: null };
+  const NS = 'http://www.w3.org/2000/svg';
+  function build(course, solids) {
+    st.course = course;
+    st.solids = solids || [];
+    st.F = course.field;
+    const on = course.field > 60;
+    svg.classList.toggle('on', on);
+    if (!on) return;
+    const F = st.F;
+    svg.setAttribute('viewBox', '0 0 ' + F + ' ' + F);
+    let h = '<g transform="translate(0 ' + F + ') scale(1 -1)">';
+    h += '<rect width="' + F + '" height="' + F + '" fill="' + (course.ground || '#dde3cc') + '"/>';
+    for (const dc of decalsOf(course)) {
+      if (dc.pad) continue;
+      h += '<path class="mr" fill="' + dc.col + '" d="M' + dc.pts.map((p) => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L') + 'Z"/>';
+    }
+    for (const o of st.solids) {
+      if (o.k !== 'box' || o.pass || o.gate !== undefined || o.z1 - o.z0 < 1.2 && o.z0 < 0.5 && o.hw < 0.5) continue;
+      const w = o.hw * 2, d = o.hd * 2;
+      const ang = Math.atan2(o.s, o.c) / DEG;
+      h += '<rect class="mb" x="' + (-o.hw).toFixed(2) + '" y="' + (-o.hd).toFixed(2) + '" width="' + w.toFixed(2) + '" height="' + d.toFixed(2) + '" transform="translate(' + o.x.toFixed(2) + ' ' + o.y.toFixed(2) + ') rotate(' + ang.toFixed(1) + ')" fill-opacity="' + Math.min(1, 0.45 + (o.z1 - o.z0) / 40).toFixed(2) + '"/>';
+    }
+    (course.gates || []).forEach((g, i) => {
+      const c = Math.cos(g.heading * DEG), s2 = Math.sin(g.heading * DEG), hw = Math.max(g.w, 2) / 2 + 1.2;
+      h += '<path class="mg g' + i + '" d="M' + (g.x + s2 * hw).toFixed(1) + ' ' + (g.y - c * hw).toFixed(1) + 'L' + (g.x - s2 * hw).toFixed(1) + ' ' + (g.y + c * hw).toFixed(1) + '"/>';
+    });
+    (course.checkpoints || []).forEach((cp, i) => {
+      h += '<circle class="mc c' + i + '" cx="' + cp.x + '" cy="' + cp.y + '" r="' + Math.max(1.6, cp.r * 1.1).toFixed(1) + '"/>';
+    });
+    h += '<g id="mini-dyn"></g></g>';
+    svg.innerHTML = h;
+    st.dyn = svg.querySelector('#mini-dyn');
+    st.last = '';
+  }
+  function draw(f, movers) {
+    if (!st.dyn || !svg.classList.contains('on')) return;
+    const F = st.F, k = F / 60;
+    const nk = f.next ? f.next.kind + f.next.n : '';
+    if (nk !== st.last) {
+      st.last = nk;
+      svg.querySelectorAll('.next').forEach((el) => el.classList.remove('next'));
+      if (f.next && f.next.kind === 'gate') svg.querySelectorAll('.g' + (f.next.n - 1)).forEach((el) => el.classList.add('next'));
+      if (f.next && f.next.kind === 'checkpoint') svg.querySelectorAll('.c' + (f.next.n - 1)).forEach((el) => el.classList.add('next'));
+    }
+    let d = '';
+    for (const m of movers) {
+      const { c } = moverPose(m.o, f.mt || 0);
+      d += '<circle class="mm" cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="' + (1.6 * k).toFixed(1) + '"/>';
+    }
+    if (f.next && f.next.kind !== 'home') d += '<path class="mt" d="M' + f.x.toFixed(1) + ' ' + f.y.toFixed(1) + 'L' + f.next.x.toFixed(1) + ' ' + f.next.y.toFixed(1) + '"/>';
+    const a = f.yaw * DEG, r = 3.2 * k;
+    const pts = [[Math.cos(a) * r, Math.sin(a) * r], [Math.cos(a + 2.5) * r * 0.8, Math.sin(a + 2.5) * r * 0.8], [Math.cos(a - 2.5) * r * 0.8, Math.sin(a - 2.5) * r * 0.8]];
+    d += '<path class="me" d="M' + pts.map((p) => (f.x + p[0]).toFixed(1) + ' ' + (f.y + p[1]).toFixed(1)).join('L') + 'Z"/>';
+    st.dyn.innerHTML = d;
+  }
+  return { build, draw };
 }
 
 // FPV goggles: a perspective view from the craft's camera (near-plane clipping, back-face culling,
@@ -677,7 +893,22 @@ const FW = 1000, FH = 750, NEAR = 0.06;
 const SUN = norm3([-0.45, -0.25, 0.86]);
 
 function createFpv(svg) {
-  const st = { faces: [], decals: [], rings: [], hills: [], course: null, msg: '', msgUntil: 0, w: FW };
+  const st = { faces: [], movers: [], decals: [], rings: [], hills: [], course: null, msg: '', msgUntil: 0, w: FW };
+  const FAR = 190, SKY = ['#b9d3e4', '#e6eeee'];
+  const fogCache = new Map();
+  /** A colour seen through haze: blended toward the horizon in eighths, cached. */
+  function hazed(col, dist, extra) {
+    const k = Math.min(0.8, Math.max(0, (dist - 50) / (FAR - 50)) * 0.7 + extra * Math.min(1, dist / 60));
+    const q = Math.round(k * 8);
+    if (!q) return col;
+    const key = col + q;
+    let v = fogCache.get(key);
+    if (!v) {
+      v = mix(col, '#dfe9ea', q / 8);
+      fogCache.set(key, v);
+    }
+    return v;
+  }
 
   // the drawing's width in viewBox units for the frame's shape (750 high), between a tall phone and a wide screen
   function fit() {
@@ -692,11 +923,17 @@ function createFpv(svg) {
   function build(course, solids) {
     st.course = course;
     st.faces = [];
+    st.movers = (solids || []).filter((o) => o.k === 'mov');
     for (const o of solids || []) {
+      if (o.k === 'mov') continue;
       for (const f of facesOf(o)) {
         const k = dot3(f.n, SUN);
         const t = tones(o.col);
-        st.faces.push({ pts: f.pts, n: f.n, fill: k > 0.55 ? t.l : k > 0.05 ? t.m : t.d, gate: o.gate });
+        let cx = 0, cy = 0, cz = 0, rad = 0;
+        for (const p of f.pts) { cx += p[0]; cy += p[1]; cz += p[2]; }
+        cx /= f.pts.length; cy /= f.pts.length; cz /= f.pts.length;
+        for (const p of f.pts) rad = Math.max(rad, Math.hypot(p[0] - cx, p[1] - cy, p[2] - cz));
+        st.faces.push({ pts: f.pts, n: f.n, fill: k > 0.55 ? t.l : k > 0.05 ? t.m : t.d, gate: o.gate, cx, cy, cz, rad, bands: o.win ? bandsOf(f, o) : null });
       }
     }
     st.decals = decalsOf(course);
@@ -812,7 +1049,9 @@ function createFpv(svg) {
     if (!st.course) return;
     fit();
     const c = camera(f, craft, camTilt);
-    let s = '<rect width="' + st.w + '" height="' + FH + '" fill="#cfe2ea"/>';
+    const sky = Array.isArray(st.course.sky) ? st.course.sky : SKY;
+    const fog = Array.isArray(f.env) ? f.env[1] : 0, night = Array.isArray(f.env) ? f.env[0] : 0;
+    let s = '<defs><linearGradient id="skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + sky[0] + '"/><stop offset=".52" stop-color="' + sky[1] + '"/></linearGradient></defs><rect width="' + st.w + '" height="' + FH + '" fill="url(#skyg)"/>';
     for (const h of st.hills) {
       const p = polyStr(c, h, 'fill="#b8c7c3" class="fi"');
       if (p) s += p;
@@ -833,20 +1072,57 @@ function createFpv(svg) {
     for (const dc of st.decals) s += polyStr(c, dc.pts, 'fill="' + dc.col + '" class="fi"') || '';
     // solids and rings, far to near
     const items = [];
-    for (const face of st.faces) {
+    const px = c.pos[0], py = c.pos[1], pz = c.pos[2];
+    const near = (cx, cy, cz, rad) => {
+      const dx = cx - px, dy = cy - py, dz = cz - pz;
+      const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (dist - rad > FAR) return -1;
+      if (dx * c.fwd[0] + dy * c.fwd[1] + dz * c.fwd[2] < -rad) return -1; // wholly behind
+      return dist;
+    };
+    const faceItem = (face, fill, dist, withBands) => {
       const p0 = face.pts[0];
-      if (dot3(face.n, [c.pos[0] - p0[0], c.pos[1] - p0[1], c.pos[2] - p0[2]]) <= 0) continue;
+      if (dot3(face.n, [px - p0[0], py - p0[1], pz - p0[2]]) <= 0) return;
       const cam = face.pts.map((p) => toCam(c, p));
       let z = 0, any = false;
       for (const q of cam) {
         z += q[2];
         if (q[2] > NEAR) any = true;
       }
-      if (!any) continue;
+      if (!any) return;
       const cp = clip(cam);
-      if (cp.length < 3) continue;
+      if (cp.length < 3) return;
+      let str = '<path d="' + path(cp.map((q) => scr(c, q))) + '" fill="' + fill + '" class="fi"/>';
+      if (withBands && face.bands && dist < 75) {
+        const glass = night > 0.05 ? mix('#3b4d66', '#1c2438', night) : '#3b4d66';
+        for (const q of face.bands.quads) str += polyStr(c, q, 'fill="' + glass + '"') || '';
+        if (night > 0.05) for (const q of face.bands.lit) str += polyStr(c, q, 'fill="#ffd25e" fill-opacity="' + Math.min(1, night * 1.3).toFixed(2) + '"') || '';
+      }
+      items.push({ z: z / cam.length, s: str });
+    };
+    for (const face of st.faces) {
+      const dist = near(face.cx, face.cy, face.cz, face.rad);
+      if (dist < 0) continue;
       const next = f.next && f.next.kind === 'gate' && face.gate === f.next.n - 1;
-      items.push({ z: z / cam.length, s: '<path d="' + path(cp.map((q) => scr(c, q))) + '" fill="' + (next ? '#f4b829' : face.fill) + '" class="fi"/>' });
+      faceItem(face, next ? '#f4b829' : hazed(face.fill, dist, fog), dist, true);
+    }
+    for (const m of st.movers) {
+      const { faces, c: mc } = moverFaces(m, f.mt || 0);
+      const dist = near(mc[0], mc[1], mc[2], Math.hypot(m.hw, m.hd, m.hh));
+      if (dist < 0) continue;
+      const tn = tones(m.col);
+      for (const face of faces) {
+        const k = dot3(face.n, SUN);
+        faceItem(face, hazed(k > 0.55 ? tn.l : k > 0.05 ? tn.m : tn.d, dist, fog), dist, false);
+      }
+    }
+    const ng = f.next && f.next.kind === 'gate' ? (st.course.gates || [])[f.next.n - 1] : null;
+    if (ng && ng.w) {
+      const gc = Math.cos(ng.heading * DEG), gs = Math.sin(ng.heading * DEG), hw = ng.w / 2, z0 = ng.z || 0;
+      const q = [[-hw, z0], [hw, z0], [hw, z0 + ng.h], [-hw, z0 + ng.h]].map(([l, z]) => [ng.x - gs * l, ng.y + gc * l, z]);
+      const mid = toCam(c, [ng.x, ng.y, z0 + ng.h / 2]);
+      const str = polyStr(c, q, 'fill="rgba(244,184,41,.3)" stroke="#f4b829" stroke-width="3" class="ring"');
+      if (str && mid[2] > NEAR) items.push({ z: mid[2] + 0.02, s: str });
     }
     for (const r of st.rings) {
       const isNext = f.next && f.next.kind === 'checkpoint' && f.next.n - 1 === r.i;
@@ -881,6 +1157,8 @@ function createFpv(svg) {
     }
     items.sort((a, b) => b.z - a.z);
     for (const it of items) s += it.s;
+    if (night > 0.02) s += '<rect width="' + st.w + '" height="' + FH + '" fill="#0c1636" opacity="' + Math.min(0.62, night * 0.62).toFixed(2) + '"/>';
+    if (fog > 0.02) s += '<rect width="' + st.w + '" height="' + FH + '" fill="#e6ecec" opacity="' + Math.min(0.55, fog * 0.55).toFixed(2) + '"/>';
     if (craft.fpvProps && f.armed) {
       const o = (0.12 + 0.2 * f.thr).toFixed(2);
       s += '<circle cx="-30" cy="-40" r="120" fill="#fff" opacity="' + o + '"/><circle cx="' + (st.w + 30) + '" cy="-40" r="120" fill="#fff" opacity="' + o + '"/>';
@@ -941,6 +1219,9 @@ const toastEl = document.getElementById('toast');
 const badgeEl = document.getElementById('badge');
 const iso = createIso(isoSvg, overlay);
 const fpv = createFpv(fpvSvg);
+const mini = createMini(document.getElementById('mini'));
+const tintEl = document.getElementById('tint');
+const hazeEl = document.getElementById('haze');
 
 function post(type, payload) {
   if (!EMBED || window.parent === window) return;
@@ -973,11 +1254,35 @@ function setFpv(on) {
   schedule();
 }
 
+const defaultWidth = () => (S.course && num(S.course.zoom) ? S.course.zoom : S.craft.look.span ? 40 : 14);
+let shownCourse = null;
 function rebuild() {
   if (!S.course) return;
+  // a new course opens at its own zoom and sky; a language change rebuilds the same one
+  if (shownCourse !== S.course.id) {
+    shownCourse = S.course.id;
+    iso.st.width = defaultWidth();
+    const sky = Array.isArray(S.course.sky) ? S.course.sky : null;
+    document.documentElement.style.setProperty('--sky1', sky ? sky[0] : '');
+    document.documentElement.style.setProperty('--sky2', sky ? sky[1] : '');
+  }
   iso.build(S.course, S.solids);
   fpv.build(S.course, S.solids);
+  mini.build(S.course, S.solids);
   schedule();
+}
+
+let envKey = '';
+/** Stress phases: night darkens the picture and lights the windows, fog washes it out. */
+function applyEnv(f) {
+  const e = Array.isArray(f.env) ? f.env : [0, 0];
+  const key = e[0] + ',' + e[1];
+  if (key === envKey) return;
+  envKey = key;
+  tintEl.style.opacity = String(Math.min(0.62, e[0] * 0.62));
+  hazeEl.style.opacity = String(Math.min(1, e[1]));
+  isoSvg.style.setProperty('--litop', String(Math.min(1, e[0] * 1.3)));
+  isoSvg.style.setProperty('--win', e[0] > 0.05 ? mix('#3b4d66', '#1c2438', Math.min(1, e[0])) : '#3b4d66');
 }
 
 const num = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -989,7 +1294,7 @@ function accept(patch) {
   if (!patch || typeof patch !== 'object') return;
   if (patch.course && typeof patch.course === 'object' && Array.isArray(patch.course.prims) && num(patch.course.field) && Array.isArray(patch.course.pad)) {
     S.course = patch.course;
-    S.solids = Array.isArray(patch.solids) ? patch.solids.filter((o) => o && (o.k === 'box' || o.k === 'cyl') && num(o.x) && num(o.z1)) : [];
+    S.solids = Array.isArray(patch.solids) ? patch.solids.filter((o) => o && (o.k === 'box' || o.k === 'cyl' || (o.k === 'mov' && o.motion && typeof o.motion === 'object')) && num(o.x) && num(o.z1)) : [];
     S.demo = false;
     rebuild();
   }
@@ -1048,7 +1353,7 @@ function act(name) {
       break;
     case 'view-reset':
       iso.st.az = 45;
-      iso.st.width = S.craft.look.span ? 40 : 14;
+      iso.st.width = defaultWidth();
       break;
     default:
       return post('error', { message: 'unknown act: ' + name });
@@ -1212,8 +1517,10 @@ function loop(ts) {
   if (f && S.course) {
     const vw = stage.clientWidth || 800, vh = stage.clientHeight || 600;
     const camTilt = num(S.course.camTilt) ? S.course.camTilt : S.craft.camTilt;
+    applyEnv(f);
     if (S.fpv) fpv.draw(f, S.craft, camTilt, S.followers, S.ghosts);
     else iso.draw(f, S.craft.look, S.followers, dt, vw, vh, S.ghosts);
+    mini.draw(f, iso.st.movers);
   }
   if (S.demo || (f && f.armed) || pointers.size) schedule();
 }
@@ -1259,6 +1566,11 @@ if (!EMBED && typeof DEMO !== 'undefined') {
     set: accept,
     act,
     setFpv,
+    view: (az, width) => {
+      if (num(az)) iso.st.az = az;
+      if (num(width)) iso.st.width = width;
+      schedule();
+    },
     state: () => ({ ...report(), demo: S.demo, frame: S.frame }),
   };
 }

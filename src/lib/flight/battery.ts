@@ -61,13 +61,13 @@ export const IDLE_AMPS = 0.4; // FC, receiver and video while armed
 
 export type BatteryNews = "low" | "empty" | null;
 
-/** Advances the pack by dt with `amps` flowing. Returns news when a threshold is crossed. */
-export function stepBattery(b: BatteryState, c: CalcOutputs, amps: number, dt: number): BatteryNews {
+/** Advances the pack by dt with `amps` flowing (`resistance` scales the pack's internal resistance: a cold or worn pack). Returns news when a threshold is crossed. */
+export function stepBattery(b: BatteryState, c: CalcOutputs, amps: number, dt: number, resistance = 1): BatteryNews {
   const chem = c.chemistry ?? "lipo";
   b.amps = amps;
   b.used += (amps * dt) / 3.6;
   const soc = 1 - b.used / c.mah;
-  const sag = amps * cellResistance(chem, c.mah);
+  const sag = amps * cellResistance(chem, c.mah) * resistance;
   b.volt = c.cells * Math.max(0, ocv(chem, soc) - sag);
   const perCell = b.volt / c.cells;
   const lim = LIMITS[chem];

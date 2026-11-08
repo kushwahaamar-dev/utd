@@ -1,10 +1,11 @@
 export * from "./types";
-export { STEP, MAX_FRAME, createSim, resetFlight, dispatch, stepSim, advance, drainEvents, frameOf, replay, hoverCommand, isClimbMode, ceilingOf, type SimState } from "./sim";
+export { STEP, MAX_FRAME, createSim, resetFlight, dispatch, stepSim, advance, drainEvents, frameOf, replay, hoverCommand, isClimbMode, ceilingOf, type FlightStats, type SimState } from "./sim";
 export { createSession, type FlightOrigin, type FlightSession, type FlightSnapshot } from "./session";
 export { ghostAt, ghostFromLog, GHOST_DT, finishOf, isGhostTrack, lapClock, loadGhost, paceGhost, saveGhost, type GhostPose, type GhostTrack } from "./ghost";
 export * from "./input";
 export { LIMITS, ocv, cellResistance, NOMINAL_CELL } from "./battery";
-export { buildSolids, collide, throughGate, passCheckpoint } from "./world";
+export { buildSolids, collide, moverPose, sweptBox, throughGate, passCheckpoint } from "./world";
+export { calmFx, ramp, stressFx, type StressFx } from "./stress";
 export { fromCalc } from "./from-calc";
 export { sfxFor, type SfxName } from "./sfx";
 export { BREAKS, causeOf, crashReplay, fixFor, type BreakId, type CrashCause, type CrashFix, type CrashReplay } from "./crash";

@@ -1,5 +1,5 @@
 import { DEG } from "./math";
-import type { Checkpoint, Course, Gate, HitKind, Prim } from "./types";
+import type { Checkpoint, Course, Gate, HitKind, Motion, Prim } from "./types";
 
 export const GATE_POST = 0.07; // m, gate post and bar thickness
 
@@ -17,6 +17,7 @@ export interface BoxSolid {
   col: string;
   gate?: number; // index of the race gate this belongs to
   pass?: boolean; // drawn, never hit
+  win?: { fh: number; lit: boolean }; // ribbon windows: one band per floor of this height
 }
 
 export interface CylSolid {
@@ -36,7 +37,25 @@ export interface CylSolid {
   pass?: boolean;
 }
 
-export type Solid = BoxSolid | CylSolid;
+/** A box that moves: its pose at any flight-clock time comes from `moverPose`, never from state. */
+export interface MoverSolid {
+  k: "mov";
+  x: number; // rest pose centre
+  y: number;
+  z0: number;
+  z1: number;
+  hw: number;
+  hd: number;
+  hh: number;
+  c: number; // rest yaw
+  s: number;
+  motion: Motion;
+  kind: HitKind;
+  col: string;
+  pass?: boolean;
+}
+
+export type Solid = BoxSolid | CylSolid | MoverSolid;
 
 // default colours, the same as the drawing uses
 export const COLS = { box: "#d9d2c3", cyl: "#cfc8b8", trunk: "#bf8a4f", crown: "#6aa86b", roof: "#c96a4e", pole: "#8a8f93", gate: "#ece6d6", house: "#efe6d2" };
@@ -54,6 +73,25 @@ const box = (x: number, y: number, z: number, w: number, d: number, h: number, y
   kind,
   col,
 });
+
+const mover = (p: Extract<Prim, { type: "mover" }>): MoverSolid => {
+  const z = p.z ?? 0;
+  return {
+    k: "mov",
+    x: p.x,
+    y: p.y,
+    z0: z,
+    z1: z + p.h,
+    hw: p.w / 2,
+    hd: p.d / 2,
+    hh: p.h / 2,
+    c: Math.cos((p.yaw ?? 0) * DEG),
+    s: Math.sin((p.yaw ?? 0) * DEG),
+    motion: p.motion,
+    kind: p.kind ?? "obstacle",
+    col: p.col ?? COLS.box,
+  };
+};
 
 const cyl = (x: number, y: number, z: number, r: number, r1: number, h: number, n: number, rot: number, kind: HitKind, col: string = COLS.cyl): CylSolid => ({
   k: "cyl",
@@ -105,11 +143,19 @@ export function buildSolids(course: Course): Solid[] {
   for (const p of course.prims) {
     const from = out.length;
     switch (p.type) {
-      case "box":
-        out.push(box(p.x, p.y, p.z ?? 0, p.w, p.d, p.h, p.yaw ?? 0, p.kind ?? "obstacle", p.col));
+      case "box": {
+        const b = box(p.x, p.y, p.z ?? 0, p.w, p.d, p.h, p.yaw ?? 0, p.kind ?? "obstacle", p.col);
+        if (p.win) b.win = { fh: p.win, lit: !!p.lit };
+        out.push(b);
+        break;
+      }
+      case "mover":
+        out.push(mover(p));
         break;
       case "house": {
-        out.push(box(p.x, p.y, 0, p.w, p.d, p.h, p.yaw ?? 0, p.kind ?? "building", p.col ?? COLS.house));
+        const b = box(p.x, p.y, 0, p.w, p.d, p.h, p.yaw ?? 0, p.kind ?? "building", p.col ?? COLS.house);
+        if (p.win) b.win = { fh: p.win, lit: !!p.lit };
+        out.push(b);
         const r = roofOf(p);
         out.push(cyl(p.x, p.y, p.h, r.r, 0, r.h, 4, r.rot, "roof", p.roofCol ?? COLS.roof));
         break;
@@ -135,10 +181,77 @@ export function buildSolids(course: Course): Solid[] {
   return out;
 }
 
-/** The first solid the sphere (x, y, z, radius m) touches, or null. */
-export function collide(solids: Solid[], x: number, y: number, z: number, m: number): Solid | null {
+/** Rotation about a unit axis (Rodrigues), as rows. */
+function axisAngle(a: [number, number, number], th: number): number[] {
+  const n = Math.hypot(a[0], a[1], a[2]) || 1;
+  const x = a[0] / n, y = a[1] / n, z = a[2] / n;
+  const c = Math.cos(th), s = Math.sin(th), k = 1 - c;
+  return [c + x * x * k, x * y * k - z * s, x * z * k + y * s, y * x * k + z * s, c + y * y * k, y * z * k - x * s, z * x * k - y * s, z * y * k + x * s, c + z * z * k];
+}
+
+const turn = (t: number, period: number, phase = 0) => 2 * Math.PI * (t / period + phase);
+
+/**
+ * Where a moving box is at flight-clock time `t` (s): its centre and its local axes as the columns of a row-major
+ * 3x3 (r[0], r[3], r[6] is the box's own x axis in the world). Pure in (solid, t).
+ */
+export function moverPose(o: MoverSolid, t: number): { c: [number, number, number]; r: number[] } {
+  const rest = [o.c, -o.s, 0, o.s, o.c, 0, 0, 0, 1];
+  let cx = o.x, cy = o.y, cz = (o.z0 + o.z1) / 2;
+  let r = rest;
+  const sp = o.motion.spin;
+  if (sp) {
+    const th = sp.sweep !== undefined ? sp.sweep * DEG * Math.sin(turn(t, sp.period, sp.phase)) : turn(t, sp.period, sp.phase);
+    const q = axisAngle(sp.axis, th);
+    const dx = cx - sp.pivot[0], dy = cy - sp.pivot[1], dz = cz - sp.pivot[2];
+    cx = sp.pivot[0] + q[0] * dx + q[1] * dy + q[2] * dz;
+    cy = sp.pivot[1] + q[3] * dx + q[4] * dy + q[5] * dz;
+    cz = sp.pivot[2] + q[6] * dx + q[7] * dy + q[8] * dz;
+    r = [0, 1, 2].flatMap((i) => [0, 1, 2].map((j) => q[i * 3] * rest[j] + q[i * 3 + 1] * rest[3 + j] + q[i * 3 + 2] * rest[6 + j]));
+  }
+  const sl = o.motion.slide;
+  if (sl) {
+    const k = 0.5 - 0.5 * Math.cos(turn(t, sl.period, sl.phase));
+    cx += sl.to[0] * k;
+    cy += sl.to[1] * k;
+    cz += sl.to[2] * k;
+  }
+  return { c: [cx, cy, cz], r };
+}
+
+/** The axis-aligned box a moving solid sweeps through over a whole cycle: what a route planner must keep clear. */
+export function sweptBox(o: MoverSolid): BoxSolid {
+  const periods = [o.motion.slide?.period, o.motion.spin?.period].filter((p): p is number => !!p);
+  const span = Math.max(...periods, 1);
+  let x0 = Infinity, y0 = Infinity, z0 = Infinity, x1 = -Infinity, y1 = -Infinity, z1 = -Infinity;
+  const N = 96;
+  for (let i = 0; i < N; i++) {
+    const { c, r } = moverPose(o, (i / N) * span);
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) {
+      const a = sx * o.hw, b = sy * o.hd, d = sz * o.hh;
+      const x = c[0] + r[0] * a + r[1] * b + r[2] * d, y = c[1] + r[3] * a + r[4] * b + r[5] * d, z = c[2] + r[6] * a + r[7] * b + r[8] * d;
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x);
+      y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+      z0 = Math.min(z0, z); z1 = Math.max(z1, z);
+    }
+  }
+  return { k: "box", x: (x0 + x1) / 2, y: (y0 + y1) / 2, z0, z1, hw: (x1 - x0) / 2, hd: (y1 - y0) / 2, c: 1, s: 0, kind: o.kind, col: o.col };
+}
+
+/** The first solid the sphere (x, y, z, radius m) touches at flight-clock time `t`, or null. */
+export function collide(solids: Solid[], x: number, y: number, z: number, m: number, t = 0): Solid | null {
   for (const o of solids) {
-    if (o.pass || z < o.z0 - m || z > o.z1 + m) continue;
+    if (o.pass) continue;
+    if (o.k === "mov") {
+      const { c, r } = moverPose(o, t);
+      const dx = x - c[0], dy = y - c[1], dz = z - c[2];
+      // the sphere in the box's own frame, then the distance to the nearest point of the box
+      const lx = dx * r[0] + dy * r[3] + dz * r[6], ly = dx * r[1] + dy * r[4] + dz * r[7], lz = dx * r[2] + dy * r[5] + dz * r[8];
+      const ex = Math.max(0, Math.abs(lx) - o.hw), ey = Math.max(0, Math.abs(ly) - o.hd), ez = Math.max(0, Math.abs(lz) - o.hh);
+      if (ex * ex + ey * ey + ez * ez < m * m) return o;
+      continue;
+    }
+    if (z < o.z0 - m || z > o.z1 + m) continue;
     const dx = x - o.x, dy = y - o.y;
     const lx = dx * o.c + dy * o.s, ly = -dx * o.s + dy * o.c;
     if (o.k === "box") {
