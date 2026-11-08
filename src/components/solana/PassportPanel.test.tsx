@@ -5,7 +5,7 @@ import { forgetDevnetKeypair } from "@/lib/solana/devnet-wallet";
 
 const features = vi.hoisted(() => ({ solana: true }));
 vi.mock("@/lib/features", () => ({
-  useFeatures: () => ({ status: "ready", features: { ai: false, image: false, voice: false, search: false, solana: features.solana, db: false, realtime: false, gemini: false } }),
+  useFeatures: () => ({ status: "ready", features: { ai: false, image: false, voice: false, search: false, solana: features.solana, db: false, realtime: false } }),
   reloadFeatures: () => {},
 }));
 vi.mock("@/i18n/client", () => ({ useLocale: () => "en" }));
