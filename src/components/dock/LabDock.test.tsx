@@ -24,6 +24,12 @@ vi.mock("@/lib/features", () => ({
   reloadFeatures: () => undefined,
 }));
 
+vi.mock("@/lib/stdb", () => ({
+  useStdb: () => ({ status: "online" }),
+  // the module has no SERPAPI_KEY here, so prices answer "not configured"
+  useStdbActions: () => ({ searchOffers: async () => ({ ok: false, error: "not configured: SERPAPI_KEY" }) }),
+}));
+
 import { I18nProvider } from "@/i18n/client";
 import { LabDock } from "./LabDock";
 import { LabRoom } from "./LabRoom";
