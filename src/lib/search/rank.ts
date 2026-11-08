@@ -1,4 +1,3 @@
-import "server-only";
 import { lineCost } from "@/lib/search/cost";
 import type { Offer, PartOffers } from "@/lib/search/types";
 

@@ -11,13 +11,14 @@ import { SHORT_FLIGHT_MIN } from "@/lib/drone/calc";
 import { isDesignPick } from "@/lib/drone/design";
 import type { DroneLabAction } from "@/lib/dronelab/store";
 import { boardBom, droneBom, offerParts, roboticsBom, type BomLine, type Slot } from "@/lib/search/bom";
+import { useStdb, useStdbActions } from "@/lib/stdb";
 import { fetchOffers, type FailCode } from "@/lib/search/client";
 import { lineCost, listingsNeeded, sumMoney } from "@/lib/search/cost";
 import { useSearchT, type SearchT } from "@/lib/search/messages";
 import { costRange, optimize, priceLines, type Candidate, type OptimizeResult } from "@/lib/search/optimize";
 import type { Offer, OffersGap, PartOffers } from "@/lib/search/types";
 import { SourcesList } from "./SourcesList";
-import { PanelSkeleton, StatusError, external, useFormat, useSearchAvailability, type Format } from "./shared";
+import { PanelSkeleton, StatusError, external, useFormat, type Format } from "./shared";
 
 /* ---------- the parts list ---------- */
 
@@ -76,6 +77,12 @@ function useBom({ lab, itemId, store }: Pick<LabDockProps, "lab" | "itemId" | "s
   return { bom, request };
 }
 
+/** Prices come from the module, so the panel is ready when the realtime server is. */
+function useOffersAvailability(): "loading" | "ready" | "error" {
+  const { status } = useStdb();
+  return status === "connecting" ? "loading" : status === "offline" ? "error" : "ready";
+}
+
 /* ---------- live offers ---------- */
 
 type Prices = {
@@ -93,6 +100,7 @@ const PARALLEL = 2;
 
 /** Prices the lines in small batches, so the list fills in as stores answer; again on "check again". */
 function useOffers(lines: BomLine[] | null, enabled: boolean, itemKey: string) {
+  const { searchOffers } = useStdbActions();
   const [round, setRound] = useState(0);
   const [prices, setPrices] = useState<Prices | null>(null);
   const key = `${itemKey}#${round}`;
@@ -110,7 +118,7 @@ function useOffers(lines: BomLine[] | null, enabled: boolean, itemKey: string) {
     const worker = async () => {
       while (next < batches.length && !controller.signal.aborted) {
         const batch = batches[next++];
-        const result = await fetchOffers({ parts: batch }, controller.signal).catch(() => null);
+        const result = await fetchOffers(searchOffers, batch, controller.signal).catch(() => null);
         if (!result || controller.signal.aborted) return;
         merge((p) => {
           if (!result.ok) return { ...p, done: p.done + 1, failure: p.failure ?? result.code };
@@ -122,7 +130,7 @@ function useOffers(lines: BomLine[] | null, enabled: boolean, itemKey: string) {
     };
     void Promise.all(Array.from({ length: Math.min(PARALLEL, batches.length) }, worker));
     return () => controller.abort();
-  }, [enabled, lines, key]);
+  }, [enabled, lines, key, searchOffers]);
 
   const current = prices?.key === key ? prices : null;
   return {
@@ -421,11 +429,13 @@ export function RealBuildPanel({ lab, itemId, store }: LabDockProps) {
   const locale = useLocale();
   const t = useSearchT(locale);
   const f = useFormat(locale);
-  const availability = useSearchAvailability();
+  const stdbReady = useOffersAvailability();
   const id = useId();
   const { bom, request } = useBom({ lab, itemId, store });
   const lines = bom.status === "ready" ? bom.lines : null;
-  const { prices, loading, refresh } = useOffers(request, availability === "ready", `${lab}:${itemId}`);
+  const { prices, loading, refresh } = useOffers(request, stdbReady === "ready", `${lab}:${itemId}`);
+  // The module answers "not configured" when it has no SerpApi key: show the same note as a deployment without search.
+  const availability = stdbReady === "ready" && prices?.failure === "not_configured" ? "off" : stdbReady;
   const offers = useMemo(() => prices?.offers ?? new Map<string, PartOffers>(), [prices]);
 
   if (!t) return <PanelSkeleton />;

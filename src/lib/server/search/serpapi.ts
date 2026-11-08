@@ -19,7 +19,7 @@ import type {
 } from "@/lib/search/types";
 import { TtlLru } from "./lru";
 import * as normalize from "./normalize";
-import { rankOffers } from "./rank";
+import { rankOffers } from "@/lib/search/rank";
 
 // The SerpApi client (HX-CONTRACT H5; parameters and fields in docs/hacktx/SEARCH.md).
 // Every call goes through search(): engine whitelist, our 6 h LRU in front of

@@ -34,6 +34,27 @@ vi.mock("@/content/index.generated", () => ({
   loadDrone: async (id: string) => (id === "quad5" ? ({ design } as unknown as DroneContent) : null),
 }));
 
+const priced = vi.hoisted(() => ({ prices: {} as Record<string, unknown[]>, off: false }));
+
+vi.mock("@/lib/stdb", () => ({
+  useStdb: () => ({ status: "online" }),
+  useStdbActions: () => ({ searchOffers: vi.fn() }),
+}));
+
+// The module call and the ranking have their own tests (client.test.ts); here the panel gets ranked answers per part key.
+vi.mock("@/lib/search/client", () => ({
+  fetchOffers: async (_search: unknown, parts: { key: string }[]) =>
+    priced.off
+      ? { ok: false, code: "not_configured" }
+      : {
+          ok: true,
+          data: {
+            parts: parts.map((p) => (priced.prices[p.key] ? { key: p.key, offers: priced.prices[p.key], best: 0 } : { key: p.key, offers: [] })),
+            fetchedAt: "2026-10-24T19:30:00.000Z",
+          },
+        },
+}));
+
 import { RealBuildPanel } from "./RealBuildPanel";
 
 const offer = (title: string, price: number, extra: Partial<Offer> = {}): Offer => ({
@@ -45,20 +66,10 @@ const offer = (title: string, price: number, extra: Partial<Offer> = {}): Offer 
   ...extra,
 });
 
-/** The fake server: /api/status says search is on; offers answer per key from `prices`. */
+/** The module's answers: offers per part key. */
 function server(prices: Record<string, PartOffers["offers"]>) {
-  return vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
-    const path = String(input);
-    if (path === "/api/status") return Response.json({ features: { search: true } });
-    if (path === "/api/search/offers") {
-      const body = JSON.parse(String(init?.body)) as { parts: { key: string }[] };
-      return Response.json({
-        parts: body.parts.map((p) => (prices[p.key] ? { key: p.key, offers: prices[p.key], best: 0 } : { key: p.key, offers: [] })),
-        fetchedAt: "2026-10-24T19:30:00.000Z",
-      });
-    }
-    return new Response("not found", { status: 404 });
-  });
+  priced.prices = prices;
+  priced.off = false;
 }
 
 function storeOf(pick: DesignPick | null) {
@@ -81,19 +92,16 @@ const renderPanel = (props: Parameters<typeof RealBuildPanel>[0]) =>
     </I18nProvider>,
   );
 
-beforeEach(() => vi.stubGlobal("fetch", server({})));
+beforeEach(() => server({}));
 afterEach(() => vi.unstubAllGlobals());
 
 describe("RealBuildPanel", () => {
   it("prices a robotics bench and adds up the cheapest total", async () => {
-    vi.stubGlobal(
-      "fetch",
-      server({
+    server({
         "board:nano": [offer("Arduino Nano", 24.9, { inStock: true })],
         "part:l298n": [offer("L298N motor driver 2pcs", 7, { pack: 2 }), offer("L298N driver", 9)],
         "part:tt-motor": [offer("TT gear motor", 3)],
-      }),
-    );
+      });
     const { store } = storeOf(null);
     renderPanel({ lab: "robotics", itemId: "l298n", store, figure: null });
 
@@ -115,17 +123,14 @@ describe("RealBuildPanel", () => {
   });
 
   it("runs the optimiser on a drone and applies the pick to the lab", async () => {
-    vi.stubGlobal(
-      "fetch",
-      server({
+    server({
         "fixed:FRAME": [offer("5 inch frame", 40)],
         "batt:6s1100": [offer("6S 1100mAh LiPo", 40)],
         "batt:4s1500": [offer("4S 1500mAh LiPo", 25)],
         "motor:2306-1750": [offer("2306 1750KV 4pcs", 90, { pack: 4 })],
         "motor:2306-2450": [offer("2306 2450KV 4pcs", 60, { pack: 4 })],
         "prop:5x4.3x3": [offer("5x4.3x3 props 4pcs", 5, { pack: 4 })],
-      }),
-    );
+      });
     const { store, dispatch } = storeOf(design.default);
     renderPanel({ lab: "drone", itemId: "quad5", store, figure: null });
 
@@ -149,14 +154,7 @@ describe("RealBuildPanel", () => {
   });
 
   it("with search off, lists a bench's parts without prices and sums a drone at catalogue prices", async () => {
-    // Fresh modules: the feature flags are a module singleton that earlier tests filled with search on.
-    vi.resetModules();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(async (input: string | URL | Request) =>
-        String(input) === "/api/status" ? Response.json({ features: { search: false } }) : new Response("not found", { status: 404 }),
-      ),
-    );
+    priced.off = true;
     const { RealBuildPanel: Panel } = await import("./RealBuildPanel");
     const { I18nProvider: Provider } = await import("@/i18n/client");
     const show = (props: Parameters<typeof Panel>[0]) =>

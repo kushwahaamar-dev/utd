@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Smoke test for the SerpApi features (BUILD-PLAN §6 step 7): one call per /api/search/* route of a running iynk,
 // so the app's own path is tested (origin check, budget guard, cache, normalisers), not a private client.
-// Each route costs at most one SerpApi search (web with extract up to three); a cached answer costs none.
+// Each route costs at most one SerpApi search; a cached answer costs none. Prices and web search run in the SpacetimeDB module now (searchOffers, searchWeb).
 // Reads SERPAPI_KEY from the environment or .env.local only to decide whether to run, and never prints it.
-// Usage: node scripts/smoke-search.mjs --base http://127.0.0.1:3000 [--only offers,web]
+// Usage: node scripts/smoke-search.mjs --base http://127.0.0.1:3000 [--only nearby,events,videos]
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -32,7 +32,7 @@ loadEnvFile(join(root, ".env.local"));
 
 const base = (arg("--base") ?? "").replace(/\/+$/, "");
 if (!base) {
-  console.log("Usage: node scripts/smoke-search.mjs --base http://127.0.0.1:3000 [--only offers,web]");
+  console.log("Usage: node scripts/smoke-search.mjs --base http://127.0.0.1:3000 [--only nearby,events,videos]");
   process.exit(2);
 }
 if (!process.env.SERPAPI_KEY?.trim()) {
@@ -42,14 +42,8 @@ if (!process.env.SERPAPI_KEY?.trim()) {
 
 const only = arg("--only")?.split(",");
 
-// What a judge's demo asks for: the quad5's motors priced, a datasheet answer, places and events near Austin, a video.
+// What a judge's demo asks for: places and events near Austin, a video.
 const CALLS = [
-  { route: "offers", query: { q: "2306 2450KV brushless motor", qty: "4" }, count: (b) => b.parts?.[0]?.offers?.length, best: (b) => {
-    const p = b.parts?.[0];
-    const o = p?.best === undefined ? undefined : p.offers[p.best];
-    return o ? `best ${o.currency} ${o.price} from ${o.source}${b.partial ? `, partial: ${b.partial}` : ""}` : "no in-stock listing";
-  } },
-  { route: "web", query: { q: "HC-SR04 datasheet echo pulse width" }, count: (b) => b.results?.length },
   { route: "nearby", query: { kind: "makerspace", near: "Austin, TX" }, count: (b) => b.places?.length },
   { route: "events", query: { q: "maker meetup", near: "Austin, TX" }, count: (b) => b.events?.length },
   { route: "videos", query: { q: "how to solder header pins" }, count: (b) => b.videos?.length },
