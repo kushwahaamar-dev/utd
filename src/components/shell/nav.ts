@@ -2,7 +2,7 @@
 // array, so a new page (the hackathon layer's /together, /passport, /verify)
 // is one entry here plus a "nav.<id>" string in every locale's shell.json.
 
-export type NavId = "dashboard" | "boards" | "robotics" | "drones" | "together" | "passport" | "verify" | "about";
+export type NavId = "dashboard" | "boards" | "robotics" | "drones" | "mission" | "races" | "together" | "passport" | "verify" | "about";
 
 export type NavEntry = {
   id: NavId;
@@ -18,10 +18,12 @@ export const NAV: readonly NavEntry[] = [
   { id: "boards", href: "/boards", bar: true },
   { id: "robotics", href: "/robotics", bar: true },
   { id: "drones", href: "/drones", bar: true },
+  { id: "mission", href: "/mission", bar: true },
+  { id: "races", href: "/races", bar: true },
   { id: "together", href: "/together", bar: true },
   { id: "passport", href: "/passport", bar: false, feature: "solana" },
   { id: "verify", href: "/verify", bar: false, feature: "solana" },
-  { id: "about", href: "/about", bar: true },
+  { id: "about", href: "/about", bar: false },
 ];
 
 /** Bar is the desktop header. Sheet and footer list every entry the feature flags allow. */

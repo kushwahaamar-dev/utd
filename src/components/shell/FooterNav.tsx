@@ -11,7 +11,7 @@ import { NAV, showNavEntry, type NavId } from "./nav";
 // The labs, the pages around them (Passport and Verify stay out while Solana is off) and the six languages.
 const GROUPS: readonly { key: "labs" | "site"; ids: readonly NavId[] }[] = [
   { key: "labs", ids: ["boards", "robotics", "drones"] },
-  { key: "site", ids: ["together", "about", "passport", "verify"] },
+  { key: "site", ids: ["mission", "races", "together", "passport", "verify", "about"] },
 ];
 
 const link = "inline-flex min-h-9 items-center text-[15px] text-ink no-underline transition-colors hover:text-muted [@media(pointer:coarse)]:min-h-11";
