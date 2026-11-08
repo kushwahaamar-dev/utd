@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { settle } from "./settle";
 import flight from "../src/i18n/messages/en/flight.json";
 
 // The fly page of every craft (src/lib/flight/registry.ts flies them all from their content): the range opens on the
@@ -74,6 +75,7 @@ test("the cockpit passes axe", async ({ page }) => {
   await page.goto("/en/drones/quad5/fly");
   await expect(main(page).locator('iframe[src*="/figures/flight/range.html"]')).toBeVisible({ timeout: 20_000 });
   await expect(main(page).getByTestId("flight-telemetry")).toBeVisible();
+  await settle(page);
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);
   expect(errors).toEqual([]);

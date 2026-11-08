@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { settle } from "./settle";
 import { ROBOTICS_IDS } from "../src/content/ids";
 import { AVAILABLE, roboticsLoaders } from "../src/content/index.generated";
 import type { RoboticsContent } from "../src/content/schema";
@@ -17,6 +18,7 @@ function watchErrors(page: Page) {
 
 // The figure is its own document with its own tests; this checks the host page around it.
 async function expectNoAxeViolations(page: Page) {
+  await settle(page);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .exclude("iframe")

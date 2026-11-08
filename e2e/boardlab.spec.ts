@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { settle } from "./settle";
 import { LOCALES, htmlLang } from "../src/i18n/config";
 import boardlab from "../src/i18n/messages/en/boardlab.json";
 import common from "../src/i18n/messages/en/common.json";
@@ -20,6 +21,7 @@ function watchErrors(page: Page) {
 }
 
 async function expectNoAxeViolations(page: Page) {
+  await settle(page);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     // The figure page is checked by its own figure tests (cfshoot); this checks the host page.
