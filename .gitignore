@@ -64,3 +64,4 @@ id.json
 
 # SpacetimeDB local data
 /spacetime/.data/
+/spacetime/node_modules/
