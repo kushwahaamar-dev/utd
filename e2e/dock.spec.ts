@@ -38,19 +38,15 @@ for (const [w, h] of [[1440, 900], [1920, 1080]]) {
   test.describe(`on a ${w} px desk`, () => {
     test.use({ viewport: { width: w, height: h } });
 
-    test("the open drawer takes its width from the stage, down to 34rem, before the rail", async ({ page }) => {
+    test("the open drawer pushes the lab shell over: the rails give way first and the stage keeps 24rem", async ({ page }) => {
       await page.goto("/en/boards/nano/blink");
       const width = (selector: string) => page.locator(`main:visible ${selector}`).first().evaluate((el) => el.getBoundingClientRect().width);
-      const stage = await width(".ws-stage");
-      const rail = await width(".ws-rail");
+      const stage = await width(".lab-stage");
       await openDock(page, false);
-      // The 416 px drawer pushes the page over. At 1920 the code keeps its whole width; at 1440 the stage stops at
-      // 34rem (544 px) and the rail gives up the rest, never below 22rem (352 px).
-      await expect.poll(() => width(".ws-stage")).toBeLessThan(stage - 100);
-      expect(await width(".ws-stage")).toBeGreaterThanOrEqual(544);
-      const docked = await width(".ws-rail");
-      expect(docked).toBeGreaterThanOrEqual(352);
-      if (w >= 1920) expect(docked).toBeCloseTo(rail, 0);
+      // The 416 px drawer pushes the page over; the guide may shrink to 12rem and the inspector to 18rem.
+      await expect.poll(() => width(".lab-stage")).toBeLessThan(stage - 100);
+      expect(await width(".lab-stage")).toBeGreaterThanOrEqual(384);
+      expect(await width(".lab-right")).toBeGreaterThanOrEqual(288);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
     });
   });
