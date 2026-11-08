@@ -22,7 +22,7 @@ export type Script = {
   proposals: ScriptedProposal[];
 };
 
-const ULTRA = "Nemotron Ultra";
+const SUPER = "Nemotron Super";
 const LIGHT = "Nemotron Lightning";
 const NANO = "Nemotron Nano";
 
