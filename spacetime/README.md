@@ -56,7 +56,7 @@ The worker (a Node process, `worker/`) connects with the SDK like any client. It
 `worker_register(secret)`; the module compares the secret with `WORKER_SECRET` in constant time and stores the
 caller's identity in private `config` (key `worker`). Every `worker_*` reducer then checks `ctx.sender` against that row
 and fails with `worker only` for anyone else. Registering again with the secret replaces the stored identity (a worker restart
-that comes back with a new token just calls it again). If `WORKER_SECRET` is unset on the database, registration fails
+that comes back with a new token just calls it again; the old identity loses its rights at once). The secret must be at least 16 characters; publish with 32+ random ones. If `WORKER_SECRET` is unset on the database, registration fails
 with a message saying so. The worker should keep its token (persist it) so its identity is stable.
 
 Worker reducers: `worker_register`, `worker_job_status`, `worker_step_start`, `worker_step_finish`, `worker_add_proposal`,

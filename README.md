@@ -88,6 +88,8 @@ flowchart LR
   closing happen in reducers. Translation and search are procedures that call out over HTTP. Timers (race close,
   empty-room cleanup, buddy expiry, the activity rollup) are scheduled reducers. The contract is in
   [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- **Security:** every client is treated as hostile; what is private, who can call what and how laps and credentials are
+  checked is in [docs/SECURITY.md](docs/SECURITY.md).
 - **The worker** (`worker/`) is a Node service that logs in as the registered worker identity. It runs the Nemotron
   agent loop for queued jobs and signs Solana transactions for queued chain jobs. It also mirrors on-chain race
   events back into the module.
