@@ -149,9 +149,9 @@ test("a daily challenge link opens the day's craft and course, with the time to 
   await expect(shared).toHaveAttribute("data-course", course);
   await expect(main(page).locator('[data-testid="flight-range"]:visible')).toHaveAttribute("data-course", course);
   await expect(shared.getByTestId("challenge-beat")).toHaveText(fill(flight.challenge.beat, { by: "Ana", time: "12.34" }));
-  // the day's board: with no database on this deployment it says so instead of breaking
+  // the day's board: with no realtime server it says so instead of breaking
   await expect(main(page).getByText(data.leaderboard.title, { exact: true })).toBeVisible();
-  await expect(main(page).getByText(data.leaderboard.offTitle)).toBeVisible();
+  await expect(main(page).getByText(data.leaderboard.offTitle)).toBeVisible({ timeout: 30_000 });
 
   // an old day's link flies that day's challenge
   await openFly(page, `/en/drones/${craft}/fly?challenge=2026-01-01`);

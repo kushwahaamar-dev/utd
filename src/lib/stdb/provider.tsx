@@ -51,6 +51,21 @@ function Bridge({ children }: { children: ReactNode }) {
 }
 
 /**
+ * Next refuses Math.random() while prerendering, and the SDK draws a throwaway connection id on every render of its
+ * provider. The id only matters once connected, so on the server the provider renders with a fixed random.
+ */
+function PrerenderSafeProvider(props: Parameters<typeof SpacetimeDBProvider<DbConnection>>[0]) {
+  if (typeof window !== "undefined") return SpacetimeDBProvider(props);
+  const real = Math.random;
+  Math.random = () => 0.5;
+  try {
+    return SpacetimeDBProvider(props);
+  } finally {
+    Math.random = real;
+  }
+}
+
+/**
  * One WebSocket for the whole app. Put it once near the root. If the server is
  * unreachable the children still render: hooks return empty lists and
  * `useStdb().status` is "offline" while the SDK keeps retrying with backoff.
@@ -70,9 +85,9 @@ export function StdbProvider({ children }: { children: ReactNode }) {
     return b;
   }, []);
   return (
-    <SpacetimeDBProvider connectionBuilder={builder}>
+    <PrerenderSafeProvider connectionBuilder={builder}>
       <Bridge>{children}</Bridge>
-    </SpacetimeDBProvider>
+    </PrerenderSafeProvider>
   );
 }
 
