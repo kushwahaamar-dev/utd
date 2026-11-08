@@ -93,7 +93,7 @@ server-side secret or stream tokens to one browser, and none of them keep state 
 
 | Runs in the SpacetimeDB module | Runs outside it, and why |
 |---|---|
-| Profiles, wallets links, presence | `/api/ai/chat`: the lab partner streams Nemotron tokens to one browser (SSE) |
+| Profiles, wallet links, presence | `/api/ai/chat`: the lab partner streams Nemotron tokens to one browser (SSE) |
 | Rooms: membership, action order, snapshots, baton, kicks | `/api/ai/plan`, `/api/ai/story`: one-shot Nemotron calls for one person |
 | Chat and its translations (procedure → Nemotron) | `/api/search/{nearby,events,videos}`: SerpApi lookups that are not shared |
 | Cursors and flight ghosts (event tables) | `/api/solana/faucet`: holds the devnet issuer key to top up a new wallet |
