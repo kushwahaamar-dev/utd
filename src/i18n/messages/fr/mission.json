@@ -10,7 +10,7 @@
   },
   "composer": {
     "label": "Que doivent faire les agents ?",
-    "placeholder": "Un drone de 5 pouces qui vole 8 minutes, pour moins de 180 $",
+    "placeholder": "Un drone de 5 pouces qui vole 8 minutes, pour moins de 400 $",
     "kind": "Mode",
     "kinds": {
       "build": "Construire",
@@ -27,7 +27,7 @@
   "presets": {
     "drone": {
       "label": "Drone de 5 pouces, 8 minutes",
-      "goal": "Drone de 5 pouces qui vole 8 minutes, pour moins de 180 $"
+      "goal": "Drone de 5 pouces qui vole 8 minutes, pour moins de 400 $"
     },
     "parking": {
       "label": "Capteur de stationnement ESP32",

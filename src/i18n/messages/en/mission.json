@@ -10,7 +10,7 @@
   },
   "composer": {
     "label": "What should the agents do?",
-    "placeholder": "A 5-inch drone that flies 8 minutes, under $180",
+    "placeholder": "A 5-inch drone that flies 8 minutes, under $400",
     "kind": "Mode",
     "kinds": {
       "build": "Build",
@@ -27,7 +27,7 @@
   "presets": {
     "drone": {
       "label": "5-inch drone, 8 minutes",
-      "goal": "5-inch drone that flies 8 minutes, under $180"
+      "goal": "5-inch drone that flies 8 minutes, under $400"
     },
     "parking": {
       "label": "ESP32 parking sensor",

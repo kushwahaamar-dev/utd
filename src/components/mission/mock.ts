@@ -147,7 +147,7 @@ export function ensureDemoRun(id: string, speed = 1): boolean {
   const kind = id.includes("diagnose") ? "diagnose" : "build";
   runs.set(id, {
     id,
-    goal: kind === "diagnose" ? "Why does my LED burn out?" : "5-inch drone that flies 8 minutes, under $180",
+    goal: kind === "diagnose" ? "Why does my LED burn out?" : "5-inch drone that flies 8 minutes, under $400",
     kind,
     script: scriptFor(kind),
     startedAt: Date.now(),

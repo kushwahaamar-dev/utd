@@ -42,7 +42,7 @@ export const droneBuild: Script = {
       title: "Plan the build",
       model: ULTRA,
       ms: 3200,
-      input: { goal: "5-inch drone that flies 8 minutes, under $180" },
+      input: { goal: "5-inch drone that flies 8 minutes, under $400" },
       output: {
         plan: [
           { id: "p1", text: "Pick a 5-inch frame and motor class" },
@@ -51,7 +51,7 @@ export const droneBuild: Script = {
           { id: "p4", text: "Price every part live and check the budget" },
           { id: "p5", text: "Check the wiring on the bench" },
         ],
-        criteria: ["Estimated flight time of at least 8 min", "Thrust-to-weight above 4", "Parts total at most $180", "No bench faults"],
+        criteria: ["Estimated flight time of at least 8 min", "Thrust-to-weight above 4", "Parts total at most $400", "No bench faults"],
       },
     },
     {
@@ -68,7 +68,7 @@ export const droneBuild: Script = {
       title: "Choose the frame and stack",
       model: LIGHT,
       ms: 2100,
-      input: { constraints: { size: "5in", budget: 180 } },
+      input: { constraints: { size: "5in", budget: 400 } },
       output: { summary: "220 mm freestyle frame, 45 A 4-in-1 ESC, 4S 1300 mAh to start", planItem: "p1" },
     },
     {
@@ -171,7 +171,7 @@ export const droneBuild: Script = {
       title: "Final review",
       model: ULTRA,
       ms: 2600,
-      input: { criteria: ["flight >= 8 min", "T:W > 4", "total <= $180", "no faults"] },
+      input: { criteria: ["flight >= 8 min", "T:W > 4", "total <= $400", "no faults"] },
       output: { verdict: "approve", reasons: ["Flight time 8.4 min, thrust-to-weight 4.2", "$164.42 is $15.58 under budget", "Simulator and bench both clean"] },
     },
     {
@@ -193,7 +193,7 @@ export const droneBuild: Script = {
       { label: "No faults", ok: true },
     ],
     bom: droneBom,
-    budget: 180,
+    budget: 400,
     lab: { kind: "drone", id: "quad5" },
   },
   proposals: [

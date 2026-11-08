@@ -10,7 +10,7 @@
   },
   "composer": {
     "label": "¿Qué deben hacer los agentes?",
-    "placeholder": "Un dron de 5 pulgadas que vuele 8 minutos por menos de 180 $",
+    "placeholder": "Un dron de 5 pulgadas que vuele 8 minutos por menos de 400 $",
     "kind": "Modo",
     "kinds": {
       "build": "Construir",
@@ -27,7 +27,7 @@
   "presets": {
     "drone": {
       "label": "Dron de 5 pulgadas, 8 minutos",
-      "goal": "Dron de 5 pulgadas que vuele 8 minutos por menos de 180 $"
+      "goal": "Dron de 5 pulgadas que vuele 8 minutos por menos de 400 $"
     },
     "parking": {
       "label": "Sensor de aparcamiento ESP32",

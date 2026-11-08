@@ -10,7 +10,7 @@
   },
   "composer": {
     "label": "Was sollen die Agenten tun?",
-    "placeholder": "Eine 5-Zoll-Drohne, die 8 Minuten fliegt, unter 180 $",
+    "placeholder": "Eine 5-Zoll-Drohne, die 8 Minuten fliegt, unter 400 $",
     "kind": "Modus",
     "kinds": {
       "build": "Bauen",
@@ -27,7 +27,7 @@
   "presets": {
     "drone": {
       "label": "5-Zoll-Drohne, 8 Minuten",
-      "goal": "5-Zoll-Drohne, die 8 Minuten fliegt, unter 180 $"
+      "goal": "5-Zoll-Drohne, die 8 Minuten fliegt, unter 400 $"
     },
     "parking": {
       "label": "ESP32-Parksensor",
