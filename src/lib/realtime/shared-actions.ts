@@ -1,5 +1,5 @@
 // Which lab-store actions a room shares (H7), per lab. Each store names its
-// own: what changes the build is shared and applied in the relay's order;
+// own: what changes the build is shared and applied in the module's order;
 // camera, tabs, hover, each person's own quiz and everything a client derives
 // itself (figure reports, interpreter ticks, check results) stays local.
 //

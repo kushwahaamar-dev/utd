@@ -118,11 +118,11 @@ export function ChatPanel({ room, t, locale }: { room: RoomApi; t: TogetherT; lo
     }
   };
 
-  const translateReady = status === "ready" && features.ai;
+  const translateReady = !room.translationOff;
   const voiceReady = status === "ready" && features.voice;
   // What isn't set up, said once: not one line above the chat and another under it.
   const offNote =
-    status !== "ready" ? null : !features.ai && !features.voice ? t("chat.offBoth") : !features.ai ? t("chat.translateOff") : !features.voice ? t("chat.voice.off") : null;
+    status !== "ready" ? null : room.translationOff && !features.voice ? t("chat.offBoth") : room.translationOff ? t("chat.translateOff") : !features.voice ? t("chat.voice.off") : null;
 
   return (
     <section aria-labelledby={`${id}-title`} className="flex min-h-0 flex-col gap-2">

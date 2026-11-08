@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef } from "react";
 import { useRoom } from "@/lib/realtime";
 import type { PeerGhost, RangePose } from "./FlightRange";
 
-// Friends in the room fly beside you: each range sends its pose through the room (BroadcastChannel between tabs
-// until the relay is approved), and the others draw it as a ghost with the sender's name and colour. The relay
-// checks a pose is { p: 3 numbers, q: 4 numbers, gate?: id }: q carries yaw, pitch, roll and a 0, gate the course.
+// Friends in the room fly beside you: each range sends its pose through the room (SpacetimeDB's pose events,
+// 20 Hz at most), and the others draw it as a ghost with the sender's name and colour. The module checks a pose is
+// { p: 3 numbers, q: 4 numbers, gate?: id }: q carries yaw, pitch, roll and a 0, gate the course.
 
 /** A friend's pose this old (ms) means they stopped flying or left. */
 const STALE_MS = 2000;

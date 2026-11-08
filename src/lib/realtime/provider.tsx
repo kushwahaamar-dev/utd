@@ -108,6 +108,7 @@ function toApi(client: RoomClient, state: RoomState): RoomApi {
     ended: state.ended,
     batonHolder: state.batonHolder,
     batonDenied: state.batonDenied,
+    translationOff: state.translationOff,
     chat: (text, kind, options) => client.chat(text, kind, options),
     setPresence: (p) => client.setPresence(p),
     onPose: (cb) => client.onPose(cb),

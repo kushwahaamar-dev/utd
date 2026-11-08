@@ -32,6 +32,8 @@ export type RoomState = {
   batonDenied: number;
   messages: ChatMsg[];
   seq: number;
+  /** The module has no translation key, so lines show as written. */
+  translationOff: boolean;
 };
 
 /** The reducers and procedures a room calls; `useStdbActions()` provides them. */
@@ -154,7 +156,6 @@ export class RoomClient {
   private postedAtPeers = 0;
   private postTimer: ReturnType<typeof setTimeout> | undefined;
   private rejoinTimer: ReturnType<typeof setTimeout> | undefined;
-  private translateOff = false;
   private translateLocale: Locale | null = null;
 
   constructor(private readonly options: RoomClientOptions) {
@@ -171,6 +172,7 @@ export class RoomClient {
       batonDenied: 0,
       messages: [],
       seq: 0,
+      translationOff: false,
     };
   }
 
@@ -302,7 +304,7 @@ export class RoomClient {
 
   /** Asks the module to translate every line this reader can't read yet; the answers arrive as rows. */
   translateFor(locale: Locale) {
-    if (this.translateOff || this.state.ended) return;
+    if (this.state.translationOff || this.state.ended) return;
     this.translateLocale = locale;
     for (const msg of this.state.messages) {
       if (msg.kind === "system" || msg.lang === locale || msg.translations[locale] !== undefined) continue;
@@ -313,8 +315,8 @@ export class RoomClient {
         (result) => {
           if (result.ok) return;
           // Without a key on the database there is nothing to retry: readers see the originals.
-          if (result.error.startsWith("not configured")) this.translateOff = true;
-          this.markUntranslated(msg.id, locale);
+          if (result.error.startsWith("not configured")) this.set({ translationOff: true });
+          else this.markUntranslated(msg.id, locale);
         },
         () => this.markUntranslated(msg.id, locale),
       );

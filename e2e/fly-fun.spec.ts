@@ -1,14 +1,15 @@
-import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { expect, test, type Browser, type Page } from "@playwright/test";
 import data from "../src/components/data/messages/en.json";
 import flight from "../src/i18n/messages/en/flight.json";
 import together from "../src/i18n/messages/en/together.json";
 import { dockCopy, openDock } from "./dock-shared";
 
 // The fly page's fun (BUILD-PLAN §3.2 item 8): a friend's craft flies beside you as a ghost, a crash replays in slow
-// motion and says why, and a daily challenge link opens the day's course. Rooms run on the one-browser fallback
-// (a BroadcastChannel), so the two screens are two tabs of one context, as in room.spec.ts.
+// motion and says why, and a daily challenge link opens the day's course. Rooms run on SpacetimeDB, so the ghost
+// test needs the local module and gives each person their own browser context, as in room.spec.ts.
 
 const ANA = { v: 1, name: "Ana", color: "#ef6a4c" };
+const BO = { v: 1, name: "Bo", color: "#76a0e2" };
 const main = (page: Page) => page.locator("main#main-en");
 // a client-side move to another craft keeps the page it left in the tree, hidden
 const challengeCard = (page: Page) => main(page).locator('[data-testid="daily-challenge"]:visible');
@@ -24,10 +25,12 @@ function watchErrors(page: Page) {
   return errors;
 }
 
-async function seedIdentity(context: BrowserContext) {
-  await context.addInitScript((identity) => {
-    if (!localStorage.getItem("iynk:together:v1")) localStorage.setItem("iynk:together:v1", JSON.stringify(identity));
-  }, ANA);
+async function person(browser: Browser, baseURL: string | undefined, identity: typeof ANA) {
+  const context = await browser.newContext({ baseURL });
+  await context.addInitScript((who) => {
+    if (!localStorage.getItem("iynk:together:v1")) localStorage.setItem("iynk:together:v1", JSON.stringify(who));
+  }, identity);
+  return context.newPage();
 }
 
 async function openFly(page: Page, url: string) {
@@ -44,10 +47,9 @@ async function pickMode(page: Page, mode: string) {
   }).toPass({ timeout: 30_000 });
 }
 
-test("a friend's craft flies a lap beside you as a ghost with their name", async ({ context }) => {
+test("a friend's craft flies a lap beside you as a ghost with their name", async ({ browser, baseURL }) => {
   test.setTimeout(120_000);
-  await seedIdentity(context);
-  const a = await context.newPage();
+  const a = await person(browser, baseURL, ANA);
   const errorsA = watchErrors(a);
   await openFly(a, "/en/drones/quad5/fly");
   const dockA = await openDock(a, false);
@@ -55,7 +57,7 @@ test("a friend's craft flies a lap beside you as a ghost with their name", async
   await dockA.getByRole("button", { name: together.panel.start }).click();
   await expect(a).toHaveURL(/[?&]room=[a-z0-9]{6}/);
 
-  const b = await context.newPage();
+  const b = await person(browser, baseURL, BO);
   const errorsB = watchErrors(b);
   await openFly(b, a.url());
   const dockB = await openDock(b, false);

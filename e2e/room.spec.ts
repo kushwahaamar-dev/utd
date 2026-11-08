@@ -1,14 +1,15 @@
-import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { expect, test, type Browser, type Page } from "@playwright/test";
 import boardlab from "../src/i18n/messages/en/boardlab.json";
 import robotics from "../src/i18n/messages/en/robotics.json";
 import together from "../src/i18n/messages/en/together.json";
 import { dockCopy, openDock } from "./dock-shared";
 
-// Rooms (BUILD-PLAN §3.2 item 7) on the one-browser fallback: with no relay configured, a room is
-// a BroadcastChannel, which reaches the tabs of one browser profile. Playwright's separate
-// browser contexts are separate profiles, so the two screens here are two tabs of one context.
+// Rooms run on SpacetimeDB, so these tests need the local module (npm run stdb:start, npm run stdb:publish)
+// and the app built with NEXT_PUBLIC_STDB_URI pointing at it. Each person is their own browser context:
+// the database knows people by the identity token in their storage, and tabs of one context share it.
 
 const ANA = { v: 1, name: "Ana", color: "#ef6a4c" };
+const BO = { v: 1, name: "Bo", color: "#76a0e2" };
 const main = (page: Page) => page.locator("main#main-en");
 const fill = (template: string, params: Record<string, string>) => template.replace(/\{(\w+)\}/g, (_, k: string) => params[k] ?? "");
 
@@ -44,10 +45,13 @@ async function joinRoom(page: Page, hostName: string) {
   return dock;
 }
 
-async function seedIdentity(context: BrowserContext) {
-  await context.addInitScript((identity) => {
-    if (!localStorage.getItem("iynk:together:v1")) localStorage.setItem("iynk:together:v1", JSON.stringify(identity));
-  }, ANA);
+/** A fresh browser profile for one person, with their room name already chosen. */
+async function person(browser: Browser, baseURL: string | undefined, identity: typeof ANA) {
+  const context = await browser.newContext({ baseURL });
+  await context.addInitScript((who) => {
+    if (!localStorage.getItem("iynk:together:v1")) localStorage.setItem("iynk:together:v1", JSON.stringify(who));
+  }, identity);
+  return context.newPage();
 }
 
 const failure = (page: Page, id: string) => main(page).locator(`[data-failure="${id}"]`);
@@ -55,11 +59,10 @@ const failure = (page: Page, id: string) => main(page).locator(`[data-failure="$
 const breakItTab = (page: Page) => main(page).getByRole("tab", { name: new RegExp(`^${boardlab.failures.title}`) }).click();
 const view = (page: Page, name: string) => main(page).getByRole("radio", { name, exact: true });
 
-test("two tabs in one room share the build, and only the keyboard holder changes it", async ({ context }) => {
+test("two people in one room share the build, and only the keyboard holder changes it", async ({ browser, baseURL }) => {
   test.setTimeout(120_000);
-  await seedIdentity(context);
 
-  const a = await context.newPage();
+  const a = await person(browser, baseURL, ANA);
   const errorsA = watchErrors(a);
   await openLesson(a, "/en/boards/uno-r3/blink");
   const dockA = await startRoom(a);
@@ -69,7 +72,7 @@ test("two tabs in one room share the build, and only the keyboard holder changes
   await failure(a, "short-5v").getByRole("button", { name: boardlab.failures.trigger }).click();
   await expect(failure(a, "short-5v")).toContainText(boardlab.failures.active);
 
-  const b = await context.newPage();
+  const b = await person(browser, baseURL, BO);
   const errorsB = watchErrors(b);
   await openLesson(b, a.url());
   const dockB = await joinRoom(b, ANA.name);
@@ -86,7 +89,7 @@ test("two tabs in one room share the build, and only the keyboard holder changes
   await a.keyboard.type("\n// wired by Ana");
   await expect(main(b).locator(".cm-content")).toContainText("// wired by Ana", { timeout: 10_000 });
 
-  // Without the keyboard, breaking the board is refused in the room adapter, on both screens.
+  // Without the keyboard, breaking the board is refused, on both screens.
   await failure(b, "brownout").getByRole("button", { name: boardlab.failures.trigger }).click();
   await expect(dockB.getByText(fill(together.bar.denied, { name: ANA.name }))).toBeVisible();
   await expect(failure(b, "brownout")).not.toContainText(boardlab.failures.active);
@@ -104,13 +107,12 @@ test("two tabs in one room share the build, and only the keyboard holder changes
   expect(errorsB).toEqual([]);
 });
 
-test("a bench's steps reach the joiner's figure, then each new step reaches both", async ({ context }) => {
+test("a bench's steps reach the joiner's figure, then each new step reaches both", async ({ browser, baseURL }) => {
   test.setTimeout(120_000);
-  await seedIdentity(context);
   const step = (page: Page, id: string) => main(page).locator(`[data-step="${id}"]`);
   const doIt = (page: Page, id: string) => step(page, id).getByRole("button", { name: new RegExp(`^${robotics.steps.doIt} ?:`) });
 
-  const a = await context.newPage();
+  const a = await person(browser, baseURL, ANA);
   const errorsA = watchErrors(a);
   await a.goto("/en/robotics/esp32-s3-build");
   await expect(main(a).locator("iframe")).toHaveCount(1);
@@ -118,7 +120,7 @@ test("a bench's steps reach the joiner's figure, then each new step reaches both
   await doIt(a, "strip").click();
   await expect(step(a, "strip")).toContainText(robotics.steps.done, { timeout: 15_000 });
 
-  const b = await context.newPage();
+  const b = await person(browser, baseURL, BO);
   const errorsB = watchErrors(b);
   await b.goto(a.url());
   const dockB = await joinRoom(b, ANA.name);
@@ -131,6 +133,33 @@ test("a bench's steps reach the joiner's figure, then each new step reaches both
   // The joiner can't build without the keyboard.
   await doIt(b, "headers").click();
   await expect(dockB.getByText(fill(together.bar.denied, { name: ANA.name }))).toBeVisible();
+
+  expect(errorsA).toEqual([]);
+  expect(errorsB).toEqual([]);
+});
+
+test("chat reaches both people, and the host can remove someone", async ({ browser, baseURL }) => {
+  test.setTimeout(120_000);
+
+  const a = await person(browser, baseURL, ANA);
+  const errorsA = watchErrors(a);
+  await openLesson(a, "/en/boards/uno-r3/blink");
+  const dockA = await startRoom(a);
+
+  const b = await person(browser, baseURL, BO);
+  const errorsB = watchErrors(b);
+  await openLesson(b, a.url());
+  const dockB = await joinRoom(b, ANA.name);
+  await expect(dockA.getByText(fill(together.bar.people.other, { count: "2" }))).toBeVisible({ timeout: 15_000 });
+
+  await dockB.getByLabel(together.chat.label).fill("which pin is the LED on?");
+  await dockB.getByRole("button", { name: together.chat.send }).click();
+  await expect(dockA.getByRole("log").getByText("which pin is the LED on?")).toBeVisible({ timeout: 10_000 });
+  await expect(dockB.getByRole("log").getByText("which pin is the LED on?")).toBeVisible();
+
+  await dockA.getByRole("button", { name: fill(together.bar.remove, { name: BO.name }) }).click();
+  await a.getByRole("dialog").getByRole("button", { name: together.bar.removeYes, exact: true }).click();
+  await expect(dockB.getByText(together.panel.ended.removed)).toBeVisible({ timeout: 15_000 });
 
   expect(errorsA).toEqual([]);
   expect(errorsB).toEqual([]);

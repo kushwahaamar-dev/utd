@@ -395,3 +395,48 @@ describe("a join the db refuses", () => {
     expect(room.getState().ended).toBe("not-found");
   });
 });
+
+describe("streams and translation", () => {
+  test("cursor and pose frames from others reach listeners, with the cursor's off-screen marker", async () => {
+    const db = started();
+    const a = join(db, ANA, makeStore(droneInit, droneReduce));
+    await settle();
+    const cursors: Array<[string, unknown]> = [];
+    const poses: Array<[string, unknown]> = [];
+    a.room.onCursor((from, point) => cursors.push([from, point]));
+    a.room.onPose((from, pose) => poses.push([from, pose]));
+    a.room.cursorEvent(hex(BO), 0.25, 0.5);
+    a.room.cursorEvent(hex(BO), -1, -1);
+    a.room.cursorEvent(hex(ANA), 0.1, 0.1);
+    a.room.poseEvent(hex(BO), { p: "[1,2,3]", q: "[0,0,0,0]", gate: '"gate-race"' });
+    expect(cursors).toEqual([
+      [hex(BO), { x: 0.25, y: 0.5 }],
+      [hex(BO), null],
+    ]);
+    expect(poses).toEqual([[hex(BO), { p: [1, 2, 3], q: [0, 0, 0, 0], v: undefined, gate: "gate-race" }]]);
+  });
+
+  test("lines in another language are sent for translation once; a database without a key turns it off", async () => {
+    const db = started();
+    const backend = db.backend(ANA);
+    const asked: Array<[bigint, string]> = [];
+    backend.translateMessage = async (id, lang) => {
+      asked.push([BigInt(id), lang]);
+      return { ok: false, error: "not configured: no key" };
+    };
+    const a = new RoomClient({ id: db.code, link: "", selfId: hex(ANA), me: { name: "ana", color: "#ef6a4c", lang: "en", done: [] }, lab: "drone", itemId: "quad5", backend });
+    const b = join(db, BO, makeStore(droneInit, droneReduce));
+    db.attach(ANA, a);
+    await settle();
+    b.room.chat("hola", "text", { lang: "es" });
+    b.room.chat("hello", "text", { lang: "en" });
+    a.translateFor("en");
+    await settle(50);
+    a.translateFor("en");
+    expect(asked).toHaveLength(1);
+    expect(a.getState().translationOff).toBe(true);
+    b.room.chat("otra vez", "text", { lang: "es" });
+    await settle(50);
+    expect(asked).toHaveLength(1);
+  });
+});

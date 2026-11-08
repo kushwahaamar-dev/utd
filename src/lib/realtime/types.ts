@@ -80,4 +80,6 @@ export type RoomApi = {
   onCursor(cb: (from: string, point: CursorPoint | null) => void): () => void;
   /** Bumped when a local code edit was dropped because someone else holds the keyboard. */
   batonDenied: number;
+  /** Translation isn't set up on the database, so lines show as written. */
+  translationOff: boolean;
 };

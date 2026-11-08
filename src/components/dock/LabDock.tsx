@@ -120,7 +120,8 @@ export function LabDock<S, A extends { type: string }>(props: LabDockProps<S, A>
   const [tab, setTab] = useState<DockTab | null>(null);
   const [open, setOpen] = useState(false);
   const [dismissedRoom, setDismissedRoom] = useState(false);
-  const inRoom = together ? together.roomId !== null : addressRoom;
+  // A room that just ended on you (removed, full) keeps the drawer open so the reason is on screen.
+  const inRoom = together ? together.roomId !== null || together.ended !== null : addressRoom;
   const shown = DOCK_TABS.filter((id) => tabShown(id, features));
   const preferred = firstWorkingTab(lab, features);
   const fromRoom = tab === null && inRoom && shown.includes("together");
